@@ -10,6 +10,7 @@ kubectl get pods -n elite -w
 ```
 
 Verify metrics:
+
 ```bash
 kubectl port-forward -n elite svc/prometheus 9090:9090
 # Query: elite_socketlatency_read1ms

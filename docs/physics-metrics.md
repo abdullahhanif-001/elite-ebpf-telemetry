@@ -15,6 +15,7 @@ Kernel-truth measurements — no application code changes.
 ## Enhanced eBPF (optional build)
 
 `bpf/connect_trace.c` attaches to:
+
 - `tracepoint/syscalls/sys_enter_connect`
 - `tracepoint/syscalls/sys_exit_connect`
 
