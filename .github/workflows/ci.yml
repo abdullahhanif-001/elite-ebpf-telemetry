@@ -36,11 +36,10 @@ jobs:
       - name: Install BPF toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang llvm make docker.io
-          sudo systemctl start docker || true
+          sudo apt-get install -y clang llvm make
 
       - name: Generate BPF
-        run: make generate-bpf-in-container
+        run: make generate-bpf
         env:
           GOARCH: amd64
           BPF_CFLAGS: -O2 -g
