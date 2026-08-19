@@ -74,7 +74,11 @@ if echo "$FUZZ_LINE" | grep -qE "HTTP/1.1 (200|301|302)"; then
 else
   record A-04 High "oversized header rejected ($FUZZ_LINE)" PASS
 fi
-curl -sf -o /dev/null http://127.0.0.1:9102/metrics && record A-04b High "metrics healthy after fuzz" PASS || record A-04b High "metrics down after fuzz" FAIL
+if curl -sf -o /dev/null http://127.0.0.1:9102/metrics; then
+  record A-04b High "metrics healthy after fuzz" PASS
+else
+  record A-04b High "metrics down after fuzz" FAIL
+fi
 
 echo "--- A-05 High: metrics non-empty ---"
 COUNT=$(curl -sf http://127.0.0.1:9102/metrics 2>/dev/null | grep -cE '^(kubeskoop|elite)_' || echo 0)

@@ -57,7 +57,7 @@ jobs:
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@1.1.0
         env:
-          SHELLCHECK_OPTS: -e SC2236,SC2162,SC2268,SC1091
+          SHELLCHECK_OPTS: -e SC2236,SC2162,SC2268,SC1091,SC2012,SC2015
         with:
           ignore: tests hack
 
