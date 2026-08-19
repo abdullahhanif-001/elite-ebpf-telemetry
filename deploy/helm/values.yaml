@@ -79,14 +79,15 @@ webconsole:
     port: 80
     annotations: {}
   auth:
-    username: admin
-    password: kubeskoop
+    # Set via Helm --set or secrets; never ship production defaults in git.
+    username: changeme
+    password: changeme
   grafana:
     endpoint: http://grafana/grafana
     proxy: true
     # used for proxy mode
-    username: admin
-    password: kubeskoop
+    username: changeme
+    password: changeme
   image:
     repository: kubeskoop/controller
     tag: v1.0.1

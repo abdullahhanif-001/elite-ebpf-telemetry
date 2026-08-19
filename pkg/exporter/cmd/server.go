@@ -347,7 +347,6 @@ func (i *inspServer) createListener(cfg *InspServerConfig) (net.Listener, error)
 func (i *inspServer) newHTTPServer(cfg *InspServerConfig) (*http.Server, net.Listener, error) {
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", i.metricsServer)
-	mux.Handle("/", http.HandlerFunc(defaultPage))
 	if cfg.DebugMode {
 		mux.Handle("/status", http.HandlerFunc(i.statusPage))
 		reg := prometheus.NewRegistry()
@@ -358,6 +357,13 @@ func (i *inspServer) newHTTPServer(cfg *InspServerConfig) (*http.Server, net.Lis
 		)
 		mux.Handle("/internal", promhttp.HandlerFor(reg, promhttp.HandlerOpts{Registry: reg}))
 	}
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		defaultPage(w, r)
+	})
 
 	listener, err := i.createListener(cfg)
 	if err != nil {

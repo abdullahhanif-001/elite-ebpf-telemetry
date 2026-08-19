@@ -3,7 +3,6 @@ package probe
 import (
 	"fmt"
 	"regexp"
-	"strings"
 	"sync"
 
 	"github.com/alibaba/kubeskoop/pkg/exporter/bpfutil"

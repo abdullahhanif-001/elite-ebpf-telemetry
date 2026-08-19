@@ -20,7 +20,7 @@ BASE_RESTARTS=$(jq '[.[].pm2_env.restart_time] | add' /opt/elite/baseline/pm2-be
 
 echo "--- Attack surface: HTTP :9102 ---"
 for path in /metrics /status /debug/pprof/ /debug/pprof/heap /internal; do
-  code=$(curl -sf -o /dev/null -w '%{http_code}' "http://127.0.0.1:9102${path}" 2>/dev/null || echo "000")
+  code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:9102${path}" 2>/dev/null || echo "000")
   echo "GET ${path} -> ${code}"
 done
 
@@ -49,7 +49,7 @@ echo "--- elite-agent resource snapshot ---"
 systemctl show elite-agent -p ActiveState,CPUUsageNSec,MemoryCurrent,CPUQuota,MemoryMax
 
 echo "--- Prometheus scrape health ---"
-curl -sf 'http://127.0.0.1:9090/api/v1/query?query=up{job="elite-agent"}' | jq -r '.data.result[0].value[1] // "missing"'
+curl -sf 'http://127.0.0.1:9090/api/v1/query?query=up{job="elite-agent"}' | jq -r '.data.result[0].value[1] // "missing"' || echo "missing"
 
 echo "--- Metric prefix inventory ---"
 curl -sf http://127.0.0.1:9102/metrics | grep -oE '^(kubeskoop|elite)_[a-z_]+' | sort -u | head -20

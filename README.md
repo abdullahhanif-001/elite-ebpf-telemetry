@@ -36,7 +36,7 @@ Force a mode:
 
 ## Architecture
 
-```
+```text
 Kernel tracepoints → eBPF CO-RE → elite-agent (Go) → Prometheus (:9102) + OTLP
 ```
 

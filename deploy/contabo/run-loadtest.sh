@@ -32,7 +32,7 @@ systemctl show elite-agent -p CPUUsageNSec,MemoryCurrent | tee -a "$RESULTS"
   done
 ) &
 WATCHDOG_PID=$!
-trap "kill $WATCHDOG_PID 2>/dev/null || true" EXIT
+trap 'kill "$WATCHDOG_PID" 2>/dev/null || true' EXIT
 
 docker pull grafana/k6:latest >/dev/null 2>&1 || true
 

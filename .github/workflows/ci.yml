@@ -17,7 +17,8 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: '1.25'
+          cache-dependency-path: go.sum
 
       - name: Validate shell scripts
         run: |
@@ -29,14 +30,17 @@ jobs:
           bash -n deploy/contabo/pm2-guard.sh
           bash -n deploy/contabo/security-audit.sh
           bash -n deploy/contabo/final-stress-test.sh
+          bash -n scripts/audit-commit.sh
+          bash -n scripts/elite-adversarial-audit.sh
 
       - name: Install BPF toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang llvm make
+          sudo apt-get install -y clang llvm make docker.io
+          sudo systemctl start docker || true
 
       - name: Generate BPF
-        run: make generate-bpf
+        run: make generate-bpf-in-container
         env:
           GOARCH: amd64
           BPF_CFLAGS: -O2 -g

@@ -63,7 +63,7 @@ kubectl get svc -n kubeskoop webconsole
 
 你可能需要使用`NodePort` 或`LoadBalancer`类型的服务从集群外访问。
 
-控制台的默认用户为`admin`，密码为`kubeskoop`。
+控制台登录凭据请通过 `AUTH_USERNAME` / `AUTH_PASSWORD` 环境变量配置（Helm 默认值为 `changeme`，部署前务必修改）。
 
 ![Web Console](docs/images/web_console.jpg)
 

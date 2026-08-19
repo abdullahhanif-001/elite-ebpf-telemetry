@@ -37,4 +37,4 @@ kubectl get pod -n kubeskoop
 
 When all pods under `kubeskoop` namespace are ready, you can now access the Grafana via [http://127.0.0.1:8080](http://127.0.0.1:8080) on your host machine.
 
-The default user is `admin`, and password is `kubeskoop`.
+Set Grafana credentials via `GRAFANA_USERNAME` and `GRAFANA_PASSWORD` environment variables (Helm values default to `changeme` — change before use).

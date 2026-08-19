@@ -11,9 +11,11 @@ import (
 func ValidateListenAddress(raw string) error {
 	host := raw
 	if strings.Contains(raw, "://") {
-		u, err := net.SplitHostPort(strings.TrimPrefix(strings.TrimPrefix(raw, "tcp://"), "unix://"))
-		if err == nil {
-			host = u
+		s := strings.TrimPrefix(strings.TrimPrefix(raw, "tcp://"), "unix://")
+		if h, _, err := net.SplitHostPort(s); err == nil {
+			host = h
+		} else {
+			host = s
 		}
 	} else if h, _, err := net.SplitHostPort(raw); err == nil {
 		host = h

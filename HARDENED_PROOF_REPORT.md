@@ -1,10 +1,27 @@
 # HARDENED_PROOF_REPORT.md
 
 **Host:** `<HOST>` (`<HOST_IP>`)  
-**Date:** 2026-08-19  
+**Date:** 2026-08-19 (updated 22:56 UTC+2)  
 **Mode:** Adversarial chaos engineering + zero-loophole proof  
-**Raw log:** `/opt/elite/FINAL_STRESS_TEST.log` (111 lines)  
+**Raw logs:** `/opt/elite/baseline/adversarial-audit-*.log`, `/opt/elite/baseline/latest-security-audit.log`  
 **PM2 guard:** Active throughout — **zero PM2/Node.js commands issued**
+
+---
+
+## 0. POST-DEPLOY VERIFICATION (custom Elite build)
+
+Hardened binary deployed to `/opt/elite/bin/elite-agent` (metrics prefix `elite_*`).
+
+```text
+GET /metrics              -> 200
+GET /debug/pprof/         -> 404
+GET /status               -> 404
+p50_ns=98031464  p99_ns=479258051
+cpu_cores_avg=0.0017  (overhead PASS, threshold 0.10)
+MemoryCurrent=76021760
+ADVERSARIAL AUDIT FAILURES=0
+PM2 restarts sum=131 (unchanged)
+```
 
 ---
 

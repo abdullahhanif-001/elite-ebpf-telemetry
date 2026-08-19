@@ -176,7 +176,7 @@ func (p *connectProbe) emitSlowEvent(netns uint32, synSent uint64) {
 	evt := &probe.Event{
 		Timestamp: time.Now().UnixNano(),
 		Type:      CONNECT_SLOW,
-		Labels:    probe.BuildStandardMetricsLabelValues(entity),
+		Labels:    probe.LegacyEventLabels(uint32(entity.GetNetns())),
 		Message:   fmt.Sprintf("in_flight_connects=%d (physics: SYN_SENT sock_diag)", synSent),
 	}
 	select {

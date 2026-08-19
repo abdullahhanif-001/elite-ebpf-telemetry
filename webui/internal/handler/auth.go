@@ -39,7 +39,7 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 			return jwt.MapClaims{
 				"user": params.Username,
-				"role": "admin",
+				"role": "operator",
 			}, nil
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {

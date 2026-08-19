@@ -76,9 +76,8 @@ ifndef ignore-not-found
 endif
 
 .PHONY: generate-bpf
-generate-bpf: ## Generate bpf.
+generate-bpf: ## Generate bpf (core probes; connecttrace BPF is optional via generate-connect-bpf).
 	go generate ./pkg/exporter/probe/...
-	go generate ./pkg/exporter/probe/traceconnect/...
 
 .PHONY: generate-connect-bpf
 generate-connect-bpf: ## Generate connect_trace bpf only.
