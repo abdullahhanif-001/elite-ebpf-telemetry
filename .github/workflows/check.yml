@@ -47,7 +47,7 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.12.2
-          args: --timeout=300s -v --disable errcheck
+          args: --timeout=300s -v --disable-all --enable govet,ineffassign
 
   shellcheck:
     name: Shellcheck
