@@ -1,0 +1,59 @@
+name: Elite CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kernel: [5.15, 6.1]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Validate shell scripts
+        run: |
+          bash -n install.sh
+          bash -n benchmarks/run-overhead.sh
+          bash -n benchmarks/run-loadtest.sh
+          bash -n deploy/contabo/run-overhead-systemd.sh
+          bash -n deploy/contabo/run-loadtest.sh
+          bash -n deploy/contabo/pm2-guard.sh
+          bash -n deploy/contabo/security-audit.sh
+          bash -n deploy/contabo/final-stress-test.sh
+
+      - name: Install BPF toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang llvm make
+
+      - name: Generate BPF
+        run: make generate-bpf
+        env:
+          GOARCH: amd64
+          BPF_CFLAGS: -O2 -g
+
+      - name: Go test
+        run: go test ./pkg/export/... ./pkg/exporter/probe/traceconnect/...
+
+      - name: Build exporter
+        run: make build-exporter
+
+  benchmark-gate:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify benchmark scripts
+        run: |
+          bash -n benchmarks/run-overhead.sh
+          bash -n benchmarks/run-loadtest.sh

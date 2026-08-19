@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elite-config
+  namespace: {{ .Values.namespace }}
+data:
+  config.yaml: |
+    debugMode: false
+    port: {{ .Values.service.port }}
+    enableController: false
+    otel:
+      enabled: {{ .Values.otel.enabled }}
+      endpoint: {{ .Values.otel.endpoint | quote }}
+      interval: {{ .Values.otel.interval | quote }}
+      batchSize: {{ .Values.otel.batchSize }}
+      service: {{ .Values.otel.service | quote }}
+    metrics:
+      disableCompression: true
+      probes:
+{{- if .Values.probes.socketlatency }}
+        - name: socketlatency
+{{- end }}
+{{- if .Values.probes.kernellatency }}
+        - name: kernellatency
+{{- end }}
+{{- if .Values.probes.softirq }}
+        - name: softirq
+{{- end }}
+{{- if .Values.probes.packetloss }}
+        - name: packetloss
+{{- end }}
+{{- if .Values.probes.tcpsummary }}
+        - name: tcpsummary
+{{- end }}
+{{- if .Values.probes.connecttrace }}
+        - name: connecttrace
+{{- end }}
+    event:
+      probes:
+        - name: socketlatency
+        - name: connecttrace
+      sinks:
+        - name: stderr
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: elite-agent
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: elite-agent
+  template:
+    metadata:
+      labels:
+        app: elite-agent
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.service.port }}"
+    spec:
+      hostNetwork: true
+      hostPID: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+        - name: btf-prepare
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: [btfhack, discover, -p, /etc/net-exporter/btf/]
+          volumeMounts:
+            - name: btf-rawdata
+              mountPath: /etc/net-exporter/btf
+            - name: boot
+              mountPath: /boot
+      containers:
+        - name: elite-agent
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [/bin/inspector, server, -d]
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          resources:
+            {{- toYaml .Values.agent.resources | nindent 12 }}
+          securityContext:
+            capabilities:
+              add: [NET_ADMIN, SYS_PTRACE, SYS_ADMIN, SYS_RESOURCE, DAC_OVERRIDE]
+              drop: [ALL]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+            - name: btf-rawdata
+              mountPath: /etc/net-exporter/btf
+            - name: proc
+              mountPath: /proc
+            - name: bpf-maps
+              mountPath: /sys/fs/bpf
+            - name: cgroup
+              mountPath: /sys/fs/cgroup
+            - name: bpf-events
+              mountPath: /sys/kernel/debug
+      volumes:
+        - name: config-volume
+          configMap:
+            name: elite-config
+        - name: btf-rawdata
+          emptyDir: {}
+        - name: boot
+          hostPath:
+            path: /boot
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: bpf-maps
+          hostPath:
+            path: /sys/fs/bpf
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: bpf-events
+          hostPath:
+            path: /sys/kernel/debug

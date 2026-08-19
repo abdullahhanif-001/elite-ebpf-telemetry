@@ -1,0 +1,23 @@
+debugMode: false
+address: "127.0.0.1:9102"
+port: 9102
+enableController: false
+otel:
+  enabled: false
+  endpoint: "http://127.0.0.1:4317"
+  interval: 15s
+  batchSize: 256
+  service: elite-agent
+metrics:
+  disableCompression: true
+  probes:
+    - name: socketlatency
+    - name: softirq
+    - name: packetloss
+    - name: tcpsummary
+event:
+  probes:
+    - name: socketlatency
+    - name: packetloss
+  sinks:
+    - name: stderr

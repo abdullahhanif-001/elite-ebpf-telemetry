@@ -1,0 +1,30 @@
+# Elite default: slim physics probe set (<1% CPU target)
+debugMode: false
+port: 9102
+enableController: false
+address: "127.0.0.1:9102"
+
+otel:
+  enabled: false
+  endpoint: "http://otel-collector.observability:4317"
+  interval: 15s
+  batchSize: 256
+
+metrics:
+  disableCompression: true
+  probes:
+    - name: socketlatency
+    - name: kernellatency
+    - name: softirq
+    - name: packetloss
+    - name: tcpsummary
+    - name: connecttrace
+
+event:
+  probes:
+    - name: socketlatency
+    - name: kernellatency
+    - name: connecttrace
+    - name: packetloss
+  sinks:
+    - name: stderr

@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: kubeskoop/agent
+  tag: v1.0.0
+  pullPolicy: IfNotPresent
+
+agent:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+probes:
+  socketlatency: true
+  kernellatency: true
+  softirq: true
+  packetloss: true
+  tcpsummary: true
+  connecttrace: true
+
+otel:
+  enabled: false
+  endpoint: "http://otel-collector.observability:4317"
+  interval: 15s
+  batchSize: 256
+  service: elite-agent
+
+service:
+  port: 9102
+
+namespace: elite

@@ -1,0 +1,319 @@
+# Elite one-click bundle: slim physics agent + Prometheus + Grafana
+# Usage: kubectl apply -f deploy/elite-bundle.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elite
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elite-config
+  namespace: elite
+data:
+  config.yaml: |
+    debugMode: false
+    address: "127.0.0.1:9102"
+    port: 9102
+    enableController: false
+    otel:
+      enabled: false
+      endpoint: "http://otel-collector.observability:4317"
+      interval: 15s
+      batchSize: 256
+      service: elite-agent
+    metrics:
+      disableCompression: true
+      probes:
+        - name: socketlatency
+        - name: softirq
+        - name: packetloss
+        - name: tcpsummary
+        - name: connecttrace
+    event:
+      probes:
+        - name: socketlatency
+        - name: packetloss
+      sinks:
+        - name: stderr
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: elite-agent
+  namespace: elite
+  labels:
+    app: elite-agent
+spec:
+  selector:
+    matchLabels:
+      app: elite-agent
+  template:
+    metadata:
+      labels:
+        app: elite-agent
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9102"
+        prometheus.io/path: "/metrics"
+    spec:
+      hostNetwork: true
+      hostPID: true
+      dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+        - name: btf-prepare
+          image: kubeskoop/agent:v1.0.0
+          command: [btfhack, discover, -p, /etc/elite/btf/]
+          volumeMounts:
+            - name: btf-rawdata
+              mountPath: /etc/elite/btf
+            - name: boot
+              mountPath: /boot
+      containers:
+        - name: elite-agent
+          image: kubeskoop/agent:v1.0.0
+          command: [/bin/inspector, server, -d]
+          ports:
+            - name: metrics
+              containerPort: 9102
+          env:
+            - name: ELITE_NODENAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            capabilities:
+              add: [NET_ADMIN, SYS_PTRACE, SYS_ADMIN, SYS_RESOURCE, DAC_OVERRIDE]
+              drop: [ALL]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+            - name: btf-rawdata
+              mountPath: /etc/net-exporter/btf
+            - name: proc
+              mountPath: /proc
+            - name: containerd
+              mountPath: /run/containerd
+            - name: dockershim
+              mountPath: /var/run
+            - name: bpf-maps
+              mountPath: /sys/fs/bpf
+              mountPropagation: HostToContainer
+            - name: cgroup
+              mountPath: /sys/fs/cgroup
+              mountPropagation: HostToContainer
+            - name: bpf-events
+              mountPath: /sys/kernel/debug
+              mountPropagation: HostToContainer
+      volumes:
+        - name: config-volume
+          configMap:
+            name: elite-config
+        - name: btf-rawdata
+          emptyDir: {}
+        - name: boot
+          hostPath:
+            path: /boot
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: containerd
+          hostPath:
+            path: /run/containerd
+        - name: dockershim
+          hostPath:
+            path: /var/run
+        - name: bpf-maps
+          hostPath:
+            path: /sys/fs/bpf
+            type: DirectoryOrCreate
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: bpf-events
+          hostPath:
+            path: /sys/kernel/debug
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elite-agent
+  namespace: elite
+spec:
+  selector:
+    app: elite-agent
+  ports:
+    - name: metrics
+      port: 9102
+      targetPort: 9102
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: elite
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+    scrape_configs:
+      - job_name: elite-agent
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [elite]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
+            target_label: __address__
+            replacement: ${1}:9102
+            regex: (.+)
+          - source_labels: [__meta_kubernetes_pod_ip]
+            target_label: __address__
+            regex: (.+)
+            replacement: $1:9102
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: elite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.54.1
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: data
+              mountPath: /prometheus
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: elite
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+  type: NodePort
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: elite
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:9090
+        isDefault: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: elite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:11.2.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-admin
+                  key: password
+                  optional: true
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+          volumeMounts:
+            - name: datasources
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: dashboards
+              mountPath: /etc/grafana/provisioning/dashboards
+      volumes:
+        - name: datasources
+          configMap:
+            name: grafana-datasources
+        - name: dashboards
+          configMap:
+            name: grafana-dashboards
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: elite
+spec:
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: NodePort
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: elite
+data:
+  dashboard-provider.yaml: |
+    apiVersion: 1
+    providers:
+      - name: elite
+        folder: Elite
+        type: file
+        options:
+          path: /etc/grafana/provisioning/dashboards/json
+  physics-latency.json: |
+    {"title":"Elite Physics Latency","uid":"elite-physics","panels":[{"type":"timeseries","title":"Socket Syscall Latency (read1ms)","gridPos":{"h":8,"w":12,"x":0,"y":0},"targets":[{"expr":"elite_socketlatency_read1ms","legendFormat":"{{k8s_pod}}"}]},{"type":"timeseries","title":"Kernel Stack Latency (rxslow)","gridPos":{"h":8,"w":12,"x":12,"y":0},"targets":[{"expr":"elite_kernellatency_rxslow","legendFormat":"{{k8s_pod}}"}]},{"type":"timeseries","title":"Softirq NET_RX delay","gridPos":{"h":8,"w":12,"x":0,"y":8},"targets":[{"expr":"elite_softirq_excuteslow","legendFormat":"{{softirq_type}}"}]},{"type":"timeseries","title":"TCP Connect Attempts","gridPos":{"h":8,"w":12,"x":12,"y":8},"targets":[{"expr":"elite_connecttrace_connect_total","legendFormat":"{{k8s_pod}}"}]},{"type":"timeseries","title":"Packet Drops","gridPos":{"h":8,"w":12,"x":0,"y":16},"targets":[{"expr":"elite_packetloss_total","legendFormat":"{{k8s_pod}}"}]},{"type":"timeseries","title":"SYN_SENT in-flight","gridPos":{"h":8,"w":12,"x":12,"y":16},"targets":[{"expr":"elite_connecttrace_connect_syn_sent","legendFormat":"{{k8s_pod}}"}]},{"type":"stat","title":"Agent overhead target","gridPos":{"h":4,"w":24,"x":0,"y":24},"targets":[{"expr":"rate(process_cpu_seconds_total{job=\"elite-agent\"}[1m])","legendFormat":"CPU"}]}]}

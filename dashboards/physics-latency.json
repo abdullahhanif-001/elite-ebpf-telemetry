@@ -1,0 +1,50 @@
+{
+  "title": "Elite Physics Latency",
+  "uid": "elite-physics",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Socket Read Latency >= 1ms",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [{"expr": "elite_socketlatency_read1ms", "legendFormat": "{{k8s_pod}}"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Kernel RX Slow Path",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [{"expr": "elite_kernellatency_rxslow", "legendFormat": "{{k8s_pod}}"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Softirq Execute Slow",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [{"expr": "elite_softirq_excuteslow", "legendFormat": "{{softirq_type}}"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "TCP Connect Total",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [{"expr": "elite_connecttrace_connect_total", "legendFormat": "{{k8s_pod}}"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "Packet Loss",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [{"expr": "elite_packetloss_total", "legendFormat": "{{k8s_pod}}"}]
+    },
+    {
+      "type": "timeseries",
+      "title": "SYN_SENT In-Flight",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [{"expr": "elite_connecttrace_connect_syn_sent", "legendFormat": "{{k8s_pod}}"}]
+    },
+    {
+      "type": "stat",
+      "title": "Agent CPU (target <1%)",
+      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 24},
+      "targets": [{"expr": "rate(process_cpu_seconds_total[1m])"}]
+    }
+  ],
+  "schemaVersion": 39
+}
