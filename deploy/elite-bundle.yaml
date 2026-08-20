@@ -95,7 +95,6 @@ spec:
             runAsUser: 65532
             capabilities:
               drop: [ALL]
-              add: [BPF, PERFMON, SYS_RESOURCE]
           volumeMounts:
             - name: btf-rawdata
               mountPath: /etc/elite/btf
@@ -144,7 +143,6 @@ spec:
             runAsUser: 65532
             capabilities:
               drop: [ALL]
-              add: [BPF, PERFMON, NET_ADMIN, SYS_RESOURCE]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/elite/config

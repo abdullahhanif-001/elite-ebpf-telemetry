@@ -40,7 +40,7 @@ case "$MODE" in
 
     samples=()
     end=$((SECONDS + DURATION))
-    while [ $SECONDS -lt $end ]; do
+    while [[ $SECONDS -lt $end ]]; do
       cpu=$(kubectl top pod -n "$NAMESPACE" "$POD" --no-headers 2>/dev/null | awk '{print $2}' | sed 's/m$//' || echo "0")
       samples+=("$cpu")
       sleep 5

@@ -15,7 +15,7 @@ fi
 
 samples=()
 end=$((SECONDS + DURATION))
-while [ $SECONDS -lt $end ]; do
+while [[ $SECONDS -lt $end ]]; do
   cpu_nsec=$(systemctl show elite-agent -p CPUUsageNSec --value)
   samples+=("$cpu_nsec")
   sleep "$INTERVAL"

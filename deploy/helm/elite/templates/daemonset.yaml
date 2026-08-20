@@ -93,7 +93,6 @@ spec:
             runAsUser: 65532
             capabilities:
               drop: [ALL]
-              add: [BPF, PERFMON, SYS_RESOURCE]
           volumeMounts:
             - name: btf-rawdata
               mountPath: /etc/net-exporter/btf
@@ -126,7 +125,6 @@ spec:
             runAsNonRoot: true
             runAsUser: 65532
             capabilities:
-              add: [BPF, PERFMON, NET_ADMIN, SYS_RESOURCE]
               drop: [ALL]
           volumeMounts:
             - name: config-volume

@@ -225,7 +225,9 @@ CPU_START=$(systemctl show elite-agent -p CPUUsageNSec --value)
 MEM_PEAK=0
 for i in $(seq 1 12); do
   m=$(systemctl show elite-agent -p MemoryCurrent --value)
-  [ "$m" != "[not set]" ] && [ "$m" -gt "$MEM_PEAK" ] 2>/dev/null && MEM_PEAK=$m || true
+  if [[ "$m" != "[not set]" ]] && [[ "$m" -gt "$MEM_PEAK" ]] 2>/dev/null; then
+    MEM_PEAK=$m
+  fi
   sleep 5
 done
 wait $LOAD_PID 2>/dev/null || true

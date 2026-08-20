@@ -1,5 +1,7 @@
 FROM alpine:3.20
 RUN apk add clang=17.0.6-r1 llvm=17.0.6-r1 go=1.22.9-r0 make bash
-RUN go install github.com/cilium/ebpf/cmd/bpf2go@v0.11.0
+COPY tools/bpf2go/go.mod tools/bpf2go/go.sum /tmp/bpf2go/
+WORKDIR /tmp/bpf2go
+RUN go install -mod=readonly github.com/cilium/ebpf/cmd/bpf2go
 RUN adduser -D -u 65532 elite
 USER elite

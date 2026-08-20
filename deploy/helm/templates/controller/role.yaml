@@ -13,7 +13,4 @@ rules:
   resources:
   - pods
   verbs: ["get", "list", "watch", "delete", "create"]
-- apiGroups: [""]
-  resources: ["pods/exec", "pods/attach", "pods/portforward"]
-  verbs: ["create", "get", "list", "update", "delete"]
 {{- end }}

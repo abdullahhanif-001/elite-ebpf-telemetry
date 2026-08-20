@@ -14,5 +14,8 @@ headers=(
 )
 
 # Fetch libbpf release and extract the desired headers
-curl -sL "https://github.com/libbpf/libbpf/archive/refs/tags/v${LIBBPF_VERSION}.tar.gz" | \
-    tar -xz --xform='s#.*/##' "${headers[@]}"
+curl --proto "=https" --tlsv1.2 -fsSL \
+    "https://github.com/libbpf/libbpf/archive/refs/tags/v${LIBBPF_VERSION}.tar.gz" \
+    -o libbpf.tgz
+tar -xzf libbpf.tgz --xform='s#.*/##' "${headers[@]}"
+rm -f libbpf.tgz

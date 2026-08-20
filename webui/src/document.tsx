@@ -2,7 +2,7 @@ import { Meta, Title, Links, Main, Scripts } from 'ice';
 
 export default function Document() {
   return (
-    <html>
+    <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="description" content="Elite eBPF web console" />
