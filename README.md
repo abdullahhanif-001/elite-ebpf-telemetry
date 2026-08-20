@@ -4,13 +4,13 @@
 
 Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or systemd service) that exports physics-layer metrics: socket latency, softirq delay, packet loss, and TCP summary.
 
-**Author & creator:** abdullah i  
+**Author & creator:** Abdullah Hanif  
 **Brand:** Elite eBPF — personal open-source project  
 **Repository:** [github.com/abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)
 
 ## Contributors
 
-**abdullah i** — sole creator, author, and maintainer. See [AUTHORS.md](AUTHORS.md).
+**Abdullah Hanif** — sole creator, author, and maintainer. See [AUTHORS.md](AUTHORS.md).
 
 ---
 
@@ -46,7 +46,7 @@ Kernel tracepoints → eBPF CO-RE → elite-agent (Go) → Prometheus (:9102) + 
 
 Default metric prefix: **`elite_*`** — configured via `metrics.metricNamespace` in YAML or `ELITE_METRICS_NAMESPACE` env. Build **`bin/elite-agent`** from this repo.
 
-### Why Elite (abdullah i)
+### Why Elite (Abdullah Hanif)
 
 | Layer | Elite eBPF |
 |-------|------------|

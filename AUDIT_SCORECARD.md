@@ -1,7 +1,7 @@
 # AUDIT_SCORECARD.md
 
 **Repository:** [abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)  
-**Author:** abdullah i  
+**Author:** Abdullah Hanif  
 **Verified:** 2026-08-19 (Contabo VPS, real metrics — no mocks)  
 **PM2 impact:** restarts **131 → 131** (zero effect)
 
@@ -12,7 +12,7 @@
 | Dimension | Max | Score | Evidence |
 |-----------|-----|-------|----------|
 | CI/CD green | 10 | 8 | Elite CI + check fixes pushed; verify badges post-push |
-| Attribution clean | 10 | 10 | abdullah i only — no co-authors in git history |
+| Attribution clean | 10 | 10 | Abdullah Hanif only — no co-authors in git history |
 | Default credentials | 10 | 10 | Helm/docs use `changeme` + env vars |
 | HTTP attack surface | 15 | 15 | `/debug/pprof/` → 404, `/status` → 404, `/metrics` → 200 |
 | Real metrics live | 15 | 15 | `elite_*` series on `:9102`, Prometheus scrape |

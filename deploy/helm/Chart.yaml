@@ -1,6 +1,6 @@
 apiVersion: v1
 name: elite-ebpf
-description: Elite eBPF — zero-instrumentation kernel telemetry by abdullah i
+description: Elite eBPF — zero-instrumentation kernel telemetry by Abdullah Hanif
 type: application
 annotations:
   category: Analytics
@@ -18,5 +18,5 @@ home: https://github.com/abdullahanifpro111-spec/elite-ebpf
 sources:
   - https://github.com/abdullahanifpro111-spec/elite-ebpf
 maintainers:
-- name: abdullah i
+- name: Abdullah Hanif
   url: https://github.com/abdullahanifpro111-spec

@@ -1,6 +1,6 @@
 # Elite eBPF Helm chart
 
-Personal brand by **abdullah i**.
+Personal brand by **Abdullah Hanif**.
 
 ## Install from this repo
 

@@ -1,6 +1,6 @@
 # Elite eBPF — Deploy
 
-Personal brand by **abdullah i**. See [README.md](../README.md) for the full guide.
+Personal brand by **Abdullah Hanif**. See [README.md](../README.md) for the full guide.
 
 ## Quick install (recommended)
 

@@ -1,6 +1,6 @@
 # Contributing to Elite eBPF
 
-Elite eBPF is a personal open-source project by **abdullah i** — sole author and maintainer.
+Elite eBPF is a personal open-source project by **Abdullah Hanif** — sole author and maintainer.
 
 See [AUTHORS.md](../AUTHORS.md). Do not add third-party or AI agent names to commits or contributor lists.
 
@@ -14,7 +14,7 @@ go test ./pkg/export/... ./pkg/exporter/probe/traceconnect/...
 
 ## Commits
 
-Author: `abdullah i <abdullahanifpro111-spec@users.noreply.github.com>`
+Author: `Abdullah Hanif <abdullahanifpro111-spec@users.noreply.github.com>`
 
 Run `bash scripts/audit-commit.sh` before commit — rejects AI/agent watermarks in messages.
 

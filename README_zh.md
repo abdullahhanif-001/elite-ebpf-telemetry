@@ -4,7 +4,7 @@
 
 **零侵入内核遥测 — 每节点一个 agent，CPU 低于 1%。**
 
-**作者 / 创建者：** abdullah i  
+**作者 / 创建者：** Abdullah Hanif  
 **品牌：** Elite eBPF — 个人开源项目  
 **仓库：** [github.com/abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)
 

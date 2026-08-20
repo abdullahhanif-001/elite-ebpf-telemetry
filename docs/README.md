@@ -1,6 +1,6 @@
 # Elite eBPF Documentation
 
-Personal open-source project by **abdullah i**.
+Personal open-source project by **Abdullah Hanif**.
 
 - [Physics metrics](physics-metrics.md)
 - [Sidecar removal](sidecar-removal.md)

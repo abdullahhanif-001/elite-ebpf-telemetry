@@ -1,6 +1,6 @@
 # Elite eBPF — Interview Guide
 
-**Project:** Elite eBPF — personal brand by **abdullah i** (creator)  
+**Project:** Elite eBPF — personal brand by **Abdullah Hanif** (creator)  
 **Repo:** [github.com/abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)  
 **One-line pitch:** Zero-instrumentation kernel telemetry — one agent per node, under 1% CPU, replaces Istio sidecars and per-pod log agents.
 
@@ -61,7 +61,7 @@ Elite eBPF ek **Linux kernel-level network telemetry agent** hai jo bina applica
 
 **Data path:** Kernel event → eBPF map/ringbuf → Go userspace aggregator → `/metrics` scrape.
 
-**Key design choice:** Production eBPF probe architecture (C + Go) built for **Elite eBPF by abdullah i** — physics-layer metrics, not app instrumentation.
+**Key design choice:** Production eBPF probe architecture (C + Go) built for **Elite eBPF by Abdullah Hanif** — physics-layer metrics, not app instrumentation.
 
 ---
 
@@ -83,7 +83,7 @@ Elite eBPF ek **Linux kernel-level network telemetry agent** hai jo bina applica
 | K8s integration | client-go native | More boilerplate |
 | Build on VPS/CI | Fast static binary | Heavier toolchain |
 
-**Answer in interview:** "Elite uses Go for the agent and C for eBPF — industry standard for kernel telemetry DaemonSets. Created by abdullah i as a personal brand focused on <1% CPU physics metrics."
+**Answer in interview:** "Elite uses Go for the agent and C for eBPF — industry standard for kernel telemetry DaemonSets. Created by Abdullah Hanif as a personal brand focused on <1% CPU physics metrics."
 
 ### C/eBPF kyun?
 
@@ -181,13 +181,13 @@ Common reviewer questions — with direct answers.
 
 ### Q1: "Tum ne AI se banaya — tumhara actual contribution kya hai?"
 
-**A:** **Elite eBPF** by abdullah i — **physics probe set** slim design; **security hardening** (pprof removal, localhost bind, HTTP mux fix); **OTel bridge**; **Contabo PM2-safe deploy**; **adversarial audit scripts**; **real VPS verification** (`elite_*` metrics, FAILURES=0). Personal brand — architecture, production constraints, and audit proof are creator-owned.
+**A:** **Elite eBPF** by Abdullah Hanif — **physics probe set** slim design; **security hardening** (pprof removal, localhost bind, HTTP mux fix); **OTel bridge**; **Contabo PM2-safe deploy**; **adversarial audit scripts**; **real VPS verification** (`elite_*` metrics, FAILURES=0). Personal brand — architecture, production constraints, and audit proof are creator-owned.
 
 ---
 
 ### Q2: "Git history mein koi aur author dikhe — repo clean hai?"
 
-**A:** Sirf **abdullah i**. `scripts/audit-commit.sh` rejects co-author trailers and third-party agent watermarks in commit messages. See [AUTHORS.md](AUTHORS.md).
+**A:** Sirf **Abdullah Hanif**. `scripts/audit-commit.sh` rejects co-author trailers and third-party agent watermarks in commit messages. See [AUTHORS.md](AUTHORS.md).
 
 ---
 
@@ -205,7 +205,7 @@ Common reviewer questions — with direct answers.
 
 ### Q5: "Kyun fork, kyun scratch nahi?"
 
-**A:** ADR-001: eBPF kernel telemetry needs proven C probes + Go agent pattern. Elite implements this as abdullah i's personal product — one-click install, weeks not months to hardened production. See `docs/ADR-001-fork-base.md`.
+**A:** ADR-001: eBPF kernel telemetry needs proven C probes + Go agent pattern. Elite implements this as Abdullah Hanif's personal product — one-click install, weeks not months to hardened production. See `docs/ADR-001-fork-base.md`.
 
 ---
 
@@ -253,7 +253,7 @@ Common reviewer questions — with direct answers.
 
 ### Q13: "Agar interviewer puche: architecture kis ne decide ki?"
 
-**A:** Human decisions documented: Elite personal brand, Go+C stack, localhost bind, PM2 boundary, <1% CPU SLO, clean git publish. **Creator: abdullah i.** Constraints came from production (Contabo 6 PM2 apps, kernel 6.8, no PM2 touch).
+**A:** Human decisions documented: Elite personal brand, Go+C stack, localhost bind, PM2 boundary, <1% CPU SLO, clean git publish. **Creator: Abdullah Hanif.** Constraints came from production (Contabo 6 PM2 apps, kernel 6.8, no PM2 touch).
 
 ---
 
@@ -271,13 +271,13 @@ Common reviewer questions — with direct answers.
 
 ### Q16: "Sirf rename kiya — asli kaam kya hai?"
 
-**A:** Nahin. Metric prefix **config-driven** hai (`metrics.metricNamespace`, env `ELITE_METRICS_NAMESPACE`, code: `probe.SetMetricsNamespace()`). Elite by abdullah i adds: slim probe set, security hardening, OTel bridge, `connecttrace`, PM2-safe VPS deploy, adversarial audits, **`elite-agent` binary**, image **`ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent`**. Personal brand — not a superficial rename.
+**A:** Nahin. Metric prefix **config-driven** hai (`metrics.metricNamespace`, env `ELITE_METRICS_NAMESPACE`, code: `probe.SetMetricsNamespace()`). Elite by Abdullah Hanif adds: slim probe set, security hardening, OTel bridge, `connecttrace`, PM2-safe VPS deploy, adversarial audits, **`elite-agent` binary**, image **`ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent`**. Personal brand — not a superficial rename.
 
 ---
 
 ### Q17: "GitHub repo name kya hai aur kyun?"
 
-**A:** **[abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)** — personal brand by abdullah i. `elite` = product, `ebpf` = tech. Binary/container branding `elite-agent` + `elite_*` metrics for clear Prometheus dashboards.
+**A:** **[abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)** — personal brand by Abdullah Hanif. `elite` = product, `ebpf` = tech. Binary/container branding `elite-agent` + `elite_*` metrics for clear Prometheus dashboards.
 
 ---
 
@@ -301,7 +301,7 @@ Common reviewer questions — with direct answers.
 | [SECURITY_AUDIT_AND_METRICS.md](SECURITY_AUDIT_AND_METRICS.md) | Vulnerability matrix V-01–V-16 |
 | [HARDENED_PROOF_REPORT.md](HARDENED_PROOF_REPORT.md) | Chaos + PM2 zero-effect proof |
 | [docs/physics-metrics.md](docs/physics-metrics.md) | Metric definitions |
-| [docs/ADR-001-fork-base.md](docs/ADR-001-fork-base.md) | Elite architecture (abdullah i) |
+| [docs/ADR-001-fork-base.md](docs/ADR-001-fork-base.md) | Elite architecture (Abdullah Hanif) |
 | [deploy/contabo/](deploy/contabo/) | VPS systemd + audit scripts |
 | [scripts/elite-adversarial-audit.sh](scripts/elite-adversarial-audit.sh) | Red-team harness |
 

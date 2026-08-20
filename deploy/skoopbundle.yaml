@@ -1,4 +1,4 @@
-# DEPRECATED — use deploy/elite-bundle.yaml (Elite eBPF by abdullah i)
+# DEPRECATED — use deploy/elite-bundle.yaml (Elite eBPF by Abdullah Hanif)
 # This legacy bundle is kept for reference only.
 ---
 apiVersion: v1

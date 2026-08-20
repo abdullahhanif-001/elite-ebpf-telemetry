@@ -12,7 +12,7 @@ if [ -z "$MSG" ]; then
 fi
 
 if echo "$MSG" | grep -Eiq '(co-authored-by|cursoragent|cursor agent|superadmin|claude|openai|gpt|copilot)'; then
-  echo "audit-commit: REJECTED — message contains forbidden attribution (abdullah i only)" >&2
+  echo "audit-commit: REJECTED — message contains forbidden attribution (Abdullah Hanif only)" >&2
   exit 1
 fi
 

@@ -10,7 +10,7 @@ Istio sidecars and per-pod logging agents waste ~20% cluster CPU/RAM. Building e
 
 ## Decision
 
-**Elite eBPF** (by abdullah i) uses a production-grade eBPF agent architecture:
+**Elite eBPF** (by Abdullah Hanif) uses a production-grade eBPF agent architecture:
 
 - Metric namespace **`elite_*`** (config-driven)
 - Slim physics probe set (socket latency, softirq, packet loss, TCP summary, connect trace)
@@ -22,4 +22,4 @@ Istio sidecars and per-pod logging agents waste ~20% cluster CPU/RAM. Building e
 
 - Userspace Go: Apache-2.0
 - BPF programs in `/bpf`: GPL-2.0 (kernel compatibility)
-- Personal brand and maintenance by abdullah i
+- Personal brand and maintenance by Abdullah Hanif
