@@ -38,3 +38,6 @@ require (
 )
 
 replace github.com/alibaba/kubeskoop => ../..
+
+exclude google.golang.org/genproto v0.0.0-20210402141018-6c239bbf2bb1
+exclude google.golang.org/genproto v0.0.0-20210319143718-93e7006c17a6

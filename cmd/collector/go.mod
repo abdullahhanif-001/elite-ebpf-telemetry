@@ -11,3 +11,5 @@ replace (
 	github.com/alibaba/kubeskoop => ../..
 	github.com/alibaba/kubeskoop/pkg/skoop => ../../pkg/skoop
 )
+
+exclude google.golang.org/genproto v0.0.0-20210402141018-6c239bbf2bb1
