@@ -40,7 +40,19 @@ Force a mode:
 Kernel tracepoints → eBPF CO-RE → elite-agent (Go) → Prometheus (:9102) + OTLP
 ```
 
-Default metric prefix: `elite_*` (custom build). Stock KubeSkoop image uses `kubeskoop_*` until rebuilt from this repo.
+Default metric prefix: **`elite_*`** — configured via `metrics.metricNamespace` in YAML or `ELITE_METRICS_NAMESPACE` env (not a text find-replace). Build **`bin/elite-agent`** from this repo; do not use stock `kubeskoop/agent` images for production.
+
+### Elite vs KubeSkoop (not just a rename)
+
+| Layer | KubeSkoop upstream | Elite (this repo) |
+|-------|-------------------|-------------------|
+| Metric namespace | `kubeskoop_*` (hardcoded upstream) | **`elite_*`** via `SetMetricsNamespace()` + config |
+| Probe set | Full bundle (~15+ probes) | **Physics-only** slim set (<1% CPU) |
+| HTTP surface | Default mux, pprof exposed | **Hardened mux**, pprof 404, localhost bind |
+| Deploy | `skoopbundle.yaml` | **`elite-bundle.yaml`** + `install.sh` |
+| OTel | No | **OTLP bridge** (`pkg/export/`) |
+| Binary name | `inspector` | **`elite-agent`** |
+| Container image | `kubeskoop/agent` | **`ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent`** |
 
 ---
 
@@ -88,7 +100,7 @@ SLO: agent CPU < 1% core fraction. Methodology: [benchmarks/BENCHMARKS.md](bench
 
 ```bash
 make generate-bpf-in-container
-make build-exporter
+make build-elite-agent    # → bin/elite-agent
 ```
 
 Requires Linux, clang, Go 1.22+.

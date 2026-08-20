@@ -30,6 +30,7 @@ type OtelConfig struct {
 }
 
 type MetricsConfig struct {
+	MetricNamespace    string        `yaml:"metricNamespace" mapstructure:"metricNamespace" json:"metricNamespace"`
 	Probes             []ProbeConfig `yaml:"probes" mapstructure:"probes" json:"probes"`
 	AdditionalLabels   []string      `yaml:"additionalLabels" mapstructure:"additionalLabels" json:"additionalLabels"`
 	DisableCompression bool          `yaml:"disableCompression" mapstructure:"disableCompression" json:"disableCompression"`

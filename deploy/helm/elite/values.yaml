@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: kubeskoop/agent
+  repository: ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent
   tag: v1.0.0
   pullPolicy: IfNotPresent
 

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -11,8 +13,29 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+var metricNamespaceRe = regexp.MustCompile(`^[a-z][a-z0-9_]*$`)
+
 const LegacyMetricsNamespace = "inspector"
-const MetricsNamespace = "elite"
+
+// DefaultMetricsNamespace is the Prometheus top-level metric namespace (elite_socketlatency_*).
+const DefaultMetricsNamespace = "elite"
+
+// MetricsNamespace is set at startup from config (metricNamespace) or ELITE_METRICS_NAMESPACE.
+var MetricsNamespace = DefaultMetricsNamespace
+
+// SetMetricsNamespace configures the Prometheus namespace before probes register.
+func SetMetricsNamespace(ns string) error {
+	ns = strings.TrimSpace(ns)
+	if ns == "" {
+		MetricsNamespace = DefaultMetricsNamespace
+		return nil
+	}
+	if !metricNamespaceRe.MatchString(ns) {
+		return fmt.Errorf("invalid metricNamespace %q: use [a-z][a-z0-9_]*", ns)
+	}
+	MetricsNamespace = ns
+	return nil
+}
 
 var (
 	availableMetricsProbes = make(map[string]*metricsProbeCreator)

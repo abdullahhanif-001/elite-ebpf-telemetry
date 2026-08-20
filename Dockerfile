@@ -40,7 +40,8 @@ RUN if [ ! -z "$ALPINE_MIRROR" ]; then sed -i 's/dl-cdn.alpinelinux.org/mirrors.
     rm -rf /var/cache/apk/*
 
 FROM base AS agent
-COPY --from=cross-build /go/src/github.com/alibaba/kubeskoop/bin/inspector /bin/inspector
+COPY --from=cross-build /go/src/github.com/alibaba/kubeskoop/bin/elite-agent /bin/elite-agent
+COPY --from=cross-build /go/src/github.com/alibaba/kubeskoop/bin/elite-agent /bin/inspector
 COPY --from=cross-build /go/src/github.com/alibaba/kubeskoop/bin/pod-collector /bin/pod-collector
 COPY --from=cross-build /go/src/github.com/alibaba/kubeskoop/bin/btfhack /bin/btfhack
 

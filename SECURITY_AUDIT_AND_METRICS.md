@@ -174,7 +174,7 @@ $ curl -s http://127.0.0.1:9102/metrics | grep '^elite_'
 (empty — custom Elite binary not yet deployed)
 ```
 
-**Prefix migration:** `pkg/exporter/probe/metrics.go` sets `MetricsNamespace = "elite"`. Rebuild required to replace `kubeskoop_*` → `elite_*` on host.
+**Prefix:** Configurable via `metrics.metricNamespace` / `ELITE_METRICS_NAMESPACE` → `probe.SetMetricsNamespace()` (default `elite`). Not a source-level find-replace of `kubeskoop`.
 
 ### 4.4 Prometheus / Grafana isolation
 

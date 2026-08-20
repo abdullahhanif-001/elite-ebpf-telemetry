@@ -353,7 +353,7 @@ func filterParent(dir direction) uint32 {
 
 func filterName(dev string, dir direction) string {
 	directionName := directionName(dir)
-	return fmt.Sprintf("kubeskoop-flow-%s-%s", dev, directionName)
+	return fmt.Sprintf("elite-flow-%s-%s", dev, directionName)
 }
 
 func (f *ebpfFlow) getFlowFilter(direction direction) (*netlink.BpfFilter, error) {

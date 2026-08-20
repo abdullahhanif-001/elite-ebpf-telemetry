@@ -24,7 +24,7 @@ jobs:
       - name: Generate BPF and build
         run: |
           make generate-bpf
-          make build-exporter
+          make build-elite-agent
 
       - name: Sign with cosign (keyless)
         uses: sigstore/cosign-installer@v3
@@ -32,5 +32,5 @@ jobs:
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: elite-inspector
-          path: bin/inspector
+          name: elite-agent
+          path: bin/elite-agent

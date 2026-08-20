@@ -80,7 +80,7 @@ spec:
         - name: elite-agent
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: [/bin/inspector, server, -d]
+          command: [/bin/elite-agent, server, -c, /etc/config/config.yaml]
           ports:
             - containerPort: {{ .Values.service.port }}
           resources:

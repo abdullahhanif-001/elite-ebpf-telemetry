@@ -388,6 +388,15 @@ func (i *inspServer) start(cfg *InspServerConfig) error {
 		}
 	}
 
+	metricNS := cfg.MetricsConfig.MetricNamespace
+	if envNS := os.Getenv("ELITE_METRICS_NAMESPACE"); envNS != "" {
+		metricNS = envNS
+	}
+	if err := probe.SetMetricsNamespace(metricNS); err != nil {
+		return fmt.Errorf("invalid metrics namespace: %w", err)
+	}
+	log.Infof("Prometheus metric namespace: %s_*", probe.MetricsNamespace)
+
 	var err error
 	ctx := context.TODO()
 	err = probe.InitAdditionalLabels(cfg.MetricsConfig.AdditionalLabels)

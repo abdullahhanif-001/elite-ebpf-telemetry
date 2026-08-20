@@ -11,6 +11,7 @@ otel:
   batchSize: 256
 
 metrics:
+  metricNamespace: elite
   disableCompression: true
   probes:
     - name: socketlatency

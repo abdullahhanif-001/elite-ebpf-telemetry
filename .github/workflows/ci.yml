@@ -48,7 +48,7 @@ jobs:
         run: go test ./pkg/export/... ./pkg/exporter/probe/traceconnect/...
 
       - name: Build exporter
-        run: make build-exporter
+        run: make build-elite-agent
 
   benchmark-gate:
     runs-on: ubuntu-latest

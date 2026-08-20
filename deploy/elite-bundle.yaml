@@ -23,6 +23,7 @@ data:
       batchSize: 256
       service: elite-agent
     metrics:
+      metricNamespace: elite
       disableCompression: true
       probes:
         - name: socketlatency
@@ -62,7 +63,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
         - name: btf-prepare
-          image: kubeskoop/agent:v1.0.0
+          image: ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent:v1.0.0
           command: [btfhack, discover, -p, /etc/elite/btf/]
           volumeMounts:
             - name: btf-rawdata
@@ -71,8 +72,8 @@ spec:
               mountPath: /boot
       containers:
         - name: elite-agent
-          image: kubeskoop/agent:v1.0.0
-          command: [/bin/inspector, server, -d]
+          image: ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent:v1.0.0
+          command: [/bin/elite-agent, server, -c, /etc/elite/config/config.yaml]
           ports:
             - name: metrics
               containerPort: 9102

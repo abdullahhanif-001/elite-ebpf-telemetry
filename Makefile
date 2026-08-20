@@ -46,9 +46,9 @@ vet: ## Run go vet against code.
 
 ##@ Build
 
-.PHONY: build-exporter
-build-exporter: ## Build exporter binary.
-	CGO_ENABLED=0 go build -o bin/inspector -ldflags $(ldflags) ./cmd/exporter
+.PHONY: build-exporter build-elite-agent
+build-exporter build-elite-agent: ## Build Elite telemetry agent binary (bin/elite-agent).
+	CGO_ENABLED=0 go build -o bin/elite-agent -ldflags $(ldflags) ./cmd/exporter
 
 .PHONY: build-skoop
 build-skoop: ## Build skoop binary.
