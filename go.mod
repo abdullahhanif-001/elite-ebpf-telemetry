@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/cilium/ebpf v0.22.0
-	github.com/fsnotify/fsnotify v1.7.0
+	github.com/fsnotify/fsnotify v1.10.1
 	github.com/golang/snappy v0.0.4
 	github.com/google/gops v0.3.26
 	github.com/hashicorp/golang-lru/v2 v2.0.6
