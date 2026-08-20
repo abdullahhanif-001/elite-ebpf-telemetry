@@ -315,9 +315,12 @@ func (p *softirqProbe) loadAndAttachBPF() error {
 	if err != nil {
 		return err
 	}
-	err = spec.RewriteConstants(map[string]interface{}{"irq_filter_bits": p.ebpfProbeIrqType})
-	if err != nil {
-		return err
+	if v, ok := spec.Variables["irq_filter_bits"]; ok {
+		if err = v.Set(p.ebpfProbeIrqType); err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("irq_filter_bits variable not found in BPF spec")
 	}
 
 	err = spec.LoadAndAssign(&p.objs, &opts)
