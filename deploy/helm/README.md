@@ -1,57 +1,37 @@
-# KubeSkoop exporter
+# Elite eBPF Helm chart
 
-## INSTALLATION
+Personal brand by **abdullah i**.
 
-```shell
-# Add KubeSkoop charts repo
-helm repo add kubeskoop https://kubeskoop.github.io
-
-# You need to update helm repo info for the first time.
-helm repo update
-
-# Install KubeSkoop exporter.
-helm install -n kubeskoop --create-namespace kubeskoop-exporter kubeskoop/kubeskoop-exporter
-```
-
-You can also install locally if you need to debug the Helm Chart.
+## Install from this repo
 
 ```shell
-# Clone KubeSkoop to local disk.
-git clone https://github.com/alibaba/kubeskoop.git
+git clone https://github.com/abdullahanifpro111-spec/elite-ebpf.git
+cd elite-ebpf
 
-# Install the helm chart locally.
-helm install -n kubeskoop --create-namespace kubeskoop-exporter ./kubeskoop/deploy/kubeskoop-exporter-0.3.0.tgz --debug
+helm install -n elite --create-namespace elite-exporter ./deploy/helm --debug
 ```
 
-KubeSkoop exporter are deployed in DaemonSet. You can check the running status via:
+Verify:
 
 ```shell
-# Get pod running status of KubeSkoop exporter
-kubectl get pod -n kubeskoop -l app=kubeskoop-exporter -o wide
-
-# After pods are runing, you can get running status of probes through API server.
-kubectl get --raw /api/v1/namespaces/{{kubeskoop-exporter的pod namespace}}/pods/{{kubeskoop-exporter的pod name}}:9102/proxy/status | jq .
-
-# You can also curl it if you have direct access to the pod IP.
-curl {{kubeskoop-exporter的pod ip}}:9102/status |jq .
+kubectl get pod -n elite -l app=elite-agent -o wide
+curl http://<pod-ip>:9102/metrics | grep elite_
 ```
 
-## VARIABLES
+## Key values (`values.yaml`)
 
-| Setting                      | Description                                                                                                        | Default                                                   |
-|------------------------------|--------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| name                         | DaemonSet name of KubeSkoop exporter.                                                                              | `kubeskoop-exporter`                                      |
-| debugMode                    | Enable debug mode for kubeskoop-exporter, with debug interface, debug log level and pprof support.                | `false`                                                   |
-| appName                      | Pod app label.                                                                                                   | `kubeskoop-exporter`                                      |
-| runtimeEndpoint              | CRI runtime endpoint socket, you can use  `crictl info                                                             | awk -F":" '/containerdEndpoint/ {print $2'` to obtain it. | `/run/containerd/containerd.sock`               |
-| image.repository             | Image repository for KubeSkoop exporter container.                                                                 | `kubeskoop/agent`                                         |
-| image.tag                    | Image tag for KubeSkoop exporter container.                                                                        | `latest`                                                  |
-| image.imagePullPolicy        | `imagePullPolicy` for KubeSkoop exporter container.                                                                | `Always`                                                  |
-| initContainer.enabled        | Enable `btfhack` as initContainer to automate discover btf file when kernel does not carry btf information itself. | `true`                                                    |
-| initContainer.repository     | Image repository for `btfhack` container.                                                                          | `registry.cn-hangzhou.aliyuncs.com/acs/btfhack`           |
-| initContainer.tag            | Image tag for `btfhack` container.                                                                                 | `latest`                                                  |
-| initContainer.imagePullPolicy | `imagePullPolicy` for `btfhack` container.                                                                         | `Always`                                                  |
-| config.serverPort            | kubeskoop metrics server port, provide HTTP service.                                                               | 9102                                                      |
-| config.metricsProbes         | Metric probes to enable.                                                                                           | Refer to the probe guide.                                 |
-| config.eventProbes           | Event probes to enable.                                                                                            | Refer to the probe guide.                                 |
-| config.eventSinks            | Sink config for events, stderr/file/loki are supported now.                                                        | 15                                                        |
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `agent.image.repository` | Agent image | `ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent` |
+| `agent.image.tag` | Agent tag | `v1.0.0` |
+| `agent.config.port` | Metrics HTTP port | `9102` |
+| `config.metricProbes` | Enabled metric probes | see `values.yaml` |
+
+Override namespace and credentials at install time — never commit production secrets.
+
+```shell
+helm upgrade --install elite-exporter ./deploy/helm \
+  -n elite --create-namespace \
+  --set webconsole.auth.username="$ELITE_WEB_USER" \
+  --set webconsole.auth.password="$ELITE_WEB_PASS"
+```

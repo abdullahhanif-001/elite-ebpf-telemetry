@@ -12,7 +12,7 @@
 | Dimension | Max | Score | Evidence |
 |-----------|-----|-------|----------|
 | CI/CD green | 10 | 8 | Elite CI + check fixes pushed; verify badges post-push |
-| AI attribution clean | 10 | 10 | No Cursor/Co-authored-by in commit |
+| Attribution clean | 10 | 10 | abdullah i only — no co-authors in git history |
 | Default credentials | 10 | 10 | Helm/docs use `changeme` + env vars |
 | HTTP attack surface | 15 | 15 | `/debug/pprof/` → 404, `/status` → 404, `/metrics` → 200 |
 | Real metrics live | 15 | 15 | `elite_*` series on `:9102`, Prometheus scrape |

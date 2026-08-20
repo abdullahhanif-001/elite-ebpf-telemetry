@@ -11,8 +11,8 @@ if [ -z "$MSG" ]; then
   exit 1
 fi
 
-if echo "$MSG" | grep -Eiq '(co-authored-by|cursoragent|cursor agent|superadmin|claude)'; then
-  echo "audit-commit: REJECTED — message contains forbidden attribution (use abdullah i only)" >&2
+if echo "$MSG" | grep -Eiq '(co-authored-by|cursoragent|cursor agent|superadmin|claude|openai|gpt|copilot)'; then
+  echo "audit-commit: REJECTED — message contains forbidden attribution (abdullah i only)" >&2
   exit 1
 fi
 

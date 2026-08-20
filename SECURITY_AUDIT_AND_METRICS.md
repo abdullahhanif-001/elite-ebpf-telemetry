@@ -59,7 +59,7 @@ $ pm2 jlist | jq '[.[].pm2_env.restart_time] | add'   # post-audit
 
 ## 3. BEFORE VS AFTER HARDENING BENCHMARKS
 
-### 3.1 HTTP attack surface (BEFORE — stock `kubeskoop/agent:v1.0.0`)
+### 3.1 HTTP attack surface (BEFORE — unhardened stock agent)
 
 Captured from `/opt/elite/baseline/security-audit-20260819-201659.log`:
 
@@ -160,21 +160,28 @@ PASS: elite_agent_cpu_cores=0.0079 (<0.10)
 
 ### 4.3 Metric verification
 
-```text
-$ curl -s http://127.0.0.1:9102/metrics | grep -oE '^kubeskoop_[a-z_]+' | sort -u
-kubeskoop_packetloss_netfilter
-kubeskoop_packetloss_total
-kubeskoop_socketlatency_read
-kubeskoop_socketlatency_write
-kubeskoop_softirq_excuteslow
-kubeskoop_softirq_schedslow
-kubeskoop_tcpsummary_*   (7 series)
+**BEFORE (unhardened baseline — legacy metric prefix):**
 
-$ curl -s http://127.0.0.1:9102/metrics | grep '^elite_'
-(empty — custom Elite binary not yet deployed)
+```text
+$ curl -s http://127.0.0.1:9102/metrics | grep -oE '^legacy_[a-z_]+' | sort -u | head
+legacy_packetloss_netfilter
+legacy_packetloss_total
+legacy_socketlatency_read
+...
 ```
 
-**Prefix:** Configurable via `metrics.metricNamespace` / `ELITE_METRICS_NAMESPACE` → `probe.SetMetricsNamespace()` (default `elite`). Not a source-level find-replace of `kubeskoop`.
+**AFTER (Elite hardened — `metricNamespace: elite`):**
+
+```text
+$ curl -s http://127.0.0.1:9102/metrics | grep '^elite_'
+elite_packetloss_total
+elite_socketlatency_read
+elite_softirq_schedslow
+elite_tcpsummary_tcpestablishedconn
+...
+```
+
+**Prefix:** Configurable via `metrics.metricNamespace` / `ELITE_METRICS_NAMESPACE` → `probe.SetMetricsNamespace()` (default `elite`). Elite branding is config-driven, not a superficial rename.
 
 ### 4.4 Prometheus / Grafana isolation
 

@@ -122,7 +122,7 @@ MemoryCurrent=124.7 MB peak under chaos (below cap)
 |------|-------|
 | Kernel | **6.8.0-136-generic** |
 | BTF | `/sys/kernel/btf/vmlinux` (seeded to `/opt/elite/btf/vmlinux`) |
-| Agent binary | `kubeskoop/agent:v1.0.0` (stock) |
+| Agent binary | unhardened stock image (baseline) → **`/opt/elite/bin/elite-agent`** |
 
 ### Active probe attach log (all PASS on 6.8)
 

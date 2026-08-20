@@ -4,16 +4,16 @@ metadata:
   name: agent
   namespace: {{ .Release.Namespace }}
   labels:
-    app: kubeskoop-agent
+    app: elite-agent
 {{- with .Values.agent }}
 spec:
   selector:
     matchLabels:
-      app: kubeskoop-agent
+      app: elite-agent
   template:
     metadata:
       labels:
-        app: kubeskoop-agent
+        app: elite-agent
       annotations:
         prometheus.io/path: /metrics
         prometheus.io/port: "{{ .config.port }}"
@@ -129,7 +129,7 @@ spec:
             type: FileOrCreate
         - name: config-volume
           configMap:
-            name: kubeskoop-config
+            name: elite-config
         - name: btf-rawdata
           emptyDir: {}
 {{- end }}

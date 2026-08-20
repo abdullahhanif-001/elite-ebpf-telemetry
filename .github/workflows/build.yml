@@ -9,8 +9,8 @@ on:
     branches: [main]
 
 env:
-  REGISTRY: docker.io
-  OWNER: kubeskoop
+  REGISTRY: ghcr.io
+  OWNER: abdullahanifpro111-spec/elite-ebpf
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.after }}
@@ -55,7 +55,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        if: ${{ github.event_name != 'pull_request' && github.event.action != 'unassigned' && github.repository == 'alibaba/kubeskoop' }}
+        if: ${{ github.event_name != 'pull_request' && github.event.action != 'unassigned' && github.repository == 'abdullahanifpro111-spec/elite-ebpf' }}
 
       - name: Go Build Cache for Docker
         uses: actions/cache@v3
@@ -75,7 +75,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' && github.repository == 'alibaba/kubeskoop' }}
+          push: ${{ github.event_name != 'pull_request' && github.repository == 'abdullahanifpro111-spec/elite-ebpf' }}
           tags: ${{ steps.meta-agent.outputs.tags }}
           target: agent
           labels: ${{ steps.meta-agent.outputs.labels }}
@@ -87,7 +87,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' && github.repository == 'alibaba/kubeskoop' }}
+          push: ${{ github.event_name != 'pull_request' && github.repository == 'abdullahanifpro111-spec/elite-ebpf' }}
           tags: ${{ steps.meta-controller.outputs.tags }}
           target: controller
           labels: ${{ steps.meta-controller.outputs.labels }}

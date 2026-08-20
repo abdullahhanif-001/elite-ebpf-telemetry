@@ -4,9 +4,13 @@
 
 Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or systemd service) that exports physics-layer metrics: socket latency, softirq delay, packet loss, and TCP summary.
 
-**Author:** abdullah i  
-**Repository:** [github.com/abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)  
-**Upstream fork:** [KubeSkoop](https://github.com/alibaba/kubeskoop) (Apache-2.0 / GPL BPF)
+**Author & creator:** abdullah i  
+**Brand:** Elite eBPF — personal open-source project  
+**Repository:** [github.com/abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)
+
+## Contributors
+
+**abdullah i** — sole creator, author, and maintainer. See [AUTHORS.md](AUTHORS.md).
 
 ---
 
@@ -40,19 +44,19 @@ Force a mode:
 Kernel tracepoints → eBPF CO-RE → elite-agent (Go) → Prometheus (:9102) + OTLP
 ```
 
-Default metric prefix: **`elite_*`** — configured via `metrics.metricNamespace` in YAML or `ELITE_METRICS_NAMESPACE` env (not a text find-replace). Build **`bin/elite-agent`** from this repo; do not use stock `kubeskoop/agent` images for production.
+Default metric prefix: **`elite_*`** — configured via `metrics.metricNamespace` in YAML or `ELITE_METRICS_NAMESPACE` env. Build **`bin/elite-agent`** from this repo.
 
-### Elite vs KubeSkoop (not just a rename)
+### Why Elite (abdullah i)
 
-| Layer | KubeSkoop upstream | Elite (this repo) |
-|-------|-------------------|-------------------|
-| Metric namespace | `kubeskoop_*` (hardcoded upstream) | **`elite_*`** via `SetMetricsNamespace()` + config |
-| Probe set | Full bundle (~15+ probes) | **Physics-only** slim set (<1% CPU) |
-| HTTP surface | Default mux, pprof exposed | **Hardened mux**, pprof 404, localhost bind |
-| Deploy | `skoopbundle.yaml` | **`elite-bundle.yaml`** + `install.sh` |
-| OTel | No | **OTLP bridge** (`pkg/export/`) |
-| Binary name | `inspector` | **`elite-agent`** |
-| Container image | `kubeskoop/agent` | **`ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent`** |
+| Layer | Elite eBPF |
+|-------|------------|
+| Metric namespace | **`elite_*`** via `SetMetricsNamespace()` + config |
+| Probe set | **Physics-only** slim set (<1% CPU) |
+| HTTP surface | **Hardened mux**, pprof 404, localhost bind |
+| Deploy | **`elite-bundle.yaml`** + `install.sh` |
+| OTel | **OTLP bridge** (`pkg/export/`) |
+| Binary | **`elite-agent`** |
+| Container | **`ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent`** |
 
 ---
 
@@ -137,5 +141,6 @@ Requires Linux, clang, Go 1.22+.
 
 - [Physics metrics](docs/physics-metrics.md)
 - [Sidecar removal](docs/sidecar-removal.md)
-- [ADR-001: Fork base](docs/ADR-001-fork-base.md)
+- [ADR-001: Elite architecture](docs/ADR-001-fork-base.md)
+- [AUTHORS.md](AUTHORS.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)

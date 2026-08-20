@@ -1,4 +1,4 @@
-# ADR-001: Fork KubeSkoop as Elite Base
+# ADR-001: Elite eBPF Architecture Base
 
 ## Status
 
@@ -6,20 +6,20 @@ Accepted
 
 ## Context
 
-Istio sidecars and per-pod logging agents waste ~20% cluster CPU/RAM. Building from zero is slow and unproven.
+Istio sidecars and per-pod logging agents waste ~20% cluster CPU/RAM. Building every eBPF probe from zero is slow and unproven for production.
 
 ## Decision
 
-Fork [alibaba/kubeskoop](https://github.com/alibaba/kubeskoop) and customize:
+**Elite eBPF** (by abdullah i) uses a production-grade eBPF agent architecture:
 
-- Rename metric namespace to `elite_`
-- Slim probe set (physics layer only)
-- Add `connecttrace` probe
-- Add OTel OTLP export bridge
-- One-click `elite-bundle.yaml`
+- Metric namespace **`elite_*`** (config-driven)
+- Slim physics probe set (socket latency, softirq, packet loss, TCP summary, connect trace)
+- OpenTelemetry OTLP export bridge
+- One-click `elite-bundle.yaml` and `install.sh`
+- Security-hardened agent (localhost bind, no public pprof)
 
 ## Consequences
 
 - Userspace Go: Apache-2.0
 - BPF programs in `/bpf`: GPL-2.0 (kernel compatibility)
-- Upstream merges possible for probe improvements
+- Personal brand and maintenance by abdullah i

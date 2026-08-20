@@ -161,7 +161,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "sum(rate(kubeskoop_packetloss_total{k8s_node=\"$node\"}[1m]))",
+                    "expr": "sum(rate(elite_packetloss_total{k8s_node=\"$node\"}[1m]))",
                     "format": "time_series",
                     "hide": false,
                     "instant": false,
@@ -253,7 +253,7 @@
                             "options": {
                                 "mode": "exclude",
                                 "names": [
-                                    "kubeskoop/prometheus-deployment-5dc88c6b94-lwcgp"
+                                    "elite/prometheus-deployment-5dc88c6b94-lwcgp"
                                 ],
                                 "prefix": "All except:",
                                 "readOnly": true
@@ -299,7 +299,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_netdev_rxbytes{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_netdev_rxbytes{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "legendFormat": "Hostnet",
                     "range": true,
                     "refId": "A"
@@ -310,7 +310,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_netdev_rxbytes{k8s_node=\"$node\", k8s_pod!=\"\"}[1m])",
+                    "expr": "rate(elite_netdev_rxbytes{k8s_node=\"$node\", k8s_pod!=\"\"}[1m])",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "{{k8s_namespace}}/{{k8s_pod}}",
@@ -408,7 +408,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_netdev_txbytes{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_netdev_txbytes{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "legendFormat": "Hostnet",
                     "range": true,
                     "refId": "A"
@@ -419,7 +419,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_netdev_txbytes{k8s_node=\"$node\", k8s_pod!=\"\"}[1m])",
+                    "expr": "rate(elite_netdev_txbytes{k8s_node=\"$node\", k8s_pod!=\"\"}[1m])",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "{{k8s_namespace}}/{{k8s_pod}}",
@@ -517,7 +517,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_netdev_txerrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_netdev_txerrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "legendFormat": "tx errors",
                     "range": true,
                     "refId": "A"
@@ -613,7 +613,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_netdev_rxerrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_netdev_rxerrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "legendFormat": "rx errors",
                     "range": true,
                     "refId": "A"
@@ -709,7 +709,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_netdev_txpackets{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_netdev_txpackets{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "format": "heatmap",
                     "instant": false,
                     "interval": "",
@@ -808,7 +808,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_netdev_rxpackets{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_netdev_rxpackets{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "format": "heatmap",
                     "instant": false,
                     "interval": "",
@@ -919,7 +919,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_tcpsummary_tcptimewaitconn{k8s_node=\"$node\", k8s_pod=\"\"}",
+                    "expr": "elite_tcpsummary_tcptimewaitconn{k8s_node=\"$node\", k8s_pod=\"\"}",
                     "instant": false,
                     "legendFormat": "timewait",
                     "range": true,
@@ -931,7 +931,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_tcpsummary_tcpestablishedconn{k8s_node=\"$node\", k8s_pod=\"\"}",
+                    "expr": "elite_tcpsummary_tcpestablishedconn{k8s_node=\"$node\", k8s_pod=\"\"}",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "established",
@@ -944,7 +944,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_tcpsummary_tcpclosewaitconn{k8s_node=\"$node\", k8s_pod=\"\"}",
+                    "expr": "elite_tcpsummary_tcpclosewaitconn{k8s_node=\"$node\", k8s_pod=\"\"}",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "closewait",
@@ -957,7 +957,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_tcpsummary_tcpsynsentconn{k8s_node=\"$node\", k8s_pod=\"\"}",
+                    "expr": "elite_tcpsummary_tcpsynsentconn{k8s_node=\"$node\", k8s_pod=\"\"}",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "syn sent",
@@ -970,7 +970,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_tcpsummary_tcpsynrecvconn{k8s_node=\"$node\", k8s_pod=\"\"}",
+                    "expr": "elite_tcpsummary_tcpsynrecvconn{k8s_node=\"$node\", k8s_pod=\"\"}",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "syn recv",
@@ -1066,7 +1066,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_sock_inuse{k8s_node=\"$node\", k8s_pod=\"\"}+kubeskoop_sock_orphan{k8s_node=\"$node\", k8s_pod=\"\"}",
+                    "expr": "elite_sock_inuse{k8s_node=\"$node\", k8s_pod=\"\"}+elite_sock_orphan{k8s_node=\"$node\", k8s_pod=\"\"}",
                     "instant": false,
                     "legendFormat": "Hostnet",
                     "range": true,
@@ -1078,7 +1078,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_sock_inuse{k8s_node=\"$node\",k8s_pod!=\"\"}+kubeskoop_sock_orphan{k8s_node=\"$node\", k8s_pod!=\"\"}",
+                    "expr": "elite_sock_inuse{k8s_node=\"$node\",k8s_pod!=\"\"}+elite_sock_orphan{k8s_node=\"$node\", k8s_pod!=\"\"}",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "{{k8s_namespace}}/{{k8s_pod}}",
@@ -1187,7 +1187,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_tcpsummary_tcptxqueue{k8s_node=\"$node\", k8s_pod=\"\"}",
+                    "expr": "elite_tcpsummary_tcptxqueue{k8s_node=\"$node\", k8s_pod=\"\"}",
                     "instant": false,
                     "legendFormat": "TX Queue",
                     "range": true,
@@ -1199,7 +1199,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "kubeskoop_tcpsummary_tcprxqueue{k8s_node=\"$node\", k8s_pod=\"\"}",
+                    "expr": "elite_tcpsummary_tcprxqueue{k8s_node=\"$node\", k8s_pod=\"\"}",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "RX Queue",
@@ -1296,7 +1296,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_tcp_passiveopens{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_tcp_passiveopens{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "instant": false,
                     "legendFormat": "passive opens",
                     "range": true,
@@ -1308,7 +1308,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_tcp_activeopens{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_tcp_activeopens{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "hide": false,
                     "instant": false,
                     "legendFormat": "active opens",
@@ -1404,7 +1404,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_tcpext_listendrops{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_tcpext_listendrops{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "instant": false,
                     "legendFormat": "listen drops",
                     "range": true,
@@ -1499,7 +1499,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_tcpext_listenoverflows{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_tcpext_listenoverflows{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "instant": false,
                     "legendFormat": "listen overflows",
                     "range": true,
@@ -1594,7 +1594,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_tcpext_tcpsynretrans{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_tcpext_tcpsynretrans{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "instant": false,
                     "legendFormat": "syn retrans",
                     "range": true,
@@ -1689,7 +1689,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_tcpext_tcprcvqdrop{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_tcpext_tcprcvqdrop{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "instant": false,
                     "legendFormat": "receive queue drops",
                     "range": true,
@@ -1784,7 +1784,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_tcpext_pfmemallocdrop{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_tcpext_pfmemallocdrop{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "instant": false,
                     "legendFormat": "memory alloc fail",
                     "range": true,
@@ -1879,7 +1879,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_tcpext_tcpbacklogdrop{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_tcpext_tcpbacklogdrop{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "instant": false,
                     "legendFormat": "backlog drops",
                     "range": true,
@@ -1988,7 +1988,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_udp_rcvbuferrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_udp_rcvbuferrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "legendFormat": "receive buffer errors",
                     "range": true,
                     "refId": "A"
@@ -2083,7 +2083,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_udp_sndbuferrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_udp_sndbuferrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "legendFormat": "send buffer errors",
                     "range": true,
                     "refId": "A"
@@ -2179,7 +2179,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_udp_noports{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_udp_noports{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "legendFormat": "no port times",
                     "range": true,
                     "refId": "A"
@@ -2275,7 +2275,7 @@
                         "uid": "${DS_PROMETHEUS}"
                     },
                     "editorMode": "code",
-                    "expr": "rate(kubeskoop_udp_inerrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
+                    "expr": "rate(elite_udp_inerrors{k8s_node=\"$node\", k8s_pod=\"\"}[1m])",
                     "legendFormat": "input errors",
                     "range": true,
                     "refId": "A"
@@ -2379,7 +2379,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_rdma_erdma_hw_rx_bytes_cnt{k8s_node=\"$node\"}[1m])",
+                    "expr": "rate(elite_rdma_erdma_hw_rx_bytes_cnt{k8s_node=\"$node\"}[1m])",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}} (erdma)",
@@ -2393,7 +2393,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_rdma_mlx5_port_rcv_data{k8s_node=\"$node\"}[1m]) * 4",
+                    "expr": "rate(elite_rdma_mlx5_port_rcv_data{k8s_node=\"$node\"}[1m]) * 4",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}}:{{port}} (mlx5)",
@@ -2487,7 +2487,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_rdma_erdma_hw_tx_bytes_cnt{k8s_node=\"$node\"}[1m])",
+                    "expr": "rate(elite_rdma_erdma_hw_tx_bytes_cnt{k8s_node=\"$node\"}[1m])",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}} (erdma)",
@@ -2501,7 +2501,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_rdma_mlx5_port_xmit_data{k8s_node=\"$node\"}[1m]) * 4",
+                    "expr": "rate(elite_rdma_mlx5_port_xmit_data{k8s_node=\"$node\"}[1m]) * 4",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}}:{{port}} (mlx5)",
@@ -2595,7 +2595,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_rdma_erdma_hw_rx_packets_cnt{k8s_node=\"$node\"}[1m])",
+                    "expr": "rate(elite_rdma_erdma_hw_rx_packets_cnt{k8s_node=\"$node\"}[1m])",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}} (erdma)",
@@ -2609,7 +2609,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_rdma_mlx5_port_rcv_packets{k8s_node=\"$node\"}[1m])",
+                    "expr": "rate(elite_rdma_mlx5_port_rcv_packets{k8s_node=\"$node\"}[1m])",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}}:{{port}} (mlx5)",
@@ -2702,7 +2702,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_rdma_erdma_hw_tx_packets_cnt{k8s_node=\"$node\"}[1m])",
+                    "expr": "rate(elite_rdma_erdma_hw_tx_packets_cnt{k8s_node=\"$node\"}[1m])",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}} (erdma)",
@@ -2716,7 +2716,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "rate(kubeskoop_rdma_mlx5_port_xmit_packets{k8s_node=\"$node\"}[1m])",
+                    "expr": "rate(elite_rdma_mlx5_port_xmit_packets{k8s_node=\"$node\"}[1m])",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}}:{{port}} (mlx5)",
@@ -2810,7 +2810,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_qp{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_qp{k8s_node=\"$node\"}",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}}",
@@ -2904,7 +2904,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_mr{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_mr{k8s_node=\"$node\"}",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}}",
@@ -2997,7 +2997,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_erdma_hw_bps_limit_drop_cnt{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_erdma_hw_bps_limit_drop_cnt{k8s_node=\"$node\"}",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}}-bps-limit (erdma)",
@@ -3011,7 +3011,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_erdma_hw_pps_limit_drop_cnt{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_erdma_hw_pps_limit_drop_cnt{k8s_node=\"$node\"}",
                     "hide": false,
                     "instant": false,
                     "interval": "",
@@ -3026,7 +3026,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_mlx5_port_xmit_discards{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_mlx5_port_xmit_discards{k8s_node=\"$node\"}",
                     "hide": false,
                     "instant": false,
                     "interval": "",
@@ -3120,7 +3120,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_erdma_hw_rx_bps_limit_drop_cnt{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_erdma_hw_rx_bps_limit_drop_cnt{k8s_node=\"$node\"}",
                     "instant": false,
                     "interval": "",
                     "legendFormat": "{{device}}-bps-limit (erdma)",
@@ -3134,7 +3134,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_erdma_hw_rx_pps_limit_drop_cnt{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_erdma_hw_rx_pps_limit_drop_cnt{k8s_node=\"$node\"}",
                     "hide": false,
                     "instant": false,
                     "interval": "",
@@ -3149,7 +3149,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_mlx5_VL15_dropped{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_mlx5_VL15_dropped{k8s_node=\"$node\"}",
                     "hide": false,
                     "instant": false,
                     "interval": "",
@@ -3164,7 +3164,7 @@
                     },
                     "editorMode": "code",
                     "exemplar": false,
-                    "expr": "kubeskoop_rdma_mlx5_out_of_buffer{k8s_node=\"$node\"}",
+                    "expr": "elite_rdma_mlx5_out_of_buffer{k8s_node=\"$node\"}",
                     "hide": false,
                     "instant": false,
                     "interval": "",

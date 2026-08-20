@@ -5,7 +5,7 @@ set -x
 trap "exit 0" 15
 
 GRAFANA_HOST=${GRAFANA_HOST:-"127.0.0.1:3000"}
-GRAFANA_PASSWORD=${GRAFANA_PASSWORD:-kubeskoop}
+GRAFANA_PASSWORD=${GRAFANA_PASSWORD:-elite}
 
 register_dashboard() {
     local dashboard='{}'
@@ -49,6 +49,6 @@ grafana_ready() {
 }
 
 grafana_ready
-register_dashboard /etc/kubeskoop-exporter-pods-dashboard.json
-register_dashboard /etc/kubeskoop-exporter-nodes-dashboard.json
+register_dashboard /etc/elite-exporter-pods-dashboard.json
+register_dashboard /etc/elite-exporter-nodes-dashboard.json
 sleep infinity

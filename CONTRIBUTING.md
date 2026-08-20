@@ -1,21 +1,23 @@
-# Contributing to Elite
+# Contributing to Elite eBPF
 
-Elite is a fork/customization of [KubeSkoop](https://github.com/alibaba/kubeskoop).
+Elite eBPF is a personal open-source project by **abdullah i** — sole author and maintainer.
+
+See [AUTHORS.md](../AUTHORS.md). Do not add third-party or AI agent names to commits or contributor lists.
 
 ## Development
 
 ```bash
-make generate-bpf-in-container  # requires Docker
-make build-exporter
+make generate-bpf-in-container
+make build-elite-agent
+go test ./pkg/export/... ./pkg/exporter/probe/traceconnect/...
 ```
 
-## Pull Requests
+## Commits
 
-1. Fork the repo
-2. Create feature branch
-3. Run `go test ./...` on Linux
-4. Ensure benchmarks pass SLO gates
+Author: `abdullah i <abdullahanifpro111-spec@users.noreply.github.com>`
 
-## Code of Conduct
+Run `bash scripts/audit-commit.sh` before commit — rejects AI/agent watermarks in messages.
 
-Be respectful. Follow CNCF community guidelines.
+## License
+
+Userspace Apache-2.0; BPF `/bpf` GPL-2.0.

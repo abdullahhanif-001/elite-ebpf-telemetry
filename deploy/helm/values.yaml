@@ -34,8 +34,8 @@ agent:
     debug: false
     port: 9102
   image:
-    repository: kubeskoop/agent
-    tag: v1.0.1
+    repository: ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent
+    tag: v1.0.0
     imagePullPolicy: IfNotPresent
   resources:
     limits:
@@ -46,8 +46,8 @@ agent:
       memory: 1024Mi
   btfhack:
     enabled: true
-    repository: kubeskoop/agent
-    tag: v1.0.1
+    repository: ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent
+    tag: v1.0.0
     imagePullPolicy: IfNotPresent
   nodeSelector: {}
   tolerations: {}
@@ -59,8 +59,8 @@ controller:
     prometheusEndpoint: http://prometheus-service
     lokiEndpoint: http://loki-service:3100
   image:
-    repository: kubeskoop/controller
-    tag: v1.0.1
+    repository: ghcr.io/abdullahanifpro111-spec/elite-ebpf/controller
+    tag: v1.0.0
     imagePullPolicy: IfNotPresent
   resources:
     limits:
@@ -89,8 +89,8 @@ webconsole:
     username: changeme
     password: changeme
   image:
-    repository: kubeskoop/controller
-    tag: v1.0.1
+    repository: ghcr.io/abdullahanifpro111-spec/elite-ebpf/controller
+    tag: v1.0.0
     imagePullPolicy: IfNotPresent
   resources:
     limits:

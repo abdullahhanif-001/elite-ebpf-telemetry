@@ -22,12 +22,12 @@ install_cni() {
 kubectl apply -f /vagrant/deploy/kube-flannel.yaml
 }
 
-install_kubeskoop() {
+install_elite() {
 kubectl apply -f /vagrant/deploy/skoop-deploy.yaml
 }
 
 kubeadm_init
 copy_kubeconfig
 install_cni
-install_kubeskoop
+install_elite
 generate_join_command

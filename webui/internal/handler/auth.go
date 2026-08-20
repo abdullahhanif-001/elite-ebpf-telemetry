@@ -20,7 +20,7 @@ func RegisterAuthHandler(g *gin.RouterGroup, auth *jwt.GinJWTMiddleware) {
 
 func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 	return jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "kubeskoop webconsole",
+		Realm:       "Elite eBPF web console",
 		Key:         []byte(config.Global.Auth.JWTKey),
 		Timeout:     24 * time.Hour,
 		MaxRefresh:  24 * time.Hour,

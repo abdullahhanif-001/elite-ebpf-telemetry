@@ -52,4 +52,4 @@ COPY --from=cross-build /go/src/github.com/alibaba/kubeskoop/bin/webconsole /bin
 COPY --from=build-ui /webconsole/build /var/www
 
 COPY tools/scripts/* /bin/
-COPY deploy/resource/kubeskoop-exporter-pods-dashboard.json deploy/resource/kubeskoop-exporter-nodes-dashboard.json /etc/
+COPY deploy/resource/elite-exporter-pods-dashboard.json deploy/resource/elite-exporter-nodes-dashboard.json /etc/

@@ -24,9 +24,9 @@ spec:
             - "/bin/controller"
           volumeMounts:
             - name: lib
-              mountPath: /var/lib/kubeskoop
+              mountPath: /var/lib/elite
             - name: config
-              mountPath: /etc/kubeskoop
+              mountPath: /etc/elite
           resources:
             {{ toYaml .resources | nindent 12 }}
       {{- with .nodeSelector }}

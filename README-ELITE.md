@@ -1,5 +1,5 @@
-# Elite
+# Elite eBPF
 
-See [README.md](README.md) for the full documentation.
+Personal open-source project by **abdullah i**.
 
-This file is kept for backward compatibility.
+See [README.md](README.md) for full documentation.

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kubeskoop-config
+  name: elite-config
   namespace: {{ .Release.Namespace }}
 data:
   config.yaml: |-

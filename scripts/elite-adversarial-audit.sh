@@ -81,7 +81,7 @@ else
 fi
 
 echo "--- A-05 High: metrics non-empty ---"
-COUNT=$(curl -sf http://127.0.0.1:9102/metrics 2>/dev/null | grep -cE '^(kubeskoop|elite)_' || echo 0)
+COUNT=$(curl -sf http://127.0.0.1:9102/metrics 2>/dev/null | grep -cE '^elite_' || echo 0)
 if [ "$COUNT" -lt 5 ]; then
   record A-05 High "fewer than 5 metric lines (got $COUNT)" FAIL
 else

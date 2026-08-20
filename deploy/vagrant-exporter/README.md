@@ -1,40 +1,23 @@
-# Vagrantfile for KubeSkoop exporter
+# Vagrant test cluster — Elite eBPF exporter
 
-This `Vagrantfile` can setup a 3 node kubernetes cluster (1 master, 2 worker) with `flannel` plugin and KubeSkoop exporter for your tests.
+Optional 3-node Kubernetes (1 master, 2 workers) with flannel and **Elite eBPF** agent for local testing.
 
-Before you start, you need to install [Vagrant](https://developer.hashicorp.com/vagrant/docs/installation) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads) first.
-
-## Run KubeSkoop exporter with Vagrant
-
-When you installed Vagrant and VirtualBox, you can clone the `kubeskoop repo`, move to this folder, and run `vagrant up`.
+## Setup
 
 ```shell
-git clone git@github.com:alibaba/kubeskoop.git
-cd kubeskoop/deploy/vagrant-exporter
+git clone https://github.com/abdullahanifpro111-spec/elite-ebpf.git
+cd elite-ebpf/deploy/vagrant-exporter
 vagrant up
 ```
 
-It may take a white to set up 3 virtual machines to build a kubernetes cluster.
+## Verify
 
-## Manage cluster with `kubectl`
-
-When your cluster is ready, you can ssh into the master node to take a look at the cluster.
+Elite components install in the `elite` namespace:
 
 ```shell
-vagrant ssh master
-# on master node
-kubectl get pod -n kube-system
+kubectl get pod -n elite
 ```
 
-KubeSkoop are installed in `kubeskoop` namespace.
+When pods are ready, Grafana: [http://127.0.0.1:8080](http://127.0.0.1:8080) on the host.
 
-```shell
-# on master node
-kubectl get pod -n kubeskoop
-```
-
-## Access the Grafana on host machine
-
-When all pods under `kubeskoop` namespace are ready, you can now access the Grafana via [http://127.0.0.1:8080](http://127.0.0.1:8080) on your host machine.
-
-Set Grafana credentials via `GRAFANA_USERNAME` and `GRAFANA_PASSWORD` environment variables (Helm values default to `changeme` — change before use).
+**Note:** Legacy vagrant scripts may still reference old resource names; prefer `deploy/elite-bundle.yaml` for production-like installs.

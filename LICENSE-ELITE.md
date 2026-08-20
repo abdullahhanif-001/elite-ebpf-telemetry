@@ -8,4 +8,4 @@ Apache License 2.0 — see [LICENSE.md](LICENSE.md)
 
 GPL-2.0 WITH Linux-syscall-note — see [bpf/COPYING](bpf/COPYING)
 
-This dual-license structure matches upstream KubeSkoop and is required for Linux kernel BPF helper compatibility.
+This dual-license structure is standard for Linux eBPF projects and is required for kernel BPF helper compatibility.

@@ -2,7 +2,7 @@
   "name": "@ice/fusion-pro-scaffold",
   "version": "1.0.0",
   "license": "Apache-2.0",
-  "description": "KubeSkoop Web Console",
+  "description": "Elite eBPF Web Console",
   "dependencies": {
     "@alifd/next": "^1.26.8",
     "@alifd/theme-design-pro": "^0.8.0",

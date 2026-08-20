@@ -52,7 +52,7 @@ echo "--- Prometheus scrape health ---"
 curl -sf 'http://127.0.0.1:9090/api/v1/query?query=up{job="elite-agent"}' | jq -r '.data.result[0].value[1] // "missing"' || echo "missing"
 
 echo "--- Metric prefix inventory ---"
-curl -sf http://127.0.0.1:9102/metrics | grep -oE '^(kubeskoop|elite)_[a-z_]+' | sort -u | head -20
+curl -sf http://127.0.0.1:9102/metrics | grep -oE '^elite_[a-z_]+' | sort -u | head -20
 
 echo "--- Port exposure (must be 127.0.0.1 only) ---"
 ss -tlnp | grep -E '9102|9090|3030' || true

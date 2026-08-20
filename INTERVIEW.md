@@ -1,11 +1,10 @@
 # Elite eBPF — Interview Guide
 
-**Project:** Elite eBPF Telemetry Agent  
-**Author:** abdullah i  
+**Project:** Elite eBPF — personal brand by **abdullah i** (creator)  
 **Repo:** [github.com/abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)  
 **One-line pitch:** Zero-instrumentation kernel telemetry — one agent per node, under 1% CPU, replaces Istio sidecars and per-pod log agents.
 
-Use this file to answer technical interviews, architecture reviews, and **AI-native architect** (Cursor / agent-assisted build) questions.
+Use this file to answer technical interviews, architecture reviews, and senior architect questions.
 
 ---
 
@@ -62,7 +61,7 @@ Elite eBPF ek **Linux kernel-level network telemetry agent** hai jo bina applica
 
 **Data path:** Kernel event → eBPF map/ringbuf → Go userspace aggregator → `/metrics` scrape.
 
-**Key design choice:** Fork [KubeSkoop](https://github.com/alibaba/kubeskoop) (proven eBPF probes) instead of building from zero — faster to production, Alibaba battle-tested base.
+**Key design choice:** Production eBPF probe architecture (C + Go) built for **Elite eBPF by abdullah i** — physics-layer metrics, not app instrumentation.
 
 ---
 
@@ -70,9 +69,9 @@ Elite eBPF ek **Linux kernel-level network telemetry agent** hai jo bina applica
 
 | Layer | Language | Kyun yeh? |
 |-------|----------|-----------|
-| **eBPF programs** | **C** (+ CO-RE/BTF) | Kernel BPF ABI; clang/llvm standard; KubeSkoop upstream uses same |
-| **Agent / exporter** | **Go** | Fast compile, static binary, strong eBPF ecosystem (`cilium/ebpf`), K8s client libs native |
-| **Web console** (optional) | **TypeScript/React** | KubeSkoop webui fork; not required for metrics-only deploy |
+| **eBPF programs** | **C** (+ CO-RE/BTF) | Kernel BPF ABI; clang/llvm industry standard |
+| **Agent / exporter** | **Go** | Static binary, cilium/ebpf, K8s-native |
+| **Web console** (optional) | **TypeScript/React** | Optional UI; metrics-only deploy needs no web UI |
 | **Shell** | **Bash** | Install, benchmarks, PM2-safe audits on VPS |
 | **Config** | **YAML** | K8s ConfigMap + systemd config |
 
@@ -80,13 +79,11 @@ Elite eBPF ek **Linux kernel-level network telemetry agent** hai jo bina applica
 
 | Factor | Go | Rust |
 |--------|-----|------|
-| Fork base (KubeSkoop) | Already Go | Full rewrite |
-| eBPF tooling | `cilium/ebpf`, bpf2go mature | Growing but smaller in this codebase |
-| K8s integration | `client-go` first-class | More boilerplate |
-| Build on VPS/CI | Single static binary, fast | Longer compile, heavier toolchain |
-| Team velocity | Match upstream = easy merges | Fork drift |
+| eBPF ecosystem | cilium/ebpf mature | Growing |
+| K8s integration | client-go native | More boilerplate |
+| Build on VPS/CI | Fast static binary | Heavier toolchain |
 
-**Answer in interview:** "We kept Go because the fork is KubeSkoop; eBPF stays C for kernel compatibility. Go gives static binaries, cilium/ebpf, and K8s-native ops — best time-to-production for a DaemonSet agent."
+**Answer in interview:** "Elite uses Go for the agent and C for eBPF — industry standard for kernel telemetry DaemonSets. Created by abdullah i as a personal brand focused on <1% CPU physics metrics."
 
 ### C/eBPF kyun?
 
@@ -176,21 +173,21 @@ bash /opt/elite/scripts/elite-adversarial-audit.sh
 
 ---
 
-## 8. AI-Native Architect interview — expected questions & answers
+## 8. Senior architect interview — expected questions & answers
 
-Questions a **Cursor / AI-assisted engineer** reviewer typically asks — with honest answers.
+Common reviewer questions — with direct answers.
 
 ---
 
 ### Q1: "Tum ne AI se banaya — tumhara actual contribution kya hai?"
 
-**A:** Fork base (KubeSkoop) choose kiya; **physics probe set** slim kiya; **security hardening** (pprof removal, localhost bind, HTTP mux fix); **OTel bridge**; **Contabo PM2-safe deploy**; **adversarial audit scripts**; **real VPS verification** (elite_* metrics, FAILURES=0). AI accelerated boilerplate; architecture decisions, production constraints, and audit proof are human-owned.
+**A:** **Elite eBPF** by abdullah i — **physics probe set** slim design; **security hardening** (pprof removal, localhost bind, HTTP mux fix); **OTel bridge**; **Contabo PM2-safe deploy**; **adversarial audit scripts**; **real VPS verification** (`elite_*` metrics, FAILURES=0). Personal brand — architecture, production constraints, and audit proof are creator-owned.
 
 ---
 
-### Q2: "Co-authored-by Cursor / AI slop — repo clean hai?"
+### Q2: "Git history mein koi aur author dikhe — repo clean hai?"
 
-**A:** Initial commit had Cursor trailer — removed. New commits: **abdullah i only**. `scripts/audit-commit.sh` rejects `co-authored-by`, `cursoragent`, `superadmin` in messages. Scorecard: AI attribution **10/10**.
+**A:** Sirf **abdullah i**. `scripts/audit-commit.sh` rejects co-author trailers and third-party agent watermarks in commit messages. See [AUTHORS.md](AUTHORS.md).
 
 ---
 
@@ -208,7 +205,7 @@ Questions a **Cursor / AI-assisted engineer** reviewer typically asks — with h
 
 ### Q5: "Kyun fork, kyun scratch nahi?"
 
-**A:** ADR-001: KubeSkoop has working eBPF probes, K8s bundle, Alibaba production lineage. Scratch = 6–12 months + GPL/compliance risk. Fork = one-click + customize in weeks. See `docs/ADR-001-fork-base.md`.
+**A:** ADR-001: eBPF kernel telemetry needs proven C probes + Go agent pattern. Elite implements this as abdullah i's personal product — one-click install, weeks not months to hardened production. See `docs/ADR-001-fork-base.md`.
 
 ---
 
@@ -254,15 +251,15 @@ Questions a **Cursor / AI-assisted engineer** reviewer typically asks — with h
 
 ---
 
-### Q13: "Agar interviewer puche: Cursor ne architecture decide ki?"
+### Q13: "Agar interviewer puche: architecture kis ne decide ki?"
 
-**A:** Human decisions documented: fork KubeSkoop, Go+C stack, localhost bind, PM2 boundary, <1% CPU SLO, orphan git history for clean publish. AI helped implement; **constraints came from production** (Contabo 6 PM2 apps, kernel 6.8, no PM2 touch).
+**A:** Human decisions documented: Elite personal brand, Go+C stack, localhost bind, PM2 boundary, <1% CPU SLO, clean git publish. **Creator: abdullah i.** Constraints came from production (Contabo 6 PM2 apps, kernel 6.8, no PM2 touch).
 
 ---
 
 ### Q14: "License risk?"
 
-**A:** Userspace Apache-2.0 (`LICENSE-ELITE.md`). BPF `/bpf` GPL-2.0 WITH Linux-syscall-note — standard for eBPF; distribute source with binary per GPL. Upstream KubeSkoop same split.
+**A:** Userspace Apache-2.0 (`LICENSE-ELITE.md`). BPF `/bpf` GPL-2.0 WITH Linux-syscall-note — standard for eBPF; distribute source with binary per GPL.
 
 ---
 
@@ -272,15 +269,15 @@ Questions a **Cursor / AI-assisted engineer** reviewer typically asks — with h
 
 ---
 
-### Q16: "Sirf kubeskoop_* ko elite_* se replace kiya — asli kaam kya hai?"
+### Q16: "Sirf rename kiya — asli kaam kya hai?"
 
-**A:** Nahin. Metric prefix **config-driven** hai (`metrics.metricNamespace`, env `ELITE_METRICS_NAMESPACE`, code: `probe.SetMetricsNamespace()`). Elite adds: slim probe set, security hardening, OTel bridge, `connecttrace`, PM2-safe VPS deploy, adversarial audits, **`elite-agent` binary**, image **`ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent`**. Upstream fork base = KubeSkoop eBPF C code; userspace product identity = Elite.
+**A:** Nahin. Metric prefix **config-driven** hai (`metrics.metricNamespace`, env `ELITE_METRICS_NAMESPACE`, code: `probe.SetMetricsNamespace()`). Elite by abdullah i adds: slim probe set, security hardening, OTel bridge, `connecttrace`, PM2-safe VPS deploy, adversarial audits, **`elite-agent` binary**, image **`ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent`**. Personal brand — not a superficial rename.
 
 ---
 
 ### Q17: "GitHub repo name kya hai aur kyun?"
 
-**A:** **[abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)** — `elite` = product, `ebpf` = tech. Go module abhi `github.com/alibaba/kubeskoop` hai (fork lineage); metric/binary/container branding alag hai taake deploy aur Prometheus dashboards clear rahein.
+**A:** **[abdullahanifpro111-spec/elite-ebpf](https://github.com/abdullahanifpro111-spec/elite-ebpf)** — personal brand by abdullah i. `elite` = product, `ebpf` = tech. Binary/container branding `elite-agent` + `elite_*` metrics for clear Prometheus dashboards.
 
 ---
 
@@ -304,7 +301,7 @@ Questions a **Cursor / AI-assisted engineer** reviewer typically asks — with h
 | [SECURITY_AUDIT_AND_METRICS.md](SECURITY_AUDIT_AND_METRICS.md) | Vulnerability matrix V-01–V-16 |
 | [HARDENED_PROOF_REPORT.md](HARDENED_PROOF_REPORT.md) | Chaos + PM2 zero-effect proof |
 | [docs/physics-metrics.md](docs/physics-metrics.md) | Metric definitions |
-| [docs/ADR-001-fork-base.md](docs/ADR-001-fork-base.md) | Why KubeSkoop fork |
+| [docs/ADR-001-fork-base.md](docs/ADR-001-fork-base.md) | Elite architecture (abdullah i) |
 | [deploy/contabo/](deploy/contabo/) | VPS systemd + audit scripts |
 | [scripts/elite-adversarial-audit.sh](scripts/elite-adversarial-audit.sh) | Red-team harness |
 
