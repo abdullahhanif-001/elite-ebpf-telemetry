@@ -1,0 +1,22 @@
+apiVersion: v1
+name: elite-ebpf
+description: Elite eBPF — zero-instrumentation kernel telemetry by Abdullah Hanif
+type: application
+annotations:
+  category: Analytics
+  licenses: Apache-2.0
+version: 1.0.0
+appVersion: 1.0.0
+keywords:
+  - elite
+  - elite-ebpf
+  - kubernetes
+  - prometheus
+  - eBPF
+  - monitoring
+home: https://github.com/abdullahhanif-001/elite-ebpf-telemetry
+sources:
+  - https://github.com/abdullahhanif-001/elite-ebpf-telemetry
+maintainers:
+- name: Abdullah Hanif
+  url: https://github.com/abdullahhanif-001

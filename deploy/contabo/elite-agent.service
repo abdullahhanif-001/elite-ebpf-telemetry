@@ -1,0 +1,35 @@
+[Unit]
+Description=Elite eBPF Physics Agent
+After=network.target docker.service
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+Environment=KUBESKOOP_POD_NAMESPACE=elite
+Environment=KUBESKOOP_POD_NAME=contabo-host
+# Skip slow BTF mirror download when cache exists
+ExecStartPre=/bin/sh -c 'test -f /opt/elite/btf/vmlinux || /opt/elite/bin/btfhack discover -p /opt/elite/btf/'
+ExecStart=/opt/elite/bin/elite-agent server --sidecar -c /opt/elite/config/config.yaml
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=180
+
+# HARD LIMITS — steady-state ~0.008 cores; 5% burst cap for BPF attach
+CPUQuota=5%
+MemoryMax=160M
+MemoryHigh=128M
+Nice=10
+IOSchedulingClass=idle
+
+NoNewPrivileges=true
+AmbientCapabilities=CAP_BPF CAP_PERFMON CAP_SYS_ADMIN CAP_NET_ADMIN
+CapabilityBoundingSet=CAP_BPF CAP_PERFMON CAP_SYS_ADMIN CAP_NET_ADMIN
+PrivateTmp=true
+ProtectHome=true
+ReadWritePaths=/opt/elite/btf /opt/elite/logs /sys/fs/bpf
+RestrictRealtime=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

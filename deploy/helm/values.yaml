@@ -1,0 +1,109 @@
+config:
+  disableMetricsCompression: true
+#  additionalLabels:
+#    - application=${labels:application}
+#      businessline=${labels:businessline}
+#      department=${labels:department}
+#      environment=environment
+  metricProbes:
+    - name: conntrack
+    - name: qdisc
+    - name: netdev
+    - name: io
+    - name: sock
+    - name: tcpsummary
+    - name: tcp
+    - name: tcpext
+    - name: udp
+    - name: packetloss
+    - name: flow
+      args:
+        enablePortInLabel: false
+    - name: tcpretrans
+  eventProbes:
+    - name: tcpreset
+    - name: packetloss
+      args:
+        enableStack: false
+    - name: tcpretrans
+  eventSinks:
+    - name: stderr
+
+agent:
+  config:
+    debug: false
+    port: 9102
+  image:
+    repository: ghcr.io/abdullahhanif-001/elite-ebpf-telemetry/agent
+    tag: v1.0.0
+    imagePullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+      ephemeral-storage: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 128Mi
+  btfhack:
+    enabled: true
+    repository: ghcr.io/abdullahhanif-001/elite-ebpf-telemetry/agent
+    tag: v1.0.0
+    imagePullPolicy: IfNotPresent
+  nodeSelector: {}
+  tolerations: {}
+
+controller:
+  enabled: true
+  config:
+    logLevel: info
+    prometheusEndpoint: https://prometheus-service
+    lokiEndpoint: https://loki-service:3100
+  image:
+    repository: ghcr.io/abdullahhanif-001/elite-ebpf-telemetry/controller
+    tag: v1.0.0
+    imagePullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 200Mi
+      ephemeral-storage: 256Mi
+    requests:
+      cpu: 50m
+      memory: 20Mi
+      ephemeral-storage: 64Mi
+  nodeSelector: {}
+  tolerations: {}
+
+webconsole:
+  enabled: true
+  service:
+    type: ClusterIP
+    port: 80
+    annotations: {}
+  auth:
+    # Set via Helm --set or secrets; never ship production defaults in git.
+    username: changeme
+    password: changeme
+  grafana:
+    endpoint: https://grafana/grafana
+    proxy: true
+    # used for proxy mode
+    username: changeme
+    password: changeme
+  image:
+    repository: ghcr.io/abdullahhanif-001/elite-ebpf-telemetry/controller
+    tag: v1.0.0
+    imagePullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 200Mi
+      ephemeral-storage: 256Mi
+    requests:
+      cpu: 50m
+      memory: 20Mi
+      ephemeral-storage: 64Mi
+  nodeSelector: { }
+  tolerations: { }

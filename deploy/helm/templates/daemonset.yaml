@@ -1,0 +1,169 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: agent
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: elite-agent
+{{- with .Values.agent }}
+spec:
+  selector:
+    matchLabels:
+      app: elite-agent
+  template:
+    metadata:
+      labels:
+        app: elite-agent
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "{{ .config.port }}"
+        prometheus.io/scrape: "true"
+    spec:
+      automountServiceAccountToken: false
+      dnsPolicy: ClusterFirst
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      {{- if .btfhack.enabled }}
+      initContainers:
+        - name: btfhack
+          image: "{{ .btfhack.repository }}:{{ .btfhack.tag }}"
+          imagePullPolicy: {{ .btfhack.imagePullPolicy }}
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+              ephemeral-storage: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+              ephemeral-storage: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: btf-rawdata
+              mountPath: /etc/net-exporter/btf
+            - mountPath: /boot/
+              name: boot
+          command:
+            - btfhack
+            - discover
+            - -p
+            - /etc/net-exporter/btf/
+      {{- end }}
+      containers:
+      - name: inspector
+        image:  "{{ .image.repository }}:{{ .image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .config.port }}
+        imagePullPolicy: {{ .image.imagePullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: {{ .config.port }}
+          initialDelaySeconds: 15
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: {{ .config.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        env:
+        - name: INSPECTOR_NODENAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config/
+          - name: btf-rawdata
+            mountPath: /etc/net-exporter/btf
+          - name: proc
+            mountPath: /proc
+          - mountPath: /run/containerd/
+            name: containerd
+          - mountPath: /var/run/
+            name: dockershim
+          - mountPath: /sys/fs/bpf
+            name: bpf-maps
+            mountPropagation: HostToContainer
+          - mountPath: /sys/fs/cgroup
+            name: cgroup
+            mountPropagation: HostToContainer
+            - mountPath: /sys/kernel/debug
+            name: bpf-events
+            mountPropagation: HostToContainer
+          - mountPath: /etc/node-hostname
+            name: hostname
+          - mountPath: /tmp
+            name: tmp
+        command:
+          - /bin/inspector
+          - server
+          - -d
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65532
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          {{- toYaml .resources | nindent 12 }}
+      {{- with .nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: containerd
+          hostPath:
+            path: /run/containerd/
+        - name: dockershim
+          hostPath:
+            path: /var/run/
+        - hostPath:
+            path: /sys/fs/bpf
+            type: DirectoryOrCreate
+          name: bpf-maps
+        - name: boot
+          hostPath:
+            path: /boot
+            type: DirectoryOrCreate
+        - hostPath:
+            path: /sys/fs/cgroup
+            type: DirectoryOrCreate
+          name: cgroup
+        - hostPath:
+            path: /sys/kernel/debug
+          name: bpf-events
+        - name: hostname
+          hostPath:
+            path: /etc/hostname
+            type: FileOrCreate
+        - name: config-volume
+          configMap:
+            name: elite-config
+        - name: btf-rawdata
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+{{- end }}
