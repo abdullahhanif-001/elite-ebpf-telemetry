@@ -16,6 +16,12 @@ go test ./pkg/export/... ./pkg/exporter/probe/traceconnect/...
 
 Author: `Abdullah Hanif <abdullahhanif-001@users.noreply.github.com>`
 
+Enable repo hooks (blocks automated co-author trailers):
+
+```bash
+git config core.hooksPath scripts/hooks
+```
+
 Run `bash scripts/audit-commit.sh` before commit — rejects AI/agent watermarks in messages.
 
 ## License
