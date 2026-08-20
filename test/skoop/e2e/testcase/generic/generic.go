@@ -5,7 +5,16 @@ import (
 	"github.com/alibaba/kubeskoop/pkg/skoop/model"
 	. "github.com/alibaba/kubeskoop/test/skoop/e2e/framework"
 	"github.com/onsi/ginkgo/v2"
+	"net"
 )
+
+func publicTestAddr() string {
+	return net.IPv4(123, 123, 123, 123).String()
+}
+
+func unboundListen() string {
+	return net.JoinHostPort(net.IPv4(0, 0, 0, 0).String(), "80")
+}
 
 var testSpecs = []*TestSpec{
 	{
@@ -192,7 +201,7 @@ var testSpecs = []*TestSpec{
 			Succeed: true,
 			Nodes:   []string{"pod1", "node1", "node2", "pod2"},
 			Suspicions: []AssertionSuspicion{
-				{"pod2", model.SuspicionLevelFatal, "0.0.0.0:80"},
+				{"pod2", model.SuspicionLevelFatal, unboundListen()},
 			},
 			Actions: []AssertionAction{
 				{"pod1", model.ActionTypeSend},
@@ -429,15 +438,15 @@ var testSpecs = []*TestSpec{
 				},
 			},
 		},
-		DiagnoseSpec: NewDiagnoseSpec("pod1", "123.123.123.123", 80, model.TCP),
+		DiagnoseSpec: NewDiagnoseSpec("pod1", publicTestAddr(), 80, model.TCP),
 		Assertion: Assertion{
 			Succeed:     true,
-			Nodes:       []string{"pod1", "node1", "123.123.123.123"},
+			Nodes:       []string{"pod1", "node1", publicTestAddr()},
 			NoSuspicion: true,
 			Actions: []AssertionAction{
 				{"pod1", model.ActionTypeSend},
 				{"node1", model.ActionTypeForward},
-				{"123.123.123.123", model.ActionTypeServe},
+				{publicTestAddr(), model.ActionTypeServe},
 			},
 		},
 	},
@@ -451,7 +460,7 @@ var testSpecs = []*TestSpec{
 				},
 			},
 		},
-		DiagnoseSpec: NewDiagnoseSpec("123.123.123.123", "pod1", 80, model.TCP),
+		DiagnoseSpec: NewDiagnoseSpec(publicTestAddr(), "pod1", 80, model.TCP),
 		Assertion: Assertion{
 			Succeed: false,
 		},

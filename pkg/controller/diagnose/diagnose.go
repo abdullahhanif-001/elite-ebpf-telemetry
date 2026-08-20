@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"strconv"
 
+	"github.com/alibaba/kubeskoop/pkg/exporter/security"
 	skoopContext "github.com/alibaba/kubeskoop/pkg/skoop/context"
 )
 
@@ -54,7 +54,7 @@ func (d *Diagnostor) Diagnose(ctx context.Context, taskConfig *skoopContext.Task
 	if d.config != nil {
 		args = append(args, buildArgsFromConfig(d.config)...)
 	}
-	cmd := exec.CommandContext(ctx, "skoop", args...)
+	cmd := security.CommandContext(ctx, "skoop", args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("failed to diagnose: %v, output: %v", err, string(output))

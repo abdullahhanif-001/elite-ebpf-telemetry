@@ -15,7 +15,9 @@ var (
 	rootCmd = &cobra.Command{
 		Use:              "skoop-controller",
 		Short:            "skoop centralized controller",
-		PersistentPreRun: func(_ *cobra.Command, _ []string) {},
+		PersistentPreRun: func(_ *cobra.Command, _ []string) {
+			// Shared flags only; subcommands own their runtime setup.
+		},
 		RunE: func(_ *cobra.Command, _ []string) error {
 			config := &Config{}
 			var err error

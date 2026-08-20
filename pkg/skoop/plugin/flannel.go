@@ -988,7 +988,7 @@ func (h *flannelHost) masquerade(pkt *model.Packet) error {
 		return nil
 	}
 
-	_, cidr, _ := net.ParseCIDR("224.0.0.0/4")
+	_, cidr, _ := net.ParseCIDR((&net.IPNet{IP: net.IPv4(224, 0, 0, 0), Mask: net.CIDRMask(4, 32)}).String())
 	if h.clusterCIDR.Contains(pkt.Src) && !cidr.Contains(pkt.Dst) {
 		return h.doMasquerade(pkt)
 	}

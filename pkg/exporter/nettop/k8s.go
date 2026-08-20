@@ -26,6 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )
 
@@ -358,7 +359,7 @@ func StartPodCacheWatch(ctx context.Context) (*PodCache, error) {
 	utilruntime.Must(v1.AddToScheme(scheme))
 	// Create manager
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		MetricsBindAddress: "0",
+		Metrics: server.Options{BindAddress: "0"},
 		Cache: cache.Options{
 			Scheme: scheme,
 			ByObject: map[client.Object]cache.ByObject{

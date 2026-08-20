@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"os/exec"
+	"github.com/alibaba/kubeskoop/pkg/exporter/security"
 	"reflect"
 	"runtime"
 	"strconv"
@@ -15,9 +15,6 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/samber/lo"
 	"golang.org/x/sys/unix"
@@ -37,7 +34,6 @@ import (
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc"
 	pb "k8s.io/cri-api/pkg/apis/runtime/v1"
-	pbv1alpha2 "k8s.io/cri-api/pkg/apis/runtime/v1alpha2"
 )
 
 type podCollector struct {
@@ -45,9 +41,8 @@ type podCollector struct {
 	podNamespace    string
 	podName         string
 
-	dockerCli          client.APIClient
-	runtimeCli         pb.RuntimeServiceClient
-	runtimeCliV1Alpha2 pbv1alpha2.RuntimeServiceClient
+	dockerCli  client.APIClient
+	runtimeCli pb.RuntimeServiceClient
 }
 
 func (a *podCollector) DumpNodeInfos() (*k8s.NodeNetworkStackDump, error) {
@@ -117,13 +112,8 @@ func NewCollector(podNamespace, podName, runtimeEndpoint string) (collector.Coll
 		return nil, err
 	}
 	pc.runtimeCli = pb.NewRuntimeServiceClient(conn)
-	// negotiate cri api version
-	_, err = pc.runtimeCli.Version(context.TODO(), &pb.VersionRequest{})
-	if status.Code(err) == codes.Unimplemented {
-		pc.runtimeCli = nil
-		pc.runtimeCliV1Alpha2 = pbv1alpha2.NewRuntimeServiceClient(conn)
-	} else if err != nil {
-		return nil, err
+	if _, err = pc.runtimeCli.Version(context.TODO(), &pb.VersionRequest{}); err != nil {
+		return nil, fmt.Errorf("CRI v1 is required (v1alpha2 is no longer supported): %w", err)
 	}
 
 	return pc, nil
@@ -135,26 +125,12 @@ func (a *podCollector) PodInfo(sandbox *pb.PodSandbox) (k8s.PodNetInfo, error) {
 		sandboxStatus *pb.PodSandboxStatusResponse
 		err           error
 	)
-	if a.runtimeCli != nil {
-		sandboxStatus, err = a.runtimeCli.PodSandboxStatus(context.TODO(), &pb.PodSandboxStatusRequest{
-			PodSandboxId: sandbox.Id,
-			Verbose:      a.dockerCli == nil,
-		})
-		if err != nil {
-			return p, err
-		}
-	} else {
-		statusAlpha, err := a.runtimeCliV1Alpha2.PodSandboxStatus(context.TODO(), &pbv1alpha2.PodSandboxStatusRequest{
-			PodSandboxId: sandbox.Id,
-			Verbose:      a.dockerCli == nil,
-		})
-		if err != nil {
-			return p, err
-		}
-		sandboxStatus = &pb.PodSandboxStatusResponse{}
-		if err = alphaRespTov1Resp(statusAlpha, sandboxStatus); err != nil {
-			return p, fmt.Errorf("error convert alpha resp %v", err)
-		}
+	sandboxStatus, err = a.runtimeCli.PodSandboxStatus(context.TODO(), &pb.PodSandboxStatusRequest{
+		PodSandboxId: sandbox.Id,
+		Verbose:      a.dockerCli == nil,
+	})
+	if err != nil {
+		return p, err
 	}
 
 	p.PodName = sandboxStatus.Status.GetMetadata().GetName()
@@ -198,18 +174,6 @@ func unixSocketExists(sockets []string) string {
 	return ""
 }
 
-func alphaRespTov1Resp(
-	alphaRes interface{ Marshal() ([]byte, error) },
-	v1Res interface{ Unmarshal(_ []byte) error },
-) error {
-	p, err := alphaRes.Marshal()
-	if err != nil {
-		return err
-	}
-
-	return v1Res.Unmarshal(p)
-}
-
 func (a *podCollector) PodList() ([]k8s.PodNetInfo, error) {
 	var (
 		pods     []k8s.PodNetInfo
@@ -217,21 +181,9 @@ func (a *podCollector) PodList() ([]k8s.PodNetInfo, error) {
 		err      error
 	)
 
-	if a.runtimeCli != nil {
-		sandboxs, err = a.runtimeCli.ListPodSandbox(context.TODO(), &pb.ListPodSandboxRequest{})
-		if err != nil {
-			return nil, fmt.Errorf("error list pod sandbox: %v", err)
-		}
-	} else {
-		alphaSandboxs, err := a.runtimeCliV1Alpha2.ListPodSandbox(context.TODO(), &pbv1alpha2.ListPodSandboxRequest{})
-		if err != nil {
-			return nil, fmt.Errorf("error list pod sandbox: %v", err)
-		}
-		sandboxs = &pb.ListPodSandboxResponse{}
-		err = alphaRespTov1Resp(alphaSandboxs, sandboxs)
-		if err != nil {
-			return nil, fmt.Errorf("error convert alpha pod sandbox: %v", err)
-		}
+	sandboxs, err = a.runtimeCli.ListPodSandbox(context.TODO(), &pb.ListPodSandboxRequest{})
+	if err != nil {
+		return nil, fmt.Errorf("error list pod sandbox: %v", err)
 	}
 
 	for _, s := range sandboxs.Items {
@@ -346,14 +298,14 @@ func NSExec(args []string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("cannot get pid from pid: %v", err)
 	}
-	output, err := exec.Command(args[2], args[3:]...).CombinedOutput()
+	output, err := security.Command(args[2], args[3:]...).CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("err:%v, output: %v", err, string(output))
 	}
 	return string(output), nil
 }
 func namespaceCmd(pid uint32, cmd string) (string, error) {
-	cmdExec := exec.Command("nsenter", strconv.Itoa(int(pid)), "sh", "-c", cmd)
+	cmdExec := security.Command("nsenter", strconv.Itoa(int(pid)), "sh", "-c", cmd)
 	cmdExec.Path = "/proc/self/exe"
 	output, err := cmdExec.CombinedOutput()
 	if err != nil {

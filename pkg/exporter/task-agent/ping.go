@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"os/exec"
 	"regexp"
 	"strconv"
 
 	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
 	"github.com/alibaba/kubeskoop/pkg/exporter/nettop"
+	"github.com/alibaba/kubeskoop/pkg/exporter/security"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -44,7 +44,7 @@ func (a *Agent) ping(task *rpc.PingInfo) (string, error) {
 		return "", fmt.Errorf("invalid ping destination: %q is not a valid IP address", destination)
 	}
 
-	var cmd *exec.Cmd
+	var cmd interface{ Output() ([]byte, error) }
 	pingArgs := []string{"-A", "-c", "100", "-q", "-n", destination}
 	if task.Pod != nil && !task.Pod.HostNetwork {
 		var podEntry *nettop.Entity
@@ -59,11 +59,11 @@ func (a *Agent) ping(task *rpc.PingInfo) (string, error) {
 		}
 		nsenterArgs := []string{"-t", fmt.Sprintf("%d", podEntry.GetPid()), "-n", "--", "ping"}
 		nsenterArgs = append(nsenterArgs, pingArgs...)
-		cmd = exec.Command("nsenter", nsenterArgs...)
+		cmd = security.Command("nsenter", nsenterArgs...)
 	} else {
-		cmd = exec.Command("ping", pingArgs...)
+		cmd = security.Command("ping", pingArgs...)
 	}
-	log.Infof("running command: %v", cmd.Args)
+	log.Infof("running ping to %s", destination)
 	output, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("error running command: %v, output: %v", err, string(output))

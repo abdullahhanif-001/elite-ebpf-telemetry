@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"path/filepath"
 
+	"github.com/alibaba/kubeskoop/pkg/exporter/security"
 	"github.com/alibaba/kubeskoop/pkg/skoop/ui"
 
 	"k8s.io/apimachinery/pkg/util/json"
@@ -44,7 +46,16 @@ func (r *directExecutor) Diagnose(args DiagnoseArgs) (DiagnoseResult, error) {
 	var stdout, stderr bytes.Buffer
 
 	argString := r.generateArgs(args)
-	cmd := exec.Command(r.path, argString...)
+	bin := r.path
+	if !filepath.IsAbs(bin) {
+		var err error
+		bin, err = filepath.Abs(bin)
+		if err != nil {
+			return DiagnoseResult{}, err
+		}
+	}
+	cmd := exec.Command(bin, argString...)
+	cmd.Env = security.LockedEnv()
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err := cmd.Run()

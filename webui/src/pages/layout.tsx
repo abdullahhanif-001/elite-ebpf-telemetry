@@ -28,12 +28,12 @@ const getDevice: IGetDevice = (width) => {
 
 export default function Layout() {
   const location = useLocation()
-  const [device, setDevice] = useState(getDevice(NaN));
+  const [device, setDevice] = useState(getDevice(Number.NaN));
 
   if (typeof window !== 'undefined') {
     window.addEventListener('optimizedResize', (e) => {
       const deviceWidth =
-        (e && e.target && (e.target as Window).innerWidth) || NaN;
+        (e && e.target && (e.target as Window).innerWidth) || Number.NaN;
       setDevice(getDevice(deviceWidth));
     });
   }

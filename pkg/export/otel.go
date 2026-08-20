@@ -99,7 +99,7 @@ func (b *Bridge) Run(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			_ = b.Shutdown(context.Background())
+			_ = b.Shutdown(ctx)
 			return
 		case <-ticker.C:
 			if err := b.pushOnce(ctx); err != nil {

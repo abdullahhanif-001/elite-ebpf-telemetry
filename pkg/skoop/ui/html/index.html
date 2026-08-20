@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Skoop: {{.DiagnoseInfo}} </title>
 
@@ -90,7 +90,7 @@
             console.log(`patching ${n.id}`)
             let text = elem.querySelector("text")
             console.log(`text: ${text}`)
-            node_name = text.innerHTML
+            let node_name = text.innerHTML
             // calculate x, y and width
             let ellipse = elem.querySelector("ellipse")
             let d = Math.SQRT2 * ellipse.rx.baseVal.value
@@ -109,12 +109,12 @@
 
 
         function applyCluster() {
-            cluster_suspicion = document.getElementById("cluster-suspicions")
+            let cluster_suspicion = document.getElementById("cluster-suspicions")
             cluster_suspicion.onclick = ev => {
                 showSlidePanel(`Cluster`, [], cluster_info.suspicions, true)
             }
 
-            counter = `<span style="display: inline-block; text-align: center;"
+            let counter = `<span style="display: inline-block; text-align: center;"
                              class="node-suspicion-counter color-${cluster_info.suspicion_level.toLowerCase()}">
                                 ${cluster_info.suspicions ? cluster_info.suspicions.length : 0}
                        </span>`

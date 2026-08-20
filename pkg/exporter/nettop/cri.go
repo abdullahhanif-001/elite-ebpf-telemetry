@@ -13,13 +13,10 @@ import (
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/status"
 
 	internalapi "k8s.io/cri-api/pkg/apis"
 	runtimeapi "k8s.io/cri-api/pkg/apis/runtime/v1"
-	runtimeapiV1alpha2 "k8s.io/cri-api/pkg/apis/runtime/v1alpha2"
 )
 
 var (
@@ -71,7 +68,7 @@ func initCriInfo() error {
 		return nil
 	}
 
-	version, err := criClient.Version(kubeAPIVersion)
+	version, err := criClient.Version(context.Background(), kubeAPIVersion)
 	if err != nil {
 		return fmt.Errorf("failed get runtime version: %w", err)
 	}
@@ -84,47 +81,13 @@ func initCriInfo() error {
 	return nil
 }
 
-// remoteRuntimeService is a gRPC implementation of internalapi.RuntimeService.
+// remoteRuntimeService is a gRPC implementation of internalapi.RuntimeService (CRI v1 only).
 type remoteRuntimeService struct {
-	timeout               time.Duration
-	runtimeClient         runtimeapi.RuntimeServiceClient
-	runtimeClientV1alpha2 runtimeapiV1alpha2.RuntimeServiceClient
+	timeout       time.Duration
+	runtimeClient runtimeapi.RuntimeServiceClient
 }
 
-// useV1API returns true if the v1 CRI API should be used instead of v1alpha2.
-func (r *remoteRuntimeService) useV1API() bool {
-	return r.runtimeClientV1alpha2 == nil
-}
-
-func (r *remoteRuntimeService) versionV1alpha2(ctx context.Context, apiVersion string) (*runtimeapi.VersionResponse, error) {
-	typedVersion, err := r.runtimeClientV1alpha2.Version(ctx, &runtimeapiV1alpha2.VersionRequest{
-		Version: apiVersion,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if typedVersion.Version == "" || typedVersion.RuntimeName == "" || typedVersion.RuntimeApiVersion == "" || typedVersion.RuntimeVersion == "" {
-		return nil, fmt.Errorf("not all fields are set in VersionResponse (%q)", *typedVersion)
-	}
-
-	return fromV1alpha2VersionResponse(typedVersion), err
-}
-
-// Version returns the runtime name, runtime version and runtime API version.
-func (r *remoteRuntimeService) Version(apiVersion string) (*runtimeapi.VersionResponse, error) {
-
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	if r.useV1API() {
-		return r.versionV1(ctx, apiVersion)
-	}
-
-	return r.versionV1alpha2(ctx, apiVersion)
-}
-
-func (r *remoteRuntimeService) versionV1(ctx context.Context, apiVersion string) (*runtimeapi.VersionResponse, error) {
+func (r *remoteRuntimeService) Version(ctx context.Context, apiVersion string) (*runtimeapi.VersionResponse, error) {
 	typedVersion, err := r.runtimeClient.Version(ctx, &runtimeapi.VersionRequest{
 		Version: apiVersion,
 	})
@@ -140,12 +103,11 @@ func (r *remoteRuntimeService) versionV1(ctx context.Context, apiVersion string)
 }
 
 func getConnection(ctx context.Context, endPoint string) (*grpc.ClientConn, error) {
-	var conn *grpc.ClientConn
 	addr, dialer, err := GetAddressAndDialer(endPoint)
 	if err != nil {
 		return nil, err
 	}
-	conn, err = grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithContextDialer(dialer), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxMsgSize)))
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithContextDialer(dialer), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxMsgSize)))
 	if err != nil {
 		return nil, fmt.Errorf("connect endpoint '%s', make sure you are running as root and the endpoint has been started", endPoint)
 
@@ -163,137 +125,99 @@ func NewRemoteRuntimeService(endpoint string, connectionTimeout time.Duration) (
 	}
 
 	service := &remoteRuntimeService{
-		timeout: connectionTimeout,
+		timeout:       connectionTimeout,
+		runtimeClient: runtimeapi.NewRuntimeServiceClient(conn),
 	}
 
-	if err := service.determineAPIVersion(conn); err != nil {
-		return nil, err
+	if _, err := service.runtimeClient.Version(ctx, &runtimeapi.VersionRequest{}); err != nil {
+		return nil, fmt.Errorf("CRI v1 Version RPC failed (v1alpha2 is no longer supported): %w", err)
 	}
+	log.Warn("Using CRI v1 runtime API")
 
 	return service, nil
 }
 
-// Attach prepares a streaming endpoint to attach to a running container, and returns the address.
-func (r *remoteRuntimeService) Attach(_ *runtimeapi.AttachRequest) (*runtimeapi.AttachResponse, error) {
+func (r *remoteRuntimeService) Attach(_ context.Context, _ *runtimeapi.AttachRequest) (*runtimeapi.AttachResponse, error) {
 	return nil, nil
 }
 
-// CheckpointContainer triggers a checkpoint of the given CheckpointContainerRequest
-func (r *remoteRuntimeService) CheckpointContainer(_ *runtimeapi.CheckpointContainerRequest) error {
+func (r *remoteRuntimeService) CheckpointContainer(_ context.Context, _ *runtimeapi.CheckpointContainerRequest) error {
 	return nil
 }
 
-// ContainerStats returns the stats of the container.
-func (r *remoteRuntimeService) ContainerStats(_ string) (*runtimeapi.ContainerStats, error) {
+func (r *remoteRuntimeService) ContainerStats(_ context.Context, _ string) (*runtimeapi.ContainerStats, error) {
 	return nil, nil
 }
 
-// CreateContainer creates a new container in the specified PodSandbox.
-func (r *remoteRuntimeService) CreateContainer(_ string, _ *runtimeapi.ContainerConfig, _ *runtimeapi.PodSandboxConfig) (string, error) {
+func (r *remoteRuntimeService) CreateContainer(_ context.Context, _ string, _ *runtimeapi.ContainerConfig, _ *runtimeapi.PodSandboxConfig) (string, error) {
 	return "", nil
 }
 
-// Exec prepares a streaming endpoint to execute a command in the container, and returns the address.
-func (r *remoteRuntimeService) Exec(_ *runtimeapi.ExecRequest) (*runtimeapi.ExecResponse, error) {
+func (r *remoteRuntimeService) Exec(_ context.Context, _ *runtimeapi.ExecRequest) (*runtimeapi.ExecResponse, error) {
 	return nil, nil
 }
 
-// ExecSync executes a command in the container, and returns the stdout output.
-// If command exits with a non-zero exit code, an error is returned.
-func (r *remoteRuntimeService) ExecSync(_ string, _ []string, _ time.Duration) (stdout []byte, stderr []byte, err error) {
+func (r *remoteRuntimeService) ExecSync(_ context.Context, _ string, _ []string, _ time.Duration) (stdout []byte, stderr []byte, err error) {
 	return nil, nil, nil
 }
 
-func (r *remoteRuntimeService) GetContainerEvents(_ chan *runtimeapi.ContainerEventResponse) error {
+func (r *remoteRuntimeService) GetContainerEvents(_ context.Context, _ chan *runtimeapi.ContainerEventResponse, _ func(runtimeapi.RuntimeService_GetContainerEventsClient)) error {
 	return nil
 }
 
-// PortForward prepares a streaming endpoint to forward ports from a PodSandbox, and returns the address.
-func (r *remoteRuntimeService) PortForward(_ *runtimeapi.PortForwardRequest) (*runtimeapi.PortForwardResponse, error) {
+func (r *remoteRuntimeService) PortForward(_ context.Context, _ *runtimeapi.PortForwardRequest) (*runtimeapi.PortForwardResponse, error) {
 	return nil, nil
 }
 
-// RemoveContainer removes the container. If the container is running, the container
-// should be forced to removal.
-func (r *remoteRuntimeService) RemoveContainer(_ string) (err error) {
+func (r *remoteRuntimeService) RemoveContainer(_ context.Context, _ string) (err error) {
 	return nil
 }
 
-// RemovePodSandbox removes the sandbox. If there are any containers in the
-// sandbox, they should be forcibly removed.
-func (r *remoteRuntimeService) RemovePodSandbox(_ string) (err error) {
+func (r *remoteRuntimeService) RemovePodSandbox(_ context.Context, _ string) (err error) {
 	return nil
 }
 
-// ReopenContainerLog reopens the container log file.
-func (r *remoteRuntimeService) ReopenContainerLog(_ string) (err error) {
+func (r *remoteRuntimeService) ReopenContainerLog(_ context.Context, _ string) (err error) {
 	return nil
 }
 
-// RunPodSandbox creates and starts a pod-level sandbox. Runtimes should ensure
-// the sandbox is in ready state.
-func (r *remoteRuntimeService) RunPodSandbox(_ *runtimeapi.PodSandboxConfig, _ string) (string, error) {
+func (r *remoteRuntimeService) RunPodSandbox(_ context.Context, _ *runtimeapi.PodSandboxConfig, _ string) (string, error) {
 	return "", nil
 }
 
-// StartContainer starts the container.
-func (r *remoteRuntimeService) StartContainer(_ string) (err error) {
+func (r *remoteRuntimeService) StartContainer(_ context.Context, _ string) (err error) {
 	return nil
 }
 
-// StopContainer stops a running container with a grace period (i.e., timeout).
-func (r *remoteRuntimeService) StopContainer(_ string, _ int64) (err error) {
+func (r *remoteRuntimeService) StopContainer(_ context.Context, _ string, _ int64) (err error) {
 	return nil
 }
 
-// StopPodSandbox stops the sandbox. If there are any running containers in the
-// sandbox, they should be forced to termination.
-func (r *remoteRuntimeService) StopPodSandbox(_ string) (err error) {
+func (r *remoteRuntimeService) StopPodSandbox(_ context.Context, _ string) (err error) {
 	return nil
 }
 
-// UpdateContainerResources updates a containers resource config
-func (r *remoteRuntimeService) UpdateContainerResources(_ string, _ *runtimeapi.ContainerResources) (err error) {
+func (r *remoteRuntimeService) UpdateContainerResources(_ context.Context, _ string, _ *runtimeapi.ContainerResources) (err error) {
 	return nil
 }
 
-// UpdateRuntimeConfig updates the config of a runtime service. The only
-// update payload currently supported is the pod CIDR assigned to a node,
-// and the runtime service just proxies it down to the network plugin.
-func (r *remoteRuntimeService) UpdateRuntimeConfig(_ *runtimeapi.RuntimeConfig) (err error) {
+func (r *remoteRuntimeService) UpdateRuntimeConfig(_ context.Context, _ *runtimeapi.RuntimeConfig) (err error) {
 	return nil
 }
 
-// Status returns the status of the runtime.
-func (r *remoteRuntimeService) Status(verbose bool) (*runtimeapi.StatusResponse, error) {
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	if r.useV1API() {
-		return r.statusV1(ctx, verbose)
-	}
-
-	return r.statusV1alpha2(ctx, verbose)
+func (r *remoteRuntimeService) RuntimeConfig(_ context.Context) (*runtimeapi.RuntimeConfigResponse, error) {
+	return &runtimeapi.RuntimeConfigResponse{}, nil
 }
 
-func (r *remoteRuntimeService) statusV1alpha2(ctx context.Context, verbose bool) (*runtimeapi.StatusResponse, error) {
-	resp, err := r.runtimeClientV1alpha2.Status(ctx, &runtimeapiV1alpha2.StatusRequest{
-		Verbose: verbose,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.Status == nil || len(resp.Status.Conditions) < 2 {
-		errorMessage := "RuntimeReady or NetworkReady condition are not set"
-		err := errors.New(errorMessage)
-		return nil, err
-	}
-
-	return fromV1alpha2StatusResponse(resp), nil
+func (r *remoteRuntimeService) ListMetricDescriptors(_ context.Context) ([]*runtimeapi.MetricDescriptor, error) {
+	return nil, nil
 }
 
-func (r *remoteRuntimeService) statusV1(ctx context.Context, verbose bool) (*runtimeapi.StatusResponse, error) {
+func (r *remoteRuntimeService) ListPodSandboxMetrics(_ context.Context) ([]*runtimeapi.PodSandboxMetrics, error) {
+	return nil, nil
+}
+
+func (r *remoteRuntimeService) Status(ctx context.Context, verbose bool) (*runtimeapi.StatusResponse, error) {
 	resp, err := r.runtimeClient.Status(ctx, &runtimeapi.StatusRequest{
 		Verbose: verbose,
 	})
@@ -302,46 +226,13 @@ func (r *remoteRuntimeService) statusV1(ctx context.Context, verbose bool) (*run
 	}
 
 	if resp.Status == nil || len(resp.Status.Conditions) < 2 {
-		errorMessage := "RuntimeReady or NetworkReady condition are not set"
-		err := errors.New(errorMessage)
-		return nil, err
+		return nil, errors.New("RuntimeReady or NetworkReady condition are not set")
 	}
 
 	return resp, nil
 }
 
-// PodSandboxStatus returns the status of the PodSandbox.
-func (r *remoteRuntimeService) PodSandboxStatus(podSandBoxID string, verbose bool) (*runtimeapi.PodSandboxStatusResponse, error) {
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	if r.useV1API() {
-		return r.podSandboxStatusV1(ctx, podSandBoxID, verbose)
-	}
-
-	return r.podSandboxStatusV1alpha2(ctx, podSandBoxID, verbose)
-}
-
-func (r *remoteRuntimeService) podSandboxStatusV1alpha2(ctx context.Context, podSandBoxID string, verbose bool) (*runtimeapi.PodSandboxStatusResponse, error) {
-	resp, err := r.runtimeClientV1alpha2.PodSandboxStatus(ctx, &runtimeapiV1alpha2.PodSandboxStatusRequest{
-		PodSandboxId: podSandBoxID,
-		Verbose:      verbose,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	res := fromV1alpha2PodSandboxStatusResponse(resp)
-	if res.Status != nil {
-		if err := verifySandboxStatus(res.Status); err != nil {
-			return nil, err
-		}
-	}
-
-	return res, nil
-}
-
-func (r *remoteRuntimeService) podSandboxStatusV1(ctx context.Context, podSandBoxID string, verbose bool) (*runtimeapi.PodSandboxStatusResponse, error) {
+func (r *remoteRuntimeService) PodSandboxStatus(ctx context.Context, podSandBoxID string, verbose bool) (*runtimeapi.PodSandboxStatusResponse, error) {
 	resp, err := r.runtimeClient.PodSandboxStatus(ctx, &runtimeapi.PodSandboxStatusRequest{
 		PodSandboxId: podSandBoxID,
 		Verbose:      verbose,
@@ -350,9 +241,8 @@ func (r *remoteRuntimeService) podSandboxStatusV1(ctx context.Context, podSandBo
 		return nil, err
 	}
 
-	status := resp.Status
 	if resp.Status != nil {
-		if err := verifySandboxStatus(status); err != nil {
+		if err := verifySandboxStatus(resp.Status); err != nil {
 			return nil, err
 		}
 	}
@@ -360,30 +250,7 @@ func (r *remoteRuntimeService) podSandboxStatusV1(ctx context.Context, podSandBo
 	return resp, nil
 }
 
-// PodSandboxStats returns the stats of the pod.
-func (r *remoteRuntimeService) PodSandboxStats(podSandboxID string) (*runtimeapi.PodSandboxStats, error) {
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	if r.useV1API() {
-		return r.podSandboxStatsV1(ctx, podSandboxID)
-	}
-
-	return r.podSandboxStatsV1alpha2(ctx, podSandboxID)
-}
-
-func (r *remoteRuntimeService) podSandboxStatsV1alpha2(ctx context.Context, podSandboxID string) (*runtimeapi.PodSandboxStats, error) {
-	resp, err := r.runtimeClientV1alpha2.PodSandboxStats(ctx, &runtimeapiV1alpha2.PodSandboxStatsRequest{
-		PodSandboxId: podSandboxID,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return fromV1alpha2PodSandboxStats(resp.GetStats()), nil
-}
-
-func (r *remoteRuntimeService) podSandboxStatsV1(ctx context.Context, podSandboxID string) (*runtimeapi.PodSandboxStats, error) {
+func (r *remoteRuntimeService) PodSandboxStats(ctx context.Context, podSandboxID string) (*runtimeapi.PodSandboxStats, error) {
 	resp, err := r.runtimeClient.PodSandboxStats(ctx, &runtimeapi.PodSandboxStatsRequest{
 		PodSandboxId: podSandboxID,
 	})
@@ -394,31 +261,7 @@ func (r *remoteRuntimeService) podSandboxStatsV1(ctx context.Context, podSandbox
 	return resp.GetStats(), nil
 }
 
-// ListPodSandboxStats returns the list of pod sandbox stats given the filter
-func (r *remoteRuntimeService) ListPodSandboxStats(filter *runtimeapi.PodSandboxStatsFilter) ([]*runtimeapi.PodSandboxStats, error) {
-	// Set timeout, because runtimes are able to cache disk stats results
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	if r.useV1API() {
-		return r.listPodSandboxStatsV1(ctx, filter)
-	}
-
-	return r.listPodSandboxStatsV1alpha2(ctx, filter)
-}
-
-func (r *remoteRuntimeService) listPodSandboxStatsV1alpha2(ctx context.Context, filter *runtimeapi.PodSandboxStatsFilter) ([]*runtimeapi.PodSandboxStats, error) {
-	resp, err := r.runtimeClientV1alpha2.ListPodSandboxStats(ctx, &runtimeapiV1alpha2.ListPodSandboxStatsRequest{
-		Filter: v1alpha2PodSandboxStatsFilter(filter),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return fromV1alpha2ListPodSandboxStatsResponse(resp).GetStats(), nil
-}
-
-func (r *remoteRuntimeService) listPodSandboxStatsV1(ctx context.Context, filter *runtimeapi.PodSandboxStatsFilter) ([]*runtimeapi.PodSandboxStats, error) {
+func (r *remoteRuntimeService) ListPodSandboxStats(ctx context.Context, filter *runtimeapi.PodSandboxStatsFilter) ([]*runtimeapi.PodSandboxStats, error) {
 	resp, err := r.runtimeClient.ListPodSandboxStats(ctx, &runtimeapi.ListPodSandboxStatsRequest{
 		Filter: filter,
 	})
@@ -429,42 +272,7 @@ func (r *remoteRuntimeService) listPodSandboxStatsV1(ctx context.Context, filter
 	return resp.GetStats(), nil
 }
 
-// ListPodSandbox returns a list of PodSandboxes.
-func (r *remoteRuntimeService) ListPodSandbox(filter *runtimeapi.PodSandboxFilter) ([]*runtimeapi.PodSandbox, error) {
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	if r.useV1API() {
-		return r.listPodSandboxV1(ctx, filter)
-	}
-
-	return r.listPodSandboxV1alpha2(ctx, filter)
-}
-
-// ListContainers lists containers by filters.
-func (r *remoteRuntimeService) ListContainers(filter *runtimeapi.ContainerFilter) ([]*runtimeapi.Container, error) {
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	if r.useV1API() {
-		return r.listContainersV1(ctx, filter)
-	}
-
-	return r.listContainersV1alpha2(ctx, filter)
-}
-
-func (r *remoteRuntimeService) listPodSandboxV1alpha2(ctx context.Context, filter *runtimeapi.PodSandboxFilter) ([]*runtimeapi.PodSandbox, error) {
-	resp, err := r.runtimeClientV1alpha2.ListPodSandbox(ctx, &runtimeapiV1alpha2.ListPodSandboxRequest{
-		Filter: v1alpha2PodSandboxFilter(filter),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return fromV1alpha2ListPodSandboxResponse(resp).Items, nil
-}
-
-func (r *remoteRuntimeService) listPodSandboxV1(ctx context.Context, filter *runtimeapi.PodSandboxFilter) ([]*runtimeapi.PodSandbox, error) {
+func (r *remoteRuntimeService) ListPodSandbox(ctx context.Context, filter *runtimeapi.PodSandboxFilter) ([]*runtimeapi.PodSandbox, error) {
 	resp, err := r.runtimeClient.ListPodSandbox(ctx, &runtimeapi.ListPodSandboxRequest{
 		Filter: filter,
 	})
@@ -475,18 +283,7 @@ func (r *remoteRuntimeService) listPodSandboxV1(ctx context.Context, filter *run
 	return resp.Items, nil
 }
 
-func (r *remoteRuntimeService) listContainersV1alpha2(ctx context.Context, filter *runtimeapi.ContainerFilter) ([]*runtimeapi.Container, error) {
-	resp, err := r.runtimeClientV1alpha2.ListContainers(ctx, &runtimeapiV1alpha2.ListContainersRequest{
-		Filter: v1alpha2ContainerFilter(filter),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return fromV1alpha2ListContainersResponse(resp).Containers, nil
-}
-
-func (r *remoteRuntimeService) listContainersV1(ctx context.Context, filter *runtimeapi.ContainerFilter) ([]*runtimeapi.Container, error) {
+func (r *remoteRuntimeService) ListContainers(ctx context.Context, filter *runtimeapi.ContainerFilter) ([]*runtimeapi.Container, error) {
 	resp, err := r.runtimeClient.ListContainers(ctx, &runtimeapi.ListContainersRequest{
 		Filter: filter,
 	})
@@ -497,21 +294,7 @@ func (r *remoteRuntimeService) listContainersV1(ctx context.Context, filter *run
 	return resp.Containers, nil
 }
 
-// ListContainerStats returns the list of ContainerStats given the filter.
-func (r *remoteRuntimeService) ListContainerStats(filter *runtimeapi.ContainerStatsFilter) ([]*runtimeapi.ContainerStats, error) {
-	// Do not set timeout, because writable layer stats collection takes time.
-	// TODO(random-liu): Should we assume runtime should cache the result, and set timeout here?
-	ctx, cancel := getContextWithCancel()
-	defer cancel()
-
-	if r.useV1API() {
-		return r.listContainerStatsV1(ctx, filter)
-	}
-
-	return r.listContainerStatsV1alpha2(ctx, filter)
-}
-
-func (r *remoteRuntimeService) listContainerStatsV1(ctx context.Context, filter *runtimeapi.ContainerStatsFilter) ([]*runtimeapi.ContainerStats, error) {
+func (r *remoteRuntimeService) ListContainerStats(ctx context.Context, filter *runtimeapi.ContainerStatsFilter) ([]*runtimeapi.ContainerStats, error) {
 	resp, err := r.runtimeClient.ListContainerStats(ctx, &runtimeapi.ListContainerStatsRequest{
 		Filter: filter,
 	})
@@ -522,30 +305,7 @@ func (r *remoteRuntimeService) listContainerStatsV1(ctx context.Context, filter 
 	return resp.GetStats(), nil
 }
 
-func (r *remoteRuntimeService) listContainerStatsV1alpha2(ctx context.Context, filter *runtimeapi.ContainerStatsFilter) ([]*runtimeapi.ContainerStats, error) {
-	resp, err := r.runtimeClientV1alpha2.ListContainerStats(ctx, &runtimeapiV1alpha2.ListContainerStatsRequest{
-		Filter: v1alpha2ContainerStatsFilter(filter),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return fromV1alpha2ListContainerStatsResponse(resp).GetStats(), nil
-}
-
-// ContainerStatus returns the container status.
-func (r *remoteRuntimeService) ContainerStatus(containerID string, verbose bool) (*runtimeapi.ContainerStatusResponse, error) {
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	if r.useV1API() {
-		return r.containerStatusV1(ctx, containerID, verbose)
-	}
-
-	return r.containerStatusV1alpha2(ctx, containerID, verbose)
-}
-
-func (r *remoteRuntimeService) containerStatusV1(ctx context.Context, containerID string, verbose bool) (*runtimeapi.ContainerStatusResponse, error) {
+func (r *remoteRuntimeService) ContainerStatus(ctx context.Context, containerID string, verbose bool) (*runtimeapi.ContainerStatusResponse, error) {
 	resp, err := r.runtimeClient.ContainerStatus(ctx, &runtimeapi.ContainerStatusRequest{
 		ContainerId: containerID,
 		Verbose:     verbose,
@@ -554,59 +314,13 @@ func (r *remoteRuntimeService) containerStatusV1(ctx context.Context, containerI
 		return nil, err
 	}
 
-	status := resp.Status
 	if resp.Status != nil {
-		if err := verifyContainerStatus(status); err != nil {
+		if err := verifyContainerStatus(resp.Status); err != nil {
 			return nil, err
 		}
 	}
 
 	return resp, nil
-}
-
-func (r *remoteRuntimeService) containerStatusV1alpha2(ctx context.Context, containerID string, verbose bool) (*runtimeapi.ContainerStatusResponse, error) {
-	resp, err := r.runtimeClientV1alpha2.ContainerStatus(ctx, &runtimeapiV1alpha2.ContainerStatusRequest{
-		ContainerId: containerID,
-		Verbose:     verbose,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	res := fromV1alpha2ContainerStatusResponse(resp)
-	if resp.Status != nil {
-		if err := verifyContainerStatus(res.Status); err != nil {
-			return nil, err
-		}
-	}
-
-	return res, nil
-}
-
-// determineAPIVersion tries to connect to the remote runtime by using the
-// highest available API version.
-//
-// A GRPC redial will always use the initially selected (or automatically
-// determined) CRI API version. If the redial was due to the container runtime
-// being upgraded, then the container runtime must also support the initially
-// selected version or the redial is expected to fail, which requires a restart
-// of kubelet.
-func (r *remoteRuntimeService) determineAPIVersion(conn *grpc.ClientConn) error {
-	ctx, cancel := getContextWithTimeout(r.timeout)
-	defer cancel()
-
-	r.runtimeClient = runtimeapi.NewRuntimeServiceClient(conn)
-
-	if _, err := r.runtimeClient.Version(ctx, &runtimeapi.VersionRequest{}); err == nil {
-		log.Warn("Using CRI v1 runtime API")
-	} else if status.Code(err) == codes.Unimplemented {
-		log.Warn("Using CRI v1alpha2 runtime API")
-		r.runtimeClientV1alpha2 = runtimeapiV1alpha2.NewRuntimeServiceClient(conn)
-	} else {
-		return fmt.Errorf("unable to determine runtime API version: %w", err)
-	}
-
-	return nil
 }
 
 func parseEndpoint(endpoint string) (string, string, error) {

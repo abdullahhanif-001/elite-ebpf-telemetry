@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
+	"github.com/alibaba/kubeskoop/pkg/exporter/security"
 	"path"
 	"strconv"
 	"sync"
@@ -258,7 +258,7 @@ func (c *controller) storeCaptureFile(_ context.Context, spec *TaskSpec, id int,
 
 func (c *controller) DownloadCaptureFile(ctx context.Context, id int) (string, int64, io.ReadCloser, error) {
 	filename := fmt.Sprintf("/tmp/capture_task_%d.tar.gz", id)
-	compressResults := exec.CommandContext(ctx, "tar", "-czf", filename, fmt.Sprintf("/tmp/task_%d/", id))
+	compressResults := security.CommandContext(ctx, "tar", "-czf", filename, fmt.Sprintf("/tmp/task_%d/", id))
 	output, err := compressResults.CombinedOutput()
 	if err != nil {
 		return "", 0, nil, fmt.Errorf("error compress capture file: %v, output: %s", err, string(output))

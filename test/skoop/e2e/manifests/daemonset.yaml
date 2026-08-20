@@ -13,16 +13,38 @@ spec:
         app: netshoot-hostnetwork
         role: executor
     spec:
-      hostPID: true
-      hostNetwork: true
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
       containers:
-        - name:  alive
-          image: nicolaka/netshoot
+        - name: alive
+          image: nicolaka/netshoot:v0.13
           command:
-            - "sh"
-            - "-c"
-            - "sleep 30d"
+            - "sleep"
+            - "30d"
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+              ephemeral-storage: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+              ephemeral-storage: 64Mi
           securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
             capabilities:
-              add:
-              - ALL
+              drop: [ALL]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

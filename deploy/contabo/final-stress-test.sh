@@ -19,7 +19,7 @@ guard() {
   fi
   local now
   now=$(pm2 jlist | jq '[.[].pm2_env.restart_time] | add')
-  if [ "$now" != "$TARGET_RESTARTS" ]; then
+  if [[ "$now" != "$TARGET_RESTARTS" ]]; then
     log "ABORT: PM2 restarts changed $TARGET_RESTARTS -> $now"
     systemctl stop elite-agent 2>/dev/null || true
     exit 1
@@ -35,7 +35,7 @@ log "========== FINAL STRESS TEST START =========="
 log "BASELINE_RESTARTS=$BASELINE_RESTARTS TARGET=$TARGET_RESTARTS"
 
 # --- Ensure BTF cache ---
-if [ ! -f /opt/elite/btf/vmlinux ]; then
+if [[ ! -f /opt/elite/btf/vmlinux ]]; then
   cp /sys/kernel/btf/vmlinux /opt/elite/btf/vmlinux 2>/dev/null || \
     ln -sf /sys/kernel/btf/vmlinux /opt/elite/btf/vmlinux
 fi

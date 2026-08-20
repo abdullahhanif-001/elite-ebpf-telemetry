@@ -14,7 +14,7 @@ BASE_RESTARTS=$(jq '[.[].pm2_env.restart_time] | add' /opt/elite/baseline/pm2-be
 
 record() {
   local id="$1" sev="$2" msg="$3"
-  if [ "$4" = "PASS" ]; then
+  if [[ "$4" = "PASS" ]]; then
     echo "[$id][$sev] PASS: $msg"
   else
     echo "[$id][$sev] FAIL: $msg"
@@ -27,15 +27,15 @@ bash "$ROOT/security-audit.sh" || true
 echo "--- A-01 Critical: unauthenticated debug endpoints ---"
 for path in /debug/pprof/ /debug/pprof/heap /status; do
   code=$(curl -sf -o /dev/null -w '%{http_code}' "http://127.0.0.1:9102${path}" 2>/dev/null || echo "000")
-  if [ "$path" = "/status" ]; then
+  if [[ "$path" = "/status" ]]; then
     # /status may be 404 when debugMode=false (acceptable)
-    if [ "$code" = "200" ]; then
+    if [[ "$code" = "200" ]]; then
       record A-01 Critical "GET ${path} returned 200 without auth" FAIL
     else
       record A-01 Critical "GET ${path} -> ${code}" PASS
     fi
   else
-    if [ "$code" = "200" ]; then
+    if [[ "$code" = "200" ]]; then
       record A-01 Critical "GET ${path} returned 200" FAIL
     else
       record A-01 Critical "GET ${path} -> ${code}" PASS
@@ -82,7 +82,7 @@ fi
 
 echo "--- A-05 High: metrics non-empty ---"
 COUNT=$(curl -sf http://127.0.0.1:9102/metrics 2>/dev/null | grep -cE '^elite_' || echo 0)
-if [ "$COUNT" -lt 5 ]; then
+if [[ "$COUNT" -lt 5 ]]; then
   record A-05 High "fewer than 5 metric lines (got $COUNT)" FAIL
 else
   record A-05 High "metric series present ($COUNT lines)" PASS
@@ -98,7 +98,7 @@ fi
 echo "--- PM2 guard final ---"
 bash /opt/elite/scripts/pm2-guard.sh
 AFTER=$(pm2 jlist | jq '[.[].pm2_env.restart_time] | add')
-if [ "$AFTER" -gt "$BASE_RESTARTS" ]; then
+if [[ "$AFTER" -gt "$BASE_RESTARTS" ]]; then
   record PM2 Critical "restarts increased $BASE_RESTARTS -> $AFTER" FAIL
 else
   record PM2 Critical "restarts unchanged ($AFTER)" PASS

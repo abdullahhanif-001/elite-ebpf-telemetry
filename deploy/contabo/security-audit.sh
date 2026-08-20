@@ -64,7 +64,7 @@ echo "--- PM2 post-audit ---"
 guard
 AFTER=$(pm2 jlist | jq '[.[].pm2_env.restart_time] | add')
 echo "restarts_before=$BASE_RESTARTS restarts_after=$AFTER"
-if [ "$AFTER" -gt "$BASE_RESTARTS" ]; then
+if [[ "$AFTER" -gt "$BASE_RESTARTS" ]]; then
   echo "FAIL: PM2 restart count increased"
   exit 1
 fi

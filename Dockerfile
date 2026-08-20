@@ -3,7 +3,7 @@ WORKDIR /go/src/github.com/alibaba/kubeskoop/
 RUN go env -w GOMODCACHE=/root/.cache/go-build
 COPY go.mod go.sum /go/src/github.com/alibaba/kubeskoop/
 RUN --mount=type=cache,target=/root/.cache/go-build go mod download
-ADD . /go/src/github.com/alibaba/kubeskoop/
+COPY . /go/src/github.com/alibaba/kubeskoop/
 RUN --mount=type=cache,target=/root/.cache/go-build make generate-bpf
 
 FROM --platform=$BUILDPLATFORM kubeskoop/ci-builder:go12512clang211 AS cross-build
@@ -17,15 +17,15 @@ RUN --mount=type=cache,target=/root/.cache/go-build mkdir -p bin && export GOARC
 
 FROM --platform=$BUILDPLATFORM docker.io/library/node:20.9.0-alpine AS build-ui
 WORKDIR /webconsole
-ADD ./webui /webconsole
-RUN yarn install && yarn build
+COPY ./webui /webconsole
+RUN yarn install --frozen-lockfile --ignore-scripts && yarn build
 
 FROM --platform=$TARGETPLATFORM docker.io/library/alpine:3.24 AS base
 
 ARG ALPINE_MIRROR
 ENV ALPINE_MIRROR=$ALPINE_MIRROR
 
-RUN if [ ! -z "$ALPINE_MIRROR" ]; then sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories; fi && \
+RUN if [[ -n "$ALPINE_MIRROR" ]]; then sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories; fi && \
     apk add --no-cache \
     iproute2 \
     ipset \
@@ -37,7 +37,10 @@ RUN if [ ! -z "$ALPINE_MIRROR" ]; then sed -i 's/dl-cdn.alpinelinux.org/mirrors.
     tcpdump \
     curl \
     bash && \
-    rm -rf /var/cache/apk/*
+    rm -rf /var/cache/apk/* && \
+    addgroup -S elite -g 65532 && adduser -S elite -u 65532 -G elite
+
+USER elite
 
 FROM base AS agent
 COPY --from=cross-build /go/src/github.com/alibaba/kubeskoop/bin/elite-agent /bin/elite-agent

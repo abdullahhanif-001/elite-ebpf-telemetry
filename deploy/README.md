@@ -23,9 +23,9 @@ curl http://127.0.0.1:9102/metrics | grep elite_
 
 See [deploy/helm/README.md](helm/README.md). Default images: `ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent`.
 
-## Legacy bundles
+## Kubernetes
 
-`deploy/skoopbundle.yaml` is **deprecated** — use `deploy/elite-bundle.yaml` instead.
+`kubectl apply -f deploy/elite-bundle.yaml`
 
 ## Bare metal (systemd)
 

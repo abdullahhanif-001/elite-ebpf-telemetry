@@ -57,7 +57,7 @@ set_nodeip()
 echo "KUBELET_EXTRA_ARGS=--node-ip=$NODE_IP" | sudo tee /etc/default/kubelet
 }
 
-if [ ! -z "$ALIYUN_MIRROR" ]; then
+if [[ -n "$ALIYUN_MIRROR" ]]; then
     echo using aliyun mirror
     replace_aliyun_mirror
 fi
@@ -65,7 +65,7 @@ fi
 sudo apt-get update
 sudo apt-get install -y ca-certificates gnupg curl apt-transport-https
 
-if [ ! -z "$ALIYUN_MIRROR" ]; then
+if [[ -n "$ALIYUN_MIRROR" ]]; then
     add_kubernetes_aliyun_source
 else
     add_kubernetes_source
@@ -77,7 +77,7 @@ sudo apt-get update
 sudo apt-get install -y kubelet kubectl kubeadm containerd.io
 # remove cri from diabled plugins
 sudo sed -i '/disabled_plugins/d' /etc/containerd/config.toml
-if [ ! -z "$ALIYUN_MIRROR" ]; then
+if [[ -n "$ALIYUN_MIRROR" ]]; then
     cat <<EOF | sudo tee -a /etc/containerd/config.toml
 version = 2
 [plugins."io.containerd.grpc.v1.cri"]

@@ -12,6 +12,7 @@ import (
 
 	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
 	"github.com/alibaba/kubeskoop/pkg/exporter/nettop"
+	"github.com/alibaba/kubeskoop/pkg/exporter/security"
 	"github.com/samber/lo"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
@@ -98,7 +99,7 @@ func (a *Agent) execute(captures []capture) (string, []byte, error) {
 			var (
 				output []byte
 				err    error
-				cmd    = exec.Command(task.args[0], task.args[1:]...)
+				cmd    = security.Command(task.args[0], task.args[1:]...)
 			)
 			go func() {
 				output, err = cmd.CombinedOutput()
@@ -129,9 +130,9 @@ func (a *Agent) execute(captures []capture) (string, []byte, error) {
 	var outputCmd *exec.Cmd
 	if len(captures) > 1 {
 		fileType = "tar.gz"
-		outputCmd = exec.Command("tar", append([]string{"-czf", "-"}, lo.Map(captures, func(c capture, _ int) string { return c.captureFile })...)...)
+		outputCmd = security.Command("tar", append([]string{"-czf", "-"}, lo.Map(captures, func(c capture, _ int) string { return c.captureFile })...)...)
 	} else {
-		outputCmd = exec.Command("cat", captures[0].captureFile)
+		outputCmd = security.Command("cat", captures[0].captureFile)
 	}
 	output, err := outputCmd.Output()
 	if err != nil {

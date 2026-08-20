@@ -37,9 +37,7 @@ interface LoginProps {
   dataSource?: LoginParams;
 }
 
-const LoginBlock: FunctionComponent<LoginProps> = (
-  props = { dataSource: DEFAULT_DATA },
-): JSX.Element => {
+const LoginBlock: FunctionComponent<LoginProps> = (props): JSX.Element => {
   const { dataSource = DEFAULT_DATA } = props;
 
   const [, userDispatcher] = store.useModel('user');

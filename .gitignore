@@ -11,6 +11,7 @@ vendor
 
 # testing
 webui/coverage
+coverage.out
 
 # production
 webui/build

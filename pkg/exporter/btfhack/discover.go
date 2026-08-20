@@ -3,7 +3,7 @@ package btfhack
 import (
 	"fmt"
 	"log"
-	"os/exec"
+	"github.com/alibaba/kubeskoop/pkg/exporter/security"
 
 	"github.com/alibaba/kubeskoop/pkg/exporter/bpfutil"
 
@@ -50,7 +50,7 @@ var (
 )
 
 func copyBtfFile(path, dstPath string) error {
-	cmdToExecute := exec.Command("cp", path, dstPath)
+	cmdToExecute := security.Command("cp", path, dstPath)
 	output, err := cmdToExecute.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("load btf with:%s err:%s", output, err)

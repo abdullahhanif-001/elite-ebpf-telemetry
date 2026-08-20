@@ -3,10 +3,10 @@
 set -euo pipefail
 
 MSG="${1:-}"
-if [ -z "$MSG" ] && [ -f .git/COMMIT_EDITMSG ]; then
+if [[ -z "$MSG" ]] && [[ -f .git/COMMIT_EDITMSG ]]; then
   MSG="$(cat .git/COMMIT_EDITMSG)"
 fi
-if [ -z "$MSG" ]; then
+if [[ -z "$MSG" ]]; then
   echo "audit-commit: no message to check" >&2
   exit 1
 fi

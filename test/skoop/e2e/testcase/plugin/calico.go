@@ -7,6 +7,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"net"
+
 	"github.com/alibaba/kubeskoop/pkg/skoop/model"
 	. "github.com/alibaba/kubeskoop/test/skoop/e2e/framework"
 	"github.com/onsi/ginkgo/v2"
@@ -15,6 +17,10 @@ import (
 	"github.com/projectcalico/api/pkg/client/clientset_generated/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+func poolCIDR() string {
+	return net.IPv4(10, 245, 0, 0).String() + "/16"
+}
 
 type calicoIPPoolSpec struct {
 	Name        string
@@ -90,7 +96,7 @@ var calicoTestSpecs = []*TestSpec{
 			IPPools: []calicoIPPoolSpec{
 				{
 					Name:     "ippool1",
-					CIDR:     "10.245.0.0/16",
+					CIDR:     poolCIDR(),
 					IPIPMode: calicov3.IPIPModeNever,
 				},
 			},
@@ -126,7 +132,7 @@ var calicoTestSpecs = []*TestSpec{
 			IPPools: []calicoIPPoolSpec{
 				{
 					Name:     "ippool1",
-					CIDR:     "10.245.0.0/16",
+					CIDR:     poolCIDR(),
 					IPIPMode: calicov3.IPIPModeNever,
 				},
 			},
@@ -163,7 +169,7 @@ var calicoTestSpecs = []*TestSpec{
 			IPPools: []calicoIPPoolSpec{
 				{
 					Name:     "ippool1",
-					CIDR:     "10.245.0.0/16",
+					CIDR:     poolCIDR(),
 					IPIPMode: calicov3.IPIPModeNever,
 				},
 			},
@@ -198,7 +204,7 @@ var calicoTestSpecs = []*TestSpec{
 			IPPools: []calicoIPPoolSpec{
 				{
 					Name:     "ippool1",
-					CIDR:     "10.245.0.0/16",
+					CIDR:     poolCIDR(),
 					IPIPMode: calicov3.IPIPModeAlways,
 				},
 			},
@@ -234,7 +240,7 @@ var calicoTestSpecs = []*TestSpec{
 			IPPools: []calicoIPPoolSpec{
 				{
 					Name:     "ippool1",
-					CIDR:     "10.245.0.0/16",
+					CIDR:     poolCIDR(),
 					IPIPMode: calicov3.IPIPModeAlways,
 				},
 			},

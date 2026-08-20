@@ -64,13 +64,36 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "{{ .Values.service.port }}"
     spec:
-      hostNetwork: true
-      hostPID: true
-      dnsPolicy: ClusterFirstWithHostNet
+      automountServiceAccountToken: false
+      dnsPolicy: ClusterFirst
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
       initContainers:
         - name: btf-prepare
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           command: [btfhack, discover, -p, /etc/net-exporter/btf/]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+              ephemeral-storage: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+              ephemeral-storage: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop: [ALL]
+              add: [BPF, PERFMON, SYS_RESOURCE]
           volumeMounts:
             - name: btf-rawdata
               mountPath: /etc/net-exporter/btf
@@ -85,9 +108,25 @@ spec:
             - containerPort: {{ .Values.service.port }}
           resources:
             {{- toYaml .Values.agent.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
           securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
             capabilities:
-              add: [NET_ADMIN, SYS_PTRACE, SYS_ADMIN, SYS_RESOURCE, DAC_OVERRIDE]
+              add: [BPF, PERFMON, NET_ADMIN, SYS_RESOURCE]
               drop: [ALL]
           volumeMounts:
             - name: config-volume
@@ -102,6 +141,8 @@ spec:
               mountPath: /sys/fs/cgroup
             - name: bpf-events
               mountPath: /sys/kernel/debug
+            - name: tmp
+              mountPath: /tmp
       volumes:
         - name: config-volume
           configMap:
@@ -123,3 +164,5 @@ spec:
         - name: bpf-events
           hostPath:
             path: /sys/kernel/debug
+        - name: tmp
+          emptyDir: {}

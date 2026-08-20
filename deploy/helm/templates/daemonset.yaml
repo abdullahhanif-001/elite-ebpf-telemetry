@@ -17,18 +17,39 @@ spec:
       annotations:
         prometheus.io/path: /metrics
         prometheus.io/port: "{{ .config.port }}"
-        prometheus.io/scheme: http
         prometheus.io/scrape: "true"
     spec:
-      hostNetwork: true
-      hostPID: true
       automountServiceAccountToken: false
-      dnsPolicy: ClusterFirstWithHostNet
+      dnsPolicy: ClusterFirst
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
       {{- if .btfhack.enabled }}
       initContainers:
         - name: btfhack
           image: "{{ .btfhack.repository }}:{{ .btfhack.tag }}"
           imagePullPolicy: {{ .btfhack.imagePullPolicy }}
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+              ephemeral-storage: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+              ephemeral-storage: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop: [ALL]
+              add: [BPF, PERFMON, SYS_RESOURCE]
           volumeMounts:
             - name: btf-rawdata
               mountPath: /etc/net-exporter/btf
@@ -47,6 +68,18 @@ spec:
         - name: http
           containerPort: {{ .config.port }}
         imagePullPolicy: {{ .image.imagePullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: {{ .config.port }}
+          initialDelaySeconds: 15
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: {{ .config.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
         env:
         - name: INSPECTOR_NODENAME
           valueFrom:
@@ -69,23 +102,28 @@ spec:
           - mountPath: /sys/fs/cgroup
             name: cgroup
             mountPropagation: HostToContainer
-          - mountPath: /sys/kernel/debug
+            - mountPath: /sys/kernel/debug
             name: bpf-events
             mountPropagation: HostToContainer
           - mountPath: /etc/node-hostname
             name: hostname
+          - mountPath: /tmp
+            name: tmp
         command:
           - /bin/inspector
           - server
           - -d
         securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65532
           capabilities:
             add:
+            - BPF
+            - PERFMON
             - NET_ADMIN
-            - SYS_PTRACE
-            - SYS_ADMIN
             - SYS_RESOURCE
-            - DAC_OVERRIDE
             drop:
             - ALL
         resources:
@@ -131,5 +169,7 @@ spec:
           configMap:
             name: elite-config
         - name: btf-rawdata
+          emptyDir: {}
+        - name: tmp
           emptyDir: {}
 {{- end }}

@@ -398,7 +398,7 @@ func cacheNetTopology(ctx context.Context) error {
 	var newEntities []*Entity
 	newEntities = append(newEntities, defaultEntity)
 
-	sandboxList, err := criClient.ListPodSandbox(&v1.PodSandboxFilter{
+	sandboxList, err := criClient.ListPodSandbox(ctx, &v1.PodSandboxFilter{
 		State: &v1.PodSandboxStateValue{
 			State: v1.PodSandboxState_SANDBOX_READY,
 		},
@@ -421,7 +421,7 @@ func cacheNetTopology(ctx context.Context) error {
 		name := sandbox.Metadata.Name
 		labels := sandbox.Labels
 
-		sandboxStatus, err := criClient.PodSandboxStatus(sandbox.Id, true)
+		sandboxStatus, err := criClient.PodSandboxStatus(ctx, sandbox.Id, true)
 		if err != nil {
 			log.Errorf("sandbox: %s/%s failed get status err: %v", namespace, name, err)
 			continue

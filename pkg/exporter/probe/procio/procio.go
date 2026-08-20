@@ -34,7 +34,9 @@ var procIOBufferPool = sync.Pool{New: func() interface{} {
 	return &buf
 }}
 
-func noopPutBuffer() {}
+func noopPutBuffer() {
+	// Buffer return-to-pool is handled by callers after io.Copy.
+}
 
 func init() {
 	probe.MustRegisterMetricsProbe(probeName, ioProbeCreator)

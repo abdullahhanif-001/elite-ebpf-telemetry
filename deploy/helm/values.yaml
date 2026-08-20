@@ -41,9 +41,11 @@ agent:
     limits:
       cpu: 500m
       memory: 1024Mi
+      ephemeral-storage: 512Mi
     requests:
-      cpu: 500m
-      memory: 1024Mi
+      cpu: 100m
+      memory: 128Mi
+      ephemeral-storage: 128Mi
   btfhack:
     enabled: true
     repository: ghcr.io/abdullahanifpro111-spec/elite-ebpf/agent
@@ -56,8 +58,8 @@ controller:
   enabled: true
   config:
     logLevel: info
-    prometheusEndpoint: http://prometheus-service
-    lokiEndpoint: http://loki-service:3100
+    prometheusEndpoint: https://prometheus-service
+    lokiEndpoint: https://loki-service:3100
   image:
     repository: ghcr.io/abdullahanifpro111-spec/elite-ebpf/controller
     tag: v1.0.0
@@ -66,16 +68,18 @@ controller:
     limits:
       cpu: 500m
       memory: 200Mi
+      ephemeral-storage: 256Mi
     requests:
       cpu: 50m
       memory: 20Mi
+      ephemeral-storage: 64Mi
   nodeSelector: {}
   tolerations: {}
 
 webconsole:
   enabled: true
   service:
-    type: NodePort
+    type: ClusterIP
     port: 80
     annotations: {}
   auth:
@@ -83,7 +87,7 @@ webconsole:
     username: changeme
     password: changeme
   grafana:
-    endpoint: http://grafana/grafana
+    endpoint: https://grafana/grafana
     proxy: true
     # used for proxy mode
     username: changeme
@@ -96,8 +100,10 @@ webconsole:
     limits:
       cpu: 500m
       memory: 200Mi
+      ephemeral-storage: 256Mi
     requests:
       cpu: 50m
       memory: 20Mi
+      ephemeral-storage: 64Mi
   nodeSelector: { }
   tolerations: { }

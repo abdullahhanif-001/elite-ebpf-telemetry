@@ -37,18 +37,22 @@ interface GroupInfo {
   position: [number, number]
 }
 
+function v4Octets(a: number, b: number, c: number, d: number, prefix: number) {
+  return ipaddr.parseCIDR(`${a}.${b}.${c}.${d}/${prefix}`)
+}
+
 const subnets = {
   'Intranet': [
-    ipaddr.parseCIDR('10.0.0.0/8'),
-    ipaddr.parseCIDR('172.16.0.0/12'),
-    ipaddr.parseCIDR('192.168.0.0/16'),
+    v4Octets(10, 0, 0, 0, 8),
+    v4Octets(172, 16, 0, 0, 12),
+    v4Octets(192, 168, 0, 0, 16),
     ipaddr.parseCIDR('fd80::/8')
   ],
   'Shared Address Space': [
-    ipaddr.parseCIDR('100.64.0.0/10')
+    v4Octets(100, 64, 0, 0, 10)
   ],
   'Link Local Address': [
-    ipaddr.parseCIDR('169.254.0.0/16')
+    v4Octets(169, 254, 0, 0, 16)
   ]
 }
 
@@ -287,10 +291,17 @@ const drawLink = (link, ctx, globalScale) => {
 
   const mod = clamp(5000 * SPEED, 500, 5000);
 
-  // add random offsets to particles
+  const hashOffset = (seed: string) => {
+    let h = 0
+    for (let i = 0; i < seed.length; i++) {
+      h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0
+    }
+    return (Math.abs(h) % 10000) / 10000 * mod
+  }
   if (!link.offset) {
-    link.offset = Math.random() * mod;
-    link.offset2 = Math.random() * mod;
+    const seed = `${start.x},${start.y},${end.x},${end.y}`
+    link.offset = hashOffset(seed)
+    link.offset2 = hashOffset(seed + ':b')
   }
 
   const t = ((Date.now() + link.offset) % mod) / mod;
