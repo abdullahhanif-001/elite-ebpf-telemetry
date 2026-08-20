@@ -11,7 +11,7 @@ import (
 	lokiwrapper "github.com/alibaba/kubeskoop/pkg/exporter/loki"
 
 	"github.com/alibaba/kubeskoop/pkg/controller/diagnose"
-	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
+	"github.com/alibaba/kubeskoop/pkg/agentrpc"
 	skoopContext "github.com/alibaba/kubeskoop/pkg/skoop/context"
 	"github.com/prometheus/client_golang/api"
 	promv1 "github.com/prometheus/client_golang/api/prometheus/v1"

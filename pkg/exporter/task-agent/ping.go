@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
+	"github.com/alibaba/kubeskoop/pkg/agentrpc"
 	"github.com/alibaba/kubeskoop/pkg/exporter/nettop"
 	"github.com/alibaba/kubeskoop/pkg/exporter/security"
 	log "github.com/sirupsen/logrus"

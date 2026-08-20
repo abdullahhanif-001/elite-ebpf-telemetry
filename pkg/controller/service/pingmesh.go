@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
+	"github.com/alibaba/kubeskoop/pkg/agentrpc"
 	log "github.com/sirupsen/logrus"
 )
 

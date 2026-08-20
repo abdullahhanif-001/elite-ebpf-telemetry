@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
+	"github.com/alibaba/kubeskoop/pkg/agentrpc"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"

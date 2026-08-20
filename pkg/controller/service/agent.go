@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
+	"github.com/alibaba/kubeskoop/pkg/agentrpc"
 	"github.com/samber/lo"
 	log "k8s.io/klog/v2"
 )

@@ -14,7 +14,7 @@ import (
 	"github.com/alibaba/kubeskoop/pkg/controller/k8s"
 	"k8s.io/apimachinery/pkg/labels"
 
-	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
+	"github.com/alibaba/kubeskoop/pkg/agentrpc"
 	"github.com/samber/lo"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

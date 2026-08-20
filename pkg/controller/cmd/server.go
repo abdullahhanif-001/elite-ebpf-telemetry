@@ -18,7 +18,7 @@ import (
 	"github.com/alibaba/kubeskoop/pkg/controller/k8s"
 
 	"github.com/alibaba/kubeskoop/pkg/controller/graph"
-	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
+	"github.com/alibaba/kubeskoop/pkg/agentrpc"
 	"github.com/alibaba/kubeskoop/pkg/controller/service"
 	exporter "github.com/alibaba/kubeskoop/pkg/exporter/cmd"
 	skoopContext "github.com/alibaba/kubeskoop/pkg/skoop/context"

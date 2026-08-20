@@ -10,7 +10,7 @@ import (
 
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/alibaba/kubeskoop/pkg/controller/rpc"
+	"github.com/alibaba/kubeskoop/pkg/agentrpc"
 	"github.com/alibaba/kubeskoop/pkg/exporter/nettop"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
