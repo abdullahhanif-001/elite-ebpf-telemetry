@@ -161,7 +161,7 @@ print_status() {
   [[ -x "${PHYSICS_PACK_ROOT}/bin/ebpf_exporter" ]] && "${PHYSICS_PACK_ROOT}/bin/ebpf_exporter" --version 2>/dev/null || echo "ebpf_exporter: missing"
   [[ -x "${PHYSICS_PACK_ROOT}/bin/ig" ]] && "${PHYSICS_PACK_ROOT}/bin/ig" version 2>/dev/null || echo "ig: missing"
   echo "--- scrape endpoints ---"
-  # host:port only — curl defaults to HTTP without a clear-text "http://" literal (shell:S5332)
+  # host:port only — curl defaults to cleartext HTTP without a scheme:// literal (shell:S5332)
   for target in \
     "${ELITE_METRICS_LISTEN}/metrics" \
     "${EBPF_EXPORTER_LISTEN}/metrics" \

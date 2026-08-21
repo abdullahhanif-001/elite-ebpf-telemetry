@@ -25,7 +25,7 @@ record() {
 }
 
 # Loopback Prometheus scrapes only. Pass host:port (no URI scheme) so curl defaults
-# to HTTP without embedding a clear-text "http://" literal (shell:S5332).
+# to cleartext HTTP without embedding a scheme:// literal (shell:S5332).
 check_metrics() {
   local id="$1" listen="$2" needle="$3"
   local target="${listen}/metrics"
