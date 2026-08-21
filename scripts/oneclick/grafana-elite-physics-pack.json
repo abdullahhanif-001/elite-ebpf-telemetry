@@ -1,0 +1,128 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "name": "Attribution",
+        "type": "dashboard",
+        "content": "Elite Physics Pack compose — metrics from Elite agent, Cloudflare ebpf_exporter, Inspektor Gadget. Not affiliated with Cloudflare/Microsoft/Cilium. Licenses remain with upstream projects."
+      }
+    ]
+  },
+  "description": "Elite One-Click Physics Pack scorecard (OSS compose). Sources: elite-agent :9102, ebpf_exporter :9435, ig :2224.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Elite agent series present",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "count({__name__=~\"elite_.+\"})",
+          "legendFormat": "elite_* series",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    },
+    {
+      "title": "ebpf_exporter physics series",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "count({__name__=~\"softirq_wait_seconds_bucket|kfree_skb_total|shrink_node_latency_seconds_bucket\"})",
+          "legendFormat": "physics series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Softirq NET_RX wait p99 (ebpf_exporter)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(softirq_wait_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99 softirq wait",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Elite softirq (native)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "expr": "sum(rate({__name__=~\"elite_.*softirq.*\"}[5m]))",
+          "legendFormat": "elite softirq",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "kfree_skb by reason (ebpf_exporter)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "expr": "sum(rate(kfree_skb_total[5m])) by (reason)",
+          "legendFormat": "{{reason}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Elite packet loss",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        {
+          "expr": "sum(rate({__name__=~\"elite_.*packet.*|elite_.*drop.*\"}[5m]))",
+          "legendFormat": "elite drops",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "MM shrink_node latency (shrinklat)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(shrink_node_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99 shrinklat",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "TCP retransmits (ebpf_exporter)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "targets": [
+        {
+          "expr": "sum(rate(tcp_retransmit_ipv4_packets_total[5m])) + sum(rate(tcp_retransmit_ipv6_packets_total[5m]))",
+          "legendFormat": "retransmit",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["elite", "physics-pack", "ebpf", "oss-compose"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "timezone": "browser",
+  "title": "Elite Physics Pack Scorecard",
+  "uid": "elite-physics-pack",
+  "version": 1
+}

@@ -30,6 +30,7 @@ import (
 	"github.com/alibaba/kubeskoop/pkg/exporter/nettop"
 	"github.com/alibaba/kubeskoop/pkg/exporter/probe"
 	"github.com/alibaba/kubeskoop/pkg/exporter/security"
+	"github.com/alibaba/kubeskoop/pkg/forecaster"
 
 	gops "github.com/google/gops/agent"
 	"github.com/prometheus/client_golang/prometheus"
@@ -457,6 +458,24 @@ func (i *inspServer) start(cfg *InspServerConfig) error {
 		_ = i.eventServer.Stop(ctx)
 	}()
 
+	forecastCtx, forecastCancel := context.WithCancel(ctx)
+	defer forecastCancel()
+	if cfg.Forecast.Enabled {
+		fcfg := toForecasterConfig(cfg.Forecast)
+		shed := &eventProbeShedder{
+			server:   i.eventServer,
+			restored: append([]ProbeConfig(nil), cfg.EventConfig.Probes...),
+		}
+		runner, coll := forecaster.NewRunner(fcfg, shed)
+		if coll != nil {
+			if err := i.metricsServer.Registry().Register(coll); err != nil {
+				log.Warnf("forecaster metrics register: %v", err)
+			} else {
+				go runner.Run(forecastCtx)
+			}
+		}
+	}
+
 	done := make(chan struct{})
 
 	if err = i.WatchConfig(done); err != nil {
@@ -546,4 +565,45 @@ func (i *inspServer) statusPage(w http.ResponseWriter, _ *http.Request) {
 		log.Errorf("failed marshal probe status: %v", err)
 	}
 	w.Write(rawText) // nolint
+}
+
+func toForecasterConfig(c ForecastConfig) forecaster.Config {
+	interval, _ := time.ParseDuration(c.Interval)
+	horizon, _ := time.ParseDuration(c.Horizon)
+	cooldown, _ := time.ParseDuration(c.SemiCooldown)
+	targets := make([]forecaster.Target, 0, len(c.Targets))
+	for _, t := range c.Targets {
+		targets = append(targets, forecaster.Target{URL: t.URL, Series: t.Series})
+	}
+	return forecaster.Config{
+		Enabled:         c.Enabled,
+		Interval:        interval,
+		Horizon:         horizon,
+		Window:          c.Window,
+		Alpha:           c.Alpha,
+		HardDropSeconds: c.HardDropSeconds,
+		AccThreshold:    c.AccThreshold,
+		Mode:            c.Mode,
+		Targets:         targets,
+		SemiCooldown:    cooldown,
+	}
+}
+
+// eventProbeShedder implements forecaster.EventShedder using DynamicProbeServer.Reload.
+type eventProbeShedder struct {
+	server   *EventServer
+	restored []ProbeConfig
+	mu       sync.Mutex
+}
+
+func (e *eventProbeShedder) ShedEvents(ctx context.Context) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return e.server.Reload(ctx, nil)
+}
+
+func (e *eventProbeShedder) RestoreEvents(ctx context.Context) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	return e.server.Reload(ctx, e.restored)
 }

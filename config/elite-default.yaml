@@ -10,6 +10,22 @@ otel:
   interval: 15s
   batchSize: 256
 
+forecast:
+  enabled: true
+  interval: 1s
+  horizon: 5s
+  window: 8
+  alpha: 0.3
+  hardDropSeconds: 0.1
+  accThreshold: 0.001
+  mode: dry-run
+  semiCooldown: 60s
+  targets:
+    - url: "http://127.0.0.1:9435/metrics"
+      series: ["softirq_wait_seconds"]
+    - url: "http://127.0.0.1:9102/metrics"
+      series: ["elite_socketlatency"]
+
 metrics:
   metricNamespace: elite
   disableCompression: true

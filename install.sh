@@ -72,6 +72,10 @@ apply_metal() {
   echo "  curl http://127.0.0.1:9102/metrics"
   echo "  bash /opt/elite/scripts/pm2-guard.sh   # if PM2 apps present"
   echo ""
+  echo "Optional — Elite One-Click Physics Pack (OSS exporters, no scratch BPF):"
+  echo "  sudo bash $ROOT/scripts/oneclick/elite-physics-pack.sh install"
+  echo "  bash $ROOT/scripts/oneclick/physics-pack-proof.sh"
+  echo ""
   echo "See deploy/contabo/ROLLBACK.md for instant rollback."
 }
 

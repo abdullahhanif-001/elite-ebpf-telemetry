@@ -13,12 +13,32 @@ type InspServerConfig struct {
 	// Deprecated: use address instead
 	Port uint16 `yaml:"port" mapstructure:"port" json:"port"`
 
-	Address          string        `yaml:"address" mapstructure:"address" json:"address"`
-	EnableController bool          `yaml:"enableController" mapstructure:"enableController" json:"enableController"`
-	ControllerAddr   string        `yaml:"controllerAddr" mapstructure:"controllerAddr" json:"controllerAddr"`
-	MetricsConfig    MetricsConfig `yaml:"metrics" mapstructure:"metrics" json:"metrics"`
-	EventConfig      EventConfig   `yaml:"event" mapstructure:"event" json:"event"`
-	Otel             OtelConfig    `yaml:"otel" mapstructure:"otel" json:"otel"`
+	Address          string         `yaml:"address" mapstructure:"address" json:"address"`
+	EnableController bool           `yaml:"enableController" mapstructure:"enableController" json:"enableController"`
+	ControllerAddr   string         `yaml:"controllerAddr" mapstructure:"controllerAddr" json:"controllerAddr"`
+	MetricsConfig    MetricsConfig  `yaml:"metrics" mapstructure:"metrics" json:"metrics"`
+	EventConfig      EventConfig    `yaml:"event" mapstructure:"event" json:"event"`
+	Otel             OtelConfig     `yaml:"otel" mapstructure:"otel" json:"otel"`
+	Forecast         ForecastConfig `yaml:"forecast" mapstructure:"forecast" json:"forecast"`
+}
+
+// ForecastConfig drives the userspace EWMA predictive layer (no new BPF).
+type ForecastConfig struct {
+	Enabled         bool                   `yaml:"enabled" mapstructure:"enabled" json:"enabled"`
+	Interval        string                 `yaml:"interval" mapstructure:"interval" json:"interval"`
+	Horizon         string                 `yaml:"horizon" mapstructure:"horizon" json:"horizon"`
+	Window          int                    `yaml:"window" mapstructure:"window" json:"window"`
+	Alpha           float64                `yaml:"alpha" mapstructure:"alpha" json:"alpha"`
+	HardDropSeconds float64                `yaml:"hardDropSeconds" mapstructure:"hardDropSeconds" json:"hardDropSeconds"`
+	AccThreshold    float64                `yaml:"accThreshold" mapstructure:"accThreshold" json:"accThreshold"`
+	Mode            string                 `yaml:"mode" mapstructure:"mode" json:"mode"`
+	SemiCooldown    string                 `yaml:"semiCooldown" mapstructure:"semiCooldown" json:"semiCooldown"`
+	Targets      []ForecastTargetConfig `yaml:"targets" mapstructure:"targets" json:"targets"`
+}
+
+type ForecastTargetConfig struct {
+	URL    string   `yaml:"url" mapstructure:"url" json:"url"`
+	Series []string `yaml:"series" mapstructure:"series" json:"series"`
 }
 
 type OtelConfig struct {

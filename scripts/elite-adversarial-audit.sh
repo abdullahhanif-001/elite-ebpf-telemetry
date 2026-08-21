@@ -104,5 +104,15 @@ else
   record PM2 Critical "restarts unchanged ($AFTER)" PASS
 fi
 
+echo "--- Physics Pack exporters (if installed) ---"
+PACK_PROOF="$(cd "$(dirname "$0")" && pwd)/oneclick/physics-pack-proof.sh"
+if [[ -f "$PACK_PROOF" ]]; then
+  if ! bash "$PACK_PROOF"; then
+    FAIL=$((FAIL + 1))
+  fi
+else
+  echo "physics-pack-proof.sh not found; skip"
+fi
+
 echo "=== ADVERSARIAL AUDIT FAILURES=$FAIL LOG=$OUT ==="
 exit "$FAIL"
