@@ -2,10 +2,10 @@
 
 Generated: 2026-08-21T10:45:16+02:00
 
-```
+```text
 ELITE_SWITCH_MOAT
 observe_ns/op=97.92
-bench_parse_line=BenchmarkParseBodyFlood-4           	    1305	    917809 ns/op	 207.08 MB/s	       0 B/op	       0 allocs/op
+bench_parse_line=BenchmarkParseBodyFlood-4                1305         917809 ns/op   207.08 MB/s         0 B/op         0 allocs/op
 flat_false_positives=0
 pm2_guard=PASS
 live_predict=0
