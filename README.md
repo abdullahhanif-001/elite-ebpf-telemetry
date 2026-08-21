@@ -16,28 +16,42 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 
 ## What’s new
 
-### Elite Physics Pack (OSS compose)
+### Elite Physics Pack (OSS compose under systemd)
 
-A Contabo/VPS installer that wires proven upstream exporters under Elite branding — **no new kernel BPF inventions**. Downloads pinned GitHub releases (Cloudflare `ebpf_exporter`, Inspektor Gadget) and optional `bpfcc-tools`, then scrapes localhost Prometheus endpoints.
+Production-shaped **compose**, not a demo script: pinned GitHub release digests (`versions.env`), Cloudflare `ebpf_exporter` + optional Inspektor Gadget + `bpfcc-tools`, dedicated systemd units with CPUQuota, localhost-only Prometheus scrape glue, Grafana dashboard JSON, and a Contabo proof harness that samples process CPU without touching co-resident PM2 apps.
 
 ```bash
 sudo bash scripts/oneclick/elite-physics-pack.sh install
 bash scripts/oneclick/physics-pack-proof.sh
 ```
 
-Attribution and pins: [scripts/oneclick/ATTRIBUTION.md](scripts/oneclick/ATTRIBUTION.md), [docs/ADR-003-oneclick-oss-compose.md](docs/ADR-003-oneclick-oss-compose.md).
+Design constraint (ADR-003): **no new kernel BPF inventions** — Elite brands and operates upstream CO-RE artifacts with required attribution. Pins + license notes: [scripts/oneclick/ATTRIBUTION.md](scripts/oneclick/ATTRIBUTION.md), [docs/ADR-003-oneclick-oss-compose.md](docs/ADR-003-oneclick-oss-compose.md).
 
-### Deterministic predictive layer (userspace)
+### Deterministic predictive layer (`pkg/forecaster`)
 
-Pure-math EWMA + velocity/acceleration in `pkg/forecaster` (no ML, no new eBPF). Polls `:9435` / `:9102`, projects latency five seconds ahead, exports `elite_predict_*`. Modes: `dry-run` (metrics/logs) or `semi` (temporary event-probe shed via existing Reload). Hot-path parse/observe targets **0 allocs/op**; Contabo scorecard: [scripts/oneclick/SCORECARD_SWITCH.md](scripts/oneclick/SCORECARD_SWITCH.md).
+Userspace **control-plane** fault projection over physics latency series — pure math, **no ML model**, **no new eBPF**. The agent scrapes loopback Prometheus text (`:9435` / `:9102`), then runs a fixed-cost pipeline designed for always-on VPS duty:
+
+| Stage | Implementation detail |
+|-------|------------------------|
+| Scrape parse | Reusable 256 KiB body buffers; prefix match on `[]byte` (no string concat); fixed counter slots (no per-tick maps) |
+| Smooth | EWMA α=0.3 over an 8-sample ring |
+| Kinematics | Velocity + acceleration from EWMA deltas; 5s projection `s + v·t + ½a·t²` when accelerating |
+| Fault trip | Projected ≥ hardDrop **and** EWMA ≥ 30% of hardDrop (rejects flap false positives) |
+| Publish | Double-buffered `Snapshot` (no per-tick `atomic.Pointer` alloc); gauges `elite_predict_*` |
+| Actuate | `dry-run` (metrics/logs) or `semi` (temporary event-probe shed via existing Reload, metrics stay up) |
+
+Contabo A-grade gate (`forecaster-agrade.sh`): benchmem **0 B/op / 0 allocs/op** on parse/observe hot paths, PM2 process-set invariant before/after, honest Retina comparison — only claim switch-readiness when `VERDICT=SWITCH_READY` ([scripts/oneclick/SCORECARD_SWITCH.md](scripts/oneclick/SCORECARD_SWITCH.md)).
 
 ```yaml
 forecast:
   enabled: true
-  mode: dry-run
+  interval: 1s
+  horizon: 5s
+  mode: dry-run   # or semi
+  hardDropSeconds: 0.1
 ```
 
-Details: [docs/predictive-forecaster.md](docs/predictive-forecaster.md).
+Series: `elite_predict_latency_ewma_seconds`, `elite_predict_velocity`, `elite_predict_acceleration`, `elite_predict_projected_5s_seconds`, `elite_predict_fault`, `elite_predict_faults_total`. Full design notes: [docs/predictive-forecaster.md](docs/predictive-forecaster.md).
 
 ---
 
