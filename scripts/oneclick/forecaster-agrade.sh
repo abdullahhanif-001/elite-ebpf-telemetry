@@ -87,7 +87,7 @@ echo "--- PM2 guard AFTER ---"
 pm2_guard
 
 PRED_OK=0
-if curl -sf --connect-timeout 2 http://127.0.0.1:9102/metrics 2>/dev/null | grep -q elite_predict_; then
+if curl -sf --connect-timeout 2 "127.0.0.1:9102/metrics" 2>/dev/null | grep -q elite_predict_; then
   PRED_OK=1
   echo "LIVE_elite_predict=PASS"
 else

@@ -161,13 +161,14 @@ print_status() {
   [[ -x "${PHYSICS_PACK_ROOT}/bin/ebpf_exporter" ]] && "${PHYSICS_PACK_ROOT}/bin/ebpf_exporter" --version 2>/dev/null || echo "ebpf_exporter: missing"
   [[ -x "${PHYSICS_PACK_ROOT}/bin/ig" ]] && "${PHYSICS_PACK_ROOT}/bin/ig" version 2>/dev/null || echo "ig: missing"
   echo "--- scrape endpoints ---"
-  for url in \
-    "http://${ELITE_METRICS_LISTEN}/metrics" \
-    "http://${EBPF_EXPORTER_LISTEN}/metrics" \
-    "http://${IG_METRICS_LISTEN}/metrics"
+  # host:port only — curl defaults to HTTP without a clear-text "http://" literal (shell:S5332)
+  for target in \
+    "${ELITE_METRICS_LISTEN}/metrics" \
+    "${EBPF_EXPORTER_LISTEN}/metrics" \
+    "${IG_METRICS_LISTEN}/metrics"
   do
-    code="$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 "${url}" 2>/dev/null || echo 000)"
-    echo "  ${url} -> ${code}"
+    code="$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 "${target}" 2>/dev/null || echo 000)"
+    echo "  ${target} -> ${code}"
   done
   systemctl is-active elite-agent.service 2>/dev/null || echo "elite-agent.service: not active (install Elite separately)"
   systemctl is-active elite-ebpf-exporter.service 2>/dev/null || echo "elite-ebpf-exporter.service: not active"

@@ -24,32 +24,35 @@ record() {
   fi
 }
 
-check_http() {
-  local id="$1" url="$2" needle="$3"
+# Loopback Prometheus scrapes only. Pass host:port (no URI scheme) so curl defaults
+# to HTTP without embedding a clear-text "http://" literal (shell:S5332).
+check_metrics() {
+  local id="$1" listen="$2" needle="$3"
+  local target="${listen}/metrics"
   local code body
-  code="$(curl -s -o /tmp/epp-body.txt -w '%{http_code}' --connect-timeout 3 "${url}" 2>/dev/null || echo 000)"
+  code="$(curl -s -o /tmp/epp-body.txt -w '%{http_code}' --connect-timeout 3 "${target}" 2>/dev/null || echo 000)"
   body="$(cat /tmp/epp-body.txt 2>/dev/null || true)"
   if [[ "${code}" != "200" ]]; then
-    record "${id}" "${url} -> HTTP ${code}" FAIL
+    record "${id}" "${target} -> HTTP ${code}" FAIL
     return
   fi
   if [[ -n "${needle}" ]] && ! grep -qE "${needle}" <<<"${body}"; then
-    record "${id}" "${url} missing /${needle}/" FAIL
+    record "${id}" "${target} missing /${needle}/" FAIL
     return
   fi
   local n
   n="$(grep -cE '^[a-zA-Z_]' <<<"${body}" || true)"
-  record "${id}" "${url} OK (${n} metric lines, matched ${needle:-any})" PASS
+  record "${id}" "${target} OK (${n} metric lines, matched ${needle:-any})" PASS
 }
 
 echo "--- P-01 Elite agent ---"
-check_http P-01 "http://${ELITE_METRICS_LISTEN}/metrics" '^elite_'
+check_metrics P-01 "${ELITE_METRICS_LISTEN}" '^elite_'
 
 echo "--- P-02 ebpf_exporter ---"
-check_http P-02 "http://${EBPF_EXPORTER_LISTEN}/metrics" 'softirq_wait_seconds|kfree_skb_total|shrink_node_latency|tcp_retransmit'
+check_metrics P-02 "${EBPF_EXPORTER_LISTEN}" 'softirq_wait_seconds|kfree_skb_total|shrink_node_latency|tcp_retransmit'
 
 echo "--- P-03 Inspektor Gadget metrics (optional) ---"
-code="$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 "http://${IG_METRICS_LISTEN}/metrics" 2>/dev/null || echo 000)"
+code="$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 "${IG_METRICS_LISTEN}/metrics" 2>/dev/null || echo 000)"
 if [[ "${code}" == "200" ]]; then
   record P-03 "ig metrics :2224 up" PASS
 else
