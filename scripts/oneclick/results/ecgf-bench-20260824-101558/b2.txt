@@ -1,0 +1,3 @@
+elite_ecgf_posture 1
+elite_ecgf_fault 1
+elite_ecgf_be_quota_hint 25

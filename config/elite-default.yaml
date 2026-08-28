@@ -1,0 +1,50 @@
+# Elite default: slim physics probe set (<1% CPU target)
+debugMode: false
+port: 9102
+enableController: false
+address: "127.0.0.1:9102"
+
+otel:
+  enabled: false
+  endpoint: "http://otel-collector.observability:4317"
+  interval: 15s
+  batchSize: 256
+
+forecast:
+  enabled: true
+  interval: 1s
+  horizon: 5s
+  window: 8
+  alpha: 0.3
+  hardDropSeconds: 0.1
+  accThreshold: 0.001
+  mode: dry-run
+  semiCooldown: 60s
+  llcURL: "http://127.0.0.1:9104/metrics"
+  readPSI: true
+  decisionPath: "/var/lib/elite/predict-decision.json"
+  targets:
+    - url: "http://127.0.0.1:9435/metrics"
+      series: ["softirq_wait_seconds"]
+    - url: "http://127.0.0.1:9102/metrics"
+      series: ["elite_socketlatency"]
+
+metrics:
+  metricNamespace: elite
+  disableCompression: true
+  probes:
+    - name: socketlatency
+    - name: kernellatency
+    - name: softirq
+    - name: packetloss
+    - name: tcpsummary
+    - name: connecttrace
+
+event:
+  probes:
+    - name: socketlatency
+    - name: kernellatency
+    - name: connecttrace
+    - name: packetloss
+  sinks:
+    - name: stderr

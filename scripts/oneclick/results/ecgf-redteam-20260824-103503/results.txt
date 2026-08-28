@@ -1,0 +1,13 @@
+[A0] PASS: PM2 before
+[ENV] PASS: write-profiles isolate
+[A1] PASS: disallowed egress denied
+[A2] PASS: shadow read denied (nobody+inaccessible)
+[A3] PASS: exec/net probe blocked or failed closed
+[A4] SKIP: symlink escape — residual Landlock risk documented
+[A5] SKIP: fork bomb — cgroup MemoryMax only; document
+[A6] SKIP: TOCTOU residual documented
+[A7] PASS: posture sticky file remains after controller stop (manual)
+[A8] PASS: unprivileged bus write denied
+[A9] PASS: isolate → be-quota.hint=10 written
+[A10] PASS: unprivileged bpftool denied
+[A11] PASS: PM2 after

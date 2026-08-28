@@ -1,0 +1,63 @@
+# Elite Physics Pack — Prometheus scrape glue (merge into prometheus.yml scrape_configs)
+# All targets default to localhost (Contabo / hard security bind).
+
+scrape_configs:
+  - job_name: elite-agent
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["127.0.0.1:9102"]
+        labels:
+          pack: elite-physics
+          component: elite-agent
+          source: "abdullahhanif-001/elite-ebpf-telemetry"
+
+  - job_name: elite-ebpf-exporter
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["127.0.0.1:9435"]
+        labels:
+          pack: elite-physics
+          component: ebpf_exporter
+          source: "cloudflare/ebpf_exporter"
+
+  - job_name: elite-ig-tcpdrop
+    scrape_interval: 30s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["127.0.0.1:2224"]
+        labels:
+          pack: elite-physics
+          component: inspektor-gadget
+          source: "inspektor-gadget/inspektor-gadget"
+
+  - job_name: elite-llc-sensors
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["127.0.0.1:9104"]
+        labels:
+          pack: elite-physics
+          component: elite-llc
+          source: "abdullahhanif-001/elite-ebpf-telemetry"
+
+  - job_name: elite-dcic
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["127.0.0.1:9103"]
+        labels:
+          pack: elite-physics
+          component: elite-dcic
+          source: "abdullahhanif-001/elite-ebpf-telemetry"
+
+  - job_name: elite-ecgf
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["127.0.0.1:9105"]
+        labels:
+          pack: elite-physics
+          component: elite-ecgf
+          source: "abdullahhanif-001/elite-ebpf-telemetry"

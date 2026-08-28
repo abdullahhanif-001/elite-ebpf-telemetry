@@ -1,0 +1,87 @@
+{{- if and .Values.controller.enabled .Values.webconsole.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webconsole
+  namespace: {{ .Release.Namespace }}
+{{- with .Values.webconsole }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webconsole
+  template:
+    metadata:
+      name: webconsole
+      labels:
+        app: webconsole
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: webconsole
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+          imagePullPolicy: {{ .image.imagePullPolicy }}
+          command: [ "/bin/webconsole" ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop: [ALL]
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          env:
+            - name: CONTROLLER_ENDPOINT
+              value: "https://controller:10264"
+            - name: GRAFANA_PROXY
+              value: "{{ .grafana.proxy }}"
+            - name: GRAFANA_ENDPOINT
+              value: "{{ .grafana.endpoint }}"
+            - name: GRAFANA_USERNAME
+              value: "{{ .grafana.username }}"
+            - name: GRAFANA_PASSWORD
+              value: "{{ .grafana.password }}"
+            - name: AUTH_USERNAME
+              value: "{{ .auth.username }}"
+            - name: AUTH_PASSWORD
+              value: "{{ .auth.password }}"
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+      {{ with .nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{ with .tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}
+{{- end }}

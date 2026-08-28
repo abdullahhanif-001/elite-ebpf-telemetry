@@ -1,0 +1,21 @@
+[Unit]
+Description=Elite ECGF-lite Posture Controller (ADR-005)
+After=network.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/elite-ecgf -listen 127.0.0.1:9105 -decision /var/lib/elite/predict-decision.json -state /var/lib/elite/ecgf/posture.json
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+MemoryMax=64M
+CPUQuota=2%
+PrivateTmp=true
+ProtectHome=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/elite
+
+[Install]
+WantedBy=multi-user.target

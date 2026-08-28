@@ -1,0 +1,11 @@
+[Unit]
+Description=Elite agent auto-update timer (default every 6h)
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=6h
+Persistent=true
+Unit=elite-updater.service
+
+[Install]
+WantedBy=timers.target

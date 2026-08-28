@@ -1,0 +1,202 @@
+# Elite one-click bundle: hardened physics agent (bring your own Prometheus)
+# Usage: kubectl apply -f deploy/elite-bundle.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: elite
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elite-config
+  namespace: elite
+data:
+  config.yaml: |
+    debugMode: false
+    address: "127.0.0.1:9102"
+    port: 9102
+    enableController: false
+    otel:
+      enabled: false
+      endpoint: "https://otel-collector.observability:4317"
+      interval: 15s
+      batchSize: 256
+      service: elite-agent
+    metrics:
+      metricNamespace: elite
+      disableCompression: true
+      probes:
+        - name: socketlatency
+        - name: softirq
+        - name: packetloss
+        - name: tcpsummary
+        - name: connecttrace
+    event:
+      probes:
+        - name: socketlatency
+        - name: packetloss
+      sinks:
+        - name: stderr
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: elite-agent
+  namespace: elite
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: elite-agent
+  namespace: elite
+  labels:
+    app: elite-agent
+spec:
+  selector:
+    matchLabels:
+      app: elite-agent
+  template:
+    metadata:
+      labels:
+        app: elite-agent
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9102"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: elite-agent
+      automountServiceAccountToken: false
+      dnsPolicy: ClusterFirst
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: btf-prepare
+          image: ghcr.io/abdullahhanif-001/elite-ebpf-telemetry/agent:v1.0.0
+          command: [btfhack, discover, -p, /etc/elite/btf/]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+              ephemeral-storage: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+              ephemeral-storage: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: btf-rawdata
+              mountPath: /etc/elite/btf
+            - name: boot
+              mountPath: /boot
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      containers:
+        - name: elite-agent
+          image: ghcr.io/abdullahhanif-001/elite-ebpf-telemetry/agent:v1.0.0
+          command: [/bin/elite-agent, server, -c, /etc/elite/config/config.yaml]
+          ports:
+            - name: metrics
+              containerPort: 9102
+          env:
+            - name: ELITE_NODENAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+              ephemeral-storage: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+              ephemeral-storage: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9102
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9102
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/elite/config
+              readOnly: true
+            - name: btf-rawdata
+              mountPath: /etc/net-exporter/btf
+            - name: proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: bpf-maps
+              mountPath: /sys/fs/bpf
+            - name: cgroup
+              mountPath: /sys/fs/cgroup
+              readOnly: true
+            - name: bpf-events
+              mountPath: /sys/kernel/debug
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config-volume
+          configMap:
+            name: elite-config
+        - name: btf-rawdata
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: boot
+          hostPath:
+            path: /boot
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: bpf-maps
+          hostPath:
+            path: /sys/fs/bpf
+            type: DirectoryOrCreate
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
+        - name: bpf-events
+          hostPath:
+            path: /sys/kernel/debug
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elite-agent
+  namespace: elite
+spec:
+  selector:
+    app: elite-agent
+  ports:
+    - name: metrics
+      port: 9102
+      targetPort: 9102
+  type: ClusterIP

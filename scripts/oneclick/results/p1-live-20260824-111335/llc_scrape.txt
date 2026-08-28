@@ -1,0 +1,15 @@
+# HELP elite_llc_enabled 1 if LLC PERF sampling is active.
+# TYPE elite_llc_enabled gauge
+elite_llc_enabled 1
+# HELP elite_llc_references_total Cumulative cache references (sampled).
+# TYPE elite_llc_references_total counter
+elite_llc_references_total 17597521
+# HELP elite_llc_misses_total Cumulative cache misses (sampled).
+# TYPE elite_llc_misses_total counter
+elite_llc_misses_total 7613490
+# HELP elite_llc_hit_ratio Cache hit ratio (0-1).
+# TYPE elite_llc_hit_ratio gauge
+elite_llc_hit_ratio 0.567354401793298
+# HELP elite_llc_miss_rate Misses per second (approx).
+# TYPE elite_llc_miss_rate gauge
+elite_llc_miss_rate 6.87238565879861e+06

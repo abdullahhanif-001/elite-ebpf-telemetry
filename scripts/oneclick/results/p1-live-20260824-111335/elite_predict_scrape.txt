@@ -1,0 +1,30 @@
+# HELP elite_predict_acceleration Second derivative of EWMA latency (seconds/second^2).
+# TYPE elite_predict_acceleration gauge
+elite_predict_acceleration 0.02522886960707523
+# HELP elite_predict_fault 1 if projected latency breaches hard drop limit.
+# TYPE elite_predict_fault gauge
+elite_predict_fault 1
+# HELP elite_predict_fault_cause 1 when fault cause matches label (network|llc|psi|mixed).
+# TYPE elite_predict_fault_cause gauge
+elite_predict_fault_cause{cause="llc"} 1
+elite_predict_fault_cause{cause="mixed"} 0
+elite_predict_fault_cause{cause="network"} 0
+elite_predict_fault_cause{cause="psi"} 0
+# HELP elite_predict_faults_total Count of forecast fault transitions observed.
+# TYPE elite_predict_faults_total counter
+elite_predict_faults_total 5
+# HELP elite_predict_latency_ewma_seconds EWMA of scraped latency proxy (seconds).
+# TYPE elite_predict_latency_ewma_seconds gauge
+elite_predict_latency_ewma_seconds 0.07048583405843853
+# HELP elite_predict_latency_raw_seconds Last raw scraped latency proxy (seconds).
+# TYPE elite_predict_latency_raw_seconds gauge
+elite_predict_latency_raw_seconds 0.1138569994240001
+# HELP elite_predict_mode Forecast action mode (1=dry-run, 2=semi).
+# TYPE elite_predict_mode gauge
+elite_predict_mode 1
+# HELP elite_predict_projected_5s_seconds Projected latency at forecast horizon (seconds).
+# TYPE elite_predict_projected_5s_seconds gauge
+elite_predict_projected_5s_seconds 0.4787849007743994
+# HELP elite_predict_velocity First derivative of EWMA latency (seconds/second).
+# TYPE elite_predict_velocity gauge
+elite_predict_velocity 0.018587639325504095

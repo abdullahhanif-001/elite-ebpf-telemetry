@@ -1,0 +1,24 @@
+go: downloading go1.25.0 (linux/amd64)
+go: downloading github.com/prometheus/client_golang v1.22.0
+go: downloading github.com/sirupsen/logrus v1.9.4
+go: downloading golang.org/x/sys v0.47.0
+go: downloading github.com/cespare/xxhash/v2 v2.3.0
+go: downloading github.com/beorn7/perks v1.0.1
+go: downloading github.com/prometheus/client_model v0.6.1
+go: downloading github.com/prometheus/common v0.62.0
+go: downloading github.com/prometheus/procfs v0.15.1
+go: downloading google.golang.org/protobuf v1.36.11
+go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+time="2026-08-24T05:40:39Z" level=warning msg="forecaster FAULT cause=network projected=0.5955s ewma=0.0730s vel=0.0470 acc=0.0230 mode=semi"
+time="2026-08-24T05:40:39Z" level=warning msg="forecaster semi: event probes shed for 60ms"
+time="2026-08-24T05:40:39Z" level=info msg="forecaster semi: event probes restored"
+goos: linux
+goarch: amd64
+pkg: github.com/alibaba/kubeskoop/pkg/forecaster
+cpu: AMD EPYC Processor (with IBPB)
+BenchmarkCompeteEngineObserveNS-4   	11200256	       108.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkEngineObserve-4            	13359013	        95.85 ns/op	       0 B/op	       0 allocs/op
+BenchmarkParseBodyFlood-4           	    1344	    873739 ns/op	 217.52 MB/s	       0 B/op	       0 allocs/op
+BenchmarkParseMetricLineBytes-4     	22153615	        54.46 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/alibaba/kubeskoop/pkg/forecaster	5.518s

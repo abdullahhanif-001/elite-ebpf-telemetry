@@ -1,0 +1,10 @@
+=== LIVE PREDICT H11 20260824-111335 ===
+[L0] PASS: PM2 before
+[L1a] PASS: Soft DCIC metrics reachable
+[L2] PASS: wrote MOCK_ decision bus /var/lib/elite/predict-decision.json
+MOCK_ decision OK network
+[L3] PASS: Soft DCIC metrics still healthy after inject
+[L4] PASS: actuate-relevant DCIC series present
+[L5] PASS: elite_predict_* present on agent
+[L6] PASS: PM2 after
+=== H11 LIVE OK ===

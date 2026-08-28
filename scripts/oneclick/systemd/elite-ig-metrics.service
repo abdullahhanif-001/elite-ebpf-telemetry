@@ -1,0 +1,16 @@
+[Unit]
+Description=Elite Physics Pack — optional Inspektor Gadget tcpdrop metrics helper
+Documentation=https://www.inspektor-gadget.io/docs/main/reference/export-metrics
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Headless tcpdrop metrics on localhost (requires kernel BTF). Safe to fail.
+ExecStart=/bin/bash -c 'command -v ig >/dev/null && ig run ghcr.io/inspektor-gadget/gadget/trace_tcpdrop:latest --annotate=tcpdrop:metrics.collect=true --otel-metrics-name=tcpdrop:tcpdrop-metrics --otel-metrics-listen=true --otel-metrics-listen-address=127.0.0.1:2224 --detach || true'
+ExecStop=/bin/bash -c 'ig list 2>/dev/null | awk "/tcpdrop/ {print \$1}" | xargs -r -n1 ig delete || true'
+CPUQuota=3%
+MemoryMax=256M
+
+[Install]
+WantedBy=multi-user.target

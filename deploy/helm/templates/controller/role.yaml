@@ -1,0 +1,16 @@
+{{- if .Values.controller.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: controller
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["elite-config"]
+  verbs: ["get", "update"]
+- apiGroups: [""]
+  resources:
+  - pods
+  verbs: ["get", "list", "watch", "delete", "create"]
+{{- end }}

@@ -1,0 +1,19 @@
+[Unit]
+Description=Elite agent one-shot updater (signed release check)
+After=network-online.target elite-agent.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/elite/bin/elite-updater -c /opt/elite/config/update.yaml
+Nice=15
+CPUQuota=5%
+MemoryMax=64M
+PrivateTmp=true
+ProtectHome=true
+NoNewPrivileges=true
+ReadWritePaths=/opt/elite /var/lib/elite
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

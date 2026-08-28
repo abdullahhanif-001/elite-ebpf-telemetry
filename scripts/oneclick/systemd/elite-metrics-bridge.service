@@ -1,0 +1,18 @@
+[Unit]
+Description=Elite Soft Metrics Bridge (:9102)
+After=network.target elite-dcic.service
+Requires=elite-dcic.service
+
+[Service]
+Type=simple
+Environment=ELITE_BRIDGE_LISTEN=127.0.0.1:9102
+Environment=DCIC_METRICS_URL=http://127.0.0.1:9103/metrics
+Environment=EBPF_EXPORTER_URL=http://127.0.0.1:9435/metrics
+ExecStart=/usr/bin/python3 /opt/elite/dcic/bin/elite-metrics-bridge.py
+Restart=on-failure
+RestartSec=3
+CPUQuota=2%
+MemoryMax=32M
+
+[Install]
+WantedBy=multi-user.target

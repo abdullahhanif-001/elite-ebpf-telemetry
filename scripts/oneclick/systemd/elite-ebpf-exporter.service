@@ -1,0 +1,22 @@
+[Unit]
+Description=Elite Physics Pack — Cloudflare ebpf_exporter (OSS compose)
+Documentation=https://github.com/cloudflare/ebpf_exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/elite/physics-pack/ebpf_exporter.env
+WorkingDirectory=/opt/elite/physics-pack/ebpf_exporter/examples
+ExecStart=/opt/elite/physics-pack/bin/run-ebpf-exporter.sh
+Restart=on-failure
+RestartSec=5
+CPUQuota=5%
+MemoryMax=512M
+NoNewPrivileges=false
+CapabilityBoundingSet=CAP_BPF CAP_PERFMON CAP_SYS_ADMIN CAP_NET_ADMIN CAP_SYS_RESOURCE
+AmbientCapabilities=CAP_BPF CAP_PERFMON CAP_SYS_ADMIN CAP_NET_ADMIN CAP_SYS_RESOURCE
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

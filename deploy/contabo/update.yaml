@@ -1,0 +1,17 @@
+# Elite auto-update channel (copied to /opt/elite/config/update.yaml)
+channel: stable
+repo: abdullahhanif-001/elite-ebpf-telemetry
+check_interval: 6h
+auto_apply: false
+bin_dir: /opt/elite/bin
+previous_dir: /opt/elite/bin/previous
+agent_unit: elite-agent
+agent_bin: elite-agent
+updater_bin: elite-updater
+health_url: http://127.0.0.1:9102/metrics
+health_timeout: 45s
+require_cosign: false
+asset_name: ""
+update_packs: true
+versions_env_path: /opt/elite/scripts/oneclick/versions.env
+pm2_guard: /opt/elite/scripts/pm2-guard.sh

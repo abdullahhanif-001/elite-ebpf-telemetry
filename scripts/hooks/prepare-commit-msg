@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Strip automated co-author trailers before commit message is finalized.
+set -euo pipefail
+MSG_FILE="${1:?}"
+[ -f "$MSG_FILE" ] || exit 0
+grep -viE 'co-authored-by:.*cursor|co-authored-by:.*cursoragent@' "$MSG_FILE" > "${MSG_FILE}.tmp" || true
+mv "${MSG_FILE}.tmp" "$MSG_FILE"

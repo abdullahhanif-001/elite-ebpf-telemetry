@@ -1,0 +1,17 @@
+[H7a] PASS: PM2 guard before
+[H0a] PASS: bash -n oneclick scripts
+[H0b] SKIP: shellcheck not installed
+[H1] PASS: go test forecaster/dcic/llc/export/exporter
+[H2] PASS: go test -race forecaster/dcic/llc
+[H3] PASS: Observe path 0 B/op / 0 allocs/op
+[H4] PASS: MOCK_ decision bus + causal goldens (pkg tests)
+[H5] PASS: after-working exit 0
+[H6a] SKIP: physics-pack-proof.sh failed/optional
+[H6b] SKIP: llc-pack-proof.sh SKIP (capability)
+[H6c] SKIP: soft-dcic-verify.sh SKIP (capability)
+[H8a] PASS: build elite-agent
+[H8b] PASS: build elite-dcic
+[H8c] PASS: build elite-llc-sensors
+[H7b] PASS: PM2 guard after
+[H9] FAIL: Sonar alert_status=ERROR (re-poll after push/analyze)
+[H10] SKIP: gh CLI absent — confirm CI after push

@@ -1,0 +1,14 @@
+apiVersion: v2
+name: elite
+description: Zero-instrumentation eBPF physics telemetry for Kubernetes
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - ebpf
+  - observability
+  - kubernetes
+  - networking
+maintainers:
+  - name: Abdullah Hanif
+    url: https://github.com/abdullahhanif-001

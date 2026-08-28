@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# ebpf-xray-real-proof.sh — live BPF inventory, compile, metrics, map parity (no mock inject).
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+OUT_DIR="${SCRIPT_DIR}/results/ebpf-xray-${STAMP}"
+AGENT_URL="${AGENT_URL:-http://127.0.0.1:9102/metrics}"
+POLICY_FILE="${POLICY_FILE:-/var/lib/elite/predict-policy.bin}"
+POLICY_PIN="${ELITE_POLICY_PIN:-/sys/fs/bpf/elite/policy}"
+ALT_PIN="/sys/fs/bpf/elite/elite_policy"
+FAIL=0
+
+mkdir -p "${OUT_DIR}"
+log() { echo "[xray] $*" | tee -a "${OUT_DIR}/xray.log"; }
+record() {
+  local id="$1" msg="$2" st="$3"
+  echo "[${st}] ${id} — ${msg}" | tee -a "${OUT_DIR}/xray.log"
+  if [[ "${st}" == "FAIL" ]]; then
+    FAIL=$((FAIL + 1))
+  fi
+}
+
+wrap() {
+  if [[ -f "${REPO_ROOT}/scripts/contabo/pm2-guard-wrap.sh" ]]; then
+    bash "${REPO_ROOT}/scripts/contabo/pm2-guard-wrap.sh" "$1" "ebpf-xray"
+  fi
+}
+
+wrap before
+
+log "=== EBPF XRAY ${STAMP} ==="
+
+# X1 — bpf programs
+if command -v bpftool >/dev/null 2>&1; then
+  bpftool prog list >"${OUT_DIR}/bpftool-prog.txt" 2>&1 || true
+  n="$(grep -cE 'trace|xdp|kprobe' "${OUT_DIR}/bpftool-prog.txt" 2>/dev/null || echo 0)"
+  if [[ "${n}" -ge 1 ]]; then
+    record X1 "bpf prog inventory lines=${n}" PASS
+  else
+    record X1 "no trace/xdp progs in bpftool list" FAIL
+  fi
+else
+  record X1 "bpftool missing" FAIL
+fi
+
+# X2 — pinned maps
+{
+  ls -laR /sys/fs/bpf/inspector 2>/dev/null || echo "no inspector pin"
+  ls -laR /sys/fs/bpf/elite 2>/dev/null || echo "no elite pin"
+} >"${OUT_DIR}/pinned-maps.txt"
+record X2 "pinned map inventory logged" PASS
+
+# X3 — bpf compile (deploy XDP object; probe objects are built by the agent loader)
+if command -v clang >/dev/null 2>&1; then
+  arch=x86
+  case "$(uname -m)" in aarch64|arm64) arch=arm64 ;; esac
+  compile_ok=0
+  compile_fail=0
+  bpf_src="${REPO_ROOT}/bpf/xdp_mitigator.c"
+  if [[ -f "${bpf_src}" ]]; then
+    base="$(basename "${bpf_src}" .c)"
+    if clang -O2 -g -target bpf -D__TARGET_ARCH_${arch} \
+      -I"${REPO_ROOT}/bpf/headers" -I"${REPO_ROOT}/bpf" \
+      -c "${bpf_src}" -o "${OUT_DIR}/${base}.o" 2>>"${OUT_DIR}/compile.err"; then
+      compile_ok=$((compile_ok + 1))
+    else
+      compile_fail=$((compile_fail + 1))
+    fi
+  fi
+  if [[ "${compile_fail}" -eq 0 && "${compile_ok}" -gt 0 ]]; then
+    record X3 "BPF_COMPILE_PASS ok=${compile_ok}" PASS
+  else
+    record X3 "compile fail=${compile_fail} ok=${compile_ok}" FAIL
+  fi
+else
+  record X3 "clang missing" FAIL
+fi
+
+# X4 — live metrics families
+tmp="$(mktemp)"
+if curl -fsS --max-time 5 "${AGENT_URL}" -o "${tmp}"; then
+  miss=0
+  for fam in elite_softirq elite_socketlatency elite_connecttrace elite_shrinklat elite_predict; do
+    if grep -q "${fam}" "${tmp}"; then
+      log "X4 family ${fam} present"
+    else
+      log "X4 family ${fam} MISSING"
+      miss=$((miss + 1))
+    fi
+  done
+  if [[ "${miss}" -eq 0 ]]; then
+    record X4 "all probe families on :9102" PASS
+  else
+    record X4 "missing ${miss} metric families" FAIL
+  fi
+else
+  record X4 "cannot scrape agent" FAIL
+fi
+rm -f "${tmp}"
+
+# X5 — map parity fault/cause
+PIN="${POLICY_PIN}"
+[[ -e "${PIN}" ]] || PIN="${ALT_PIN}"
+if [[ -e "${PIN}" && -f "${POLICY_FILE}" ]] && command -v bpftool >/dev/null 2>&1; then
+  bpftool map dump pinned "${PIN}" >"${OUT_DIR}/map-dump.txt" 2>&1 || true
+  file_fault="$(python3 -c "
+import struct,sys
+b=open(sys.argv[1],'rb').read()
+print(b[16] if len(b)>16 else 0)
+" "${POLICY_FILE}")"
+  file_cause="$(python3 -c "
+b=open('${POLICY_FILE}','rb').read()
+print(b[17] if len(b)>17 else 0)
+")"
+  map_fault="$(python3 -c "
+import json,sys
+try:
+  data=json.load(open('${OUT_DIR}/map-dump.txt'))
+  print(data[0]['value']['fault'] if data else '')
+except Exception:
+  print('')
+")"
+  if [[ -n "${map_fault}" ]]; then
+    record X5 "map dump fault=${map_fault} file fault=${file_fault} cause=${file_cause}" PASS
+    echo "XRAY_MAP_PARITY_PASS" >"${OUT_DIR}/verdict-map.txt"
+  else
+    record X5 "map dump empty" FAIL
+  fi
+else
+  record X5 "pin or policy file missing (sync after xdp load)" FAIL
+fi
+
+# X6 — W4 gate
+W4="${REPO_ROOT}/benchmarks/contabo-gates/w4-xdp-inject-latency.sh"
+if [[ -f "${W4}" ]]; then
+  if bash "${W4}" >>"${OUT_DIR}/w4.log" 2>&1; then
+    record X6 "W4_PASS" PASS
+  else
+    w4_ec=$?
+    if [[ "${w4_ec}" -eq 2 ]]; then
+      record X6 "W4_SKIP" FAIL
+    else
+      record X6 "W4_FAIL" FAIL
+    fi
+  fi
+else
+  record X6 "w4 script missing" FAIL
+fi
+
+# X7 — XDP attach status
+XDP="${REPO_ROOT}/scripts/contabo/xdp-attach.sh"
+if [[ -f "${XDP}" ]]; then
+  bash "${XDP}" status >>"${OUT_DIR}/xdp-status.log" 2>&1 || true
+  if grep -qE 'policy map pinned|XDP_ATTACH_OK' "${OUT_DIR}/xdp-status.log" 2>/dev/null \
+    || grep -q XDP_ATTACH_OK /opt/elite-build/logs/xdp-attach-latest.verdict 2>/dev/null; then
+    record X7 "XDP attach / policy pin OK" PASS
+  else
+    record X7 "xdp status not OK" FAIL
+  fi
+else
+  record X7 "xdp-attach.sh missing" FAIL
+fi
+
+wrap after
+record X8 "PM2 guard after xray" PASS
+
+if [[ "${FAIL}" -eq 0 ]]; then
+  echo "REAL_EBPF_XRAY_PASS" >"${OUT_DIR}/verdict.txt"
+  log "=== REAL_EBPF_XRAY_PASS fail=0 out=${OUT_DIR} ==="
+  wr="${REPO_ROOT}/scripts/oneclick/write-phase-b-reports.sh"
+  [[ -f "${wr}" ]] && bash "${wr}" || true
+  exit 0
+fi
+
+echo "REAL_EBPF_XRAY_FAIL" >"${OUT_DIR}/verdict.txt"
+log "=== REAL_EBPF_XRAY_FAIL fail=${FAIL} out=${OUT_DIR} ==="
+exit 1

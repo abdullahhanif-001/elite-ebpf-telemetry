@@ -1,0 +1,237 @@
+# Elite eBPF
+
+**Zero-instrumentation kernel telemetry — one agent per node, under 1% CPU.**
+
+Category claim (Contabo physics-speed Soft closed-loop VPS bakeoff — [docs/CLAIM_CHARTER.md](docs/CLAIM_CHARTER.md)): **`WORLD_BEST_PHYSICS_SPEED_VPS`** + **`CATEGORY_BAKEOFF_PASS`** + **`ECGF_PROVEN_SUPERIOR`**. Not global eBPF #1. Docs: [docs/WORLD_BEST_PROVIDER_SCORE.md](docs/WORLD_BEST_PROVIDER_SCORE.md) · [docs/CATEGORY_NUMBER_ONE_SCORECARD.md](docs/CATEGORY_NUMBER_ONE_SCORECARD.md) · [docs/WORLD_EBPF_COMPARISON.md](docs/WORLD_EBPF_COMPARISON.md) · [docs/COMPETITIVE_PROOF.md](docs/COMPETITIVE_PROOF.md) · [docs/research/MASTER_REPORT.md](docs/research/MASTER_REPORT.md).
+
+Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or systemd service) that exports physics-layer metrics: socket latency, softirq delay, packet loss, and TCP summary.
+
+**Author & creator:** Abdullah Hanif  
+**Brand:** Elite eBPF — personal open-source project  
+**Repository:** [github.com/abdullahhanif-001/elite-ebpf-telemetry](https://github.com/abdullahhanif-001/elite-ebpf-telemetry)
+
+## Contributors
+
+**Abdullah Hanif** — sole creator, author, and maintainer. See [AUTHORS.md](AUTHORS.md).
+
+---
+
+## What’s new
+
+### Elite Physics Pack (OSS compose under systemd)
+
+Production-shaped **compose**, not a demo script: pinned GitHub release digests (`versions.env`), Cloudflare `ebpf_exporter` + optional Inspektor Gadget + `bpfcc-tools`, dedicated systemd units with CPUQuota, localhost-only Prometheus scrape glue, Grafana dashboard JSON, and a Contabo proof harness that samples process CPU without touching co-resident PM2 apps.
+
+```bash
+sudo bash scripts/oneclick/elite-physics-pack.sh install
+bash scripts/oneclick/physics-pack-proof.sh
+```
+
+Design constraint (ADR-003): **no new kernel BPF inventions** — Elite brands and operates upstream CO-RE artifacts with required attribution. Pins + license notes: [scripts/oneclick/ATTRIBUTION.md](scripts/oneclick/ATTRIBUTION.md), [docs/ADR-003-oneclick-oss-compose.md](docs/ADR-003-oneclick-oss-compose.md).
+
+### Deterministic predictive layer (`pkg/forecaster`)
+
+Userspace **control-plane** fault projection over physics latency series — pure math, **no ML model**, **no new eBPF**. The agent scrapes loopback Prometheus text (`:9435` / `:9102` / optional `:9104` LLC), fuses network + LLC + PSI, then runs a fixed-cost pipeline designed for always-on VPS duty:
+
+| Stage | Implementation detail |
+|-------|------------------------|
+| Scrape parse | Reusable 256 KiB body buffers; prefix match on `[]byte` (no string concat); fixed counter slots (no per-tick maps) |
+| Fuse | Weighted network / LLC / PSI → scalar; causal argmax → `elite_predict_fault_cause` |
+| Smooth | EWMA α=0.3 over an 8-sample ring |
+| Kinematics | Velocity + acceleration from EWMA deltas; 5s projection `s + v·t + ½a·t²` when accelerating |
+| Fault trip | Projected ≥ hardDrop **and** EWMA ≥ 30% of hardDrop (rejects flap false positives) |
+| Publish | Double-buffered `Snapshot`; decision bus `/var/lib/elite/predict-decision.json` for Soft DCIC |
+| Actuate | `dry-run` / `semi` (shed events only for `network|mixed`); Soft cgroup + optional resctrl CAT |
+
+One-click: `sudo bash scripts/oneclick/elite-oneclick.sh install --profile closed-loop` then `test --suite after-working`. ADR-004.
+
+Contabo A-grade gate (`forecaster-agrade.sh`): benchmem **0 B/op / 0 allocs/op** on parse/observe hot paths, PM2 process-set invariant before/after — only claim switch-readiness when `VERDICT=SWITCH_READY` ([scripts/oneclick/SCORECARD_SWITCH.md](scripts/oneclick/SCORECARD_SWITCH.md)). `SOFT_ONLY` is success when hardware lacks resctrl.
+
+```yaml
+forecast:
+  enabled: true
+  interval: 1s
+  horizon: 5s
+  mode: dry-run   # or semi
+  hardDropSeconds: 0.1
+  llcURL: "http://127.0.0.1:9104/metrics"
+  readPSI: true
+```
+
+Series: `elite_predict_*` including `elite_predict_fault_cause{cause=...}`. Docs: [docs/predictive-forecaster.md](docs/predictive-forecaster.md), [docs/ADR-004-closed-loop-predict-actuate.md](docs/ADR-004-closed-loop-predict-actuate.md).
+
+---
+
+## One-click install
+
+```bash
+git clone https://github.com/abdullahhanif-001/elite-ebpf-telemetry.git
+cd elite-ebpf-telemetry
+chmod +x install.sh
+sudo ./install.sh --mode metal --profile full
+```
+
+Remote (metal):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/abdullahhanif-001/elite-ebpf-telemetry/main/install.sh \
+  | sudo bash -s -- --mode metal --profile full
+```
+
+| Environment | What happens |
+|-------------|--------------|
+| Kubernetes | `kubectl apply -f deploy/elite-bundle.yaml` |
+| Linux VPS | Downloads signed release (or local/build), installs systemd `elite-agent` + optional `elite-updater.timer`, runs oneclick profile |
+
+Force a mode:
+
+```bash
+./install.sh --mode k8s
+./install.sh --mode metal --profile physics
+./install.sh --dry-run
+```
+
+Auto-update: `elite-updater` + `elite-updater.timer` (SHA256 / optional cosign). Rollback: [deploy/contabo/ROLLBACK.md](deploy/contabo/ROLLBACK.md). Gates: `bash scripts/oneclick/gates-checklist.sh`.
+
+---
+
+## Architecture
+
+```text
+Kernel tracepoints → eBPF CO-RE → elite-agent (Go) → Prometheus (:9102) + OTLP
+                         ↘ scrape :9435 / :9104 / PSI → fuse+EWMA → elite_predict_*
+                         ↘ Soft DCIC (:9103) ← decision bus ← predict fault
+```
+
+Default metric prefix: **`elite_*`** — configured via `metrics.metricNamespace` in YAML or `ELITE_METRICS_NAMESPACE` env. Build **`bin/elite-agent`** from this repo.
+
+### Why Elite (Abdullah Hanif)
+
+| Layer | Elite eBPF |
+|-------|------------|
+| Metric namespace | **`elite_*`** via `SetMetricsNamespace()` + config |
+| Probe set | **Physics-only** slim set (<1% CPU) |
+| HTTP surface | **Hardened mux**, pprof 404, localhost bind |
+| Deploy | **`elite-bundle.yaml`** + `install.sh` |
+| OTel | **OTLP bridge** (`pkg/export/`) |
+| Predict | **EWMA forecaster** (`pkg/forecaster/`) |
+| Binary | **`elite-agent`** |
+| Container | **`ghcr.io/abdullahhanif-001/elite-ebpf-telemetry/agent`** |
+
+---
+
+## Metrics
+
+| Prefix | Source |
+|--------|--------|
+| `elite_socketlatency_*` | Socket syscall latency |
+| `elite_softirq_*` | NET_RX softirq delay |
+| `elite_packetloss_*` | Kernel drop tracepoints |
+| `elite_tcpsummary_*` | TCP connection stats |
+| `elite_connecttrace_*` | TCP connect (custom build) |
+| `elite_predict_*` | Userspace EWMA fault forecast |
+
+Details: [docs/physics-metrics.md](docs/physics-metrics.md)
+
+---
+
+## Production options
+
+**Helm:**
+
+```bash
+helm install elite ./deploy/helm/elite \
+  --namespace elite --create-namespace
+```
+
+**Bare metal (PM2-safe VPS):**
+
+See [deploy/contabo/](deploy/contabo/) — systemd unit, PM2 guard, Prometheus/Grafana on localhost only.
+
+**Contabo repro (VPS only — no local go test on Windows):**
+
+```bash
+# From PC: sync src only (never overwrite /opt/elite/scripts)
+scp -r update-ebpf/* contabo-server:/opt/elite/src/
+
+# On VPS: PM2-safe real proof suite (no mock inject, no pm2 restart)
+ssh contabo-server 'bash /opt/elite/src/scripts/oneclick/elite-run-safe.sh'
+
+# Pass verdicts: REAL_CLOSED_LOOP_PASS, H11_PASS_LIVE, SPEED_PASS,
+# CATEGORY_BAKEOFF_PASS, PM2_GUARD_OK, ADVERSARIAL AUDIT FAILURES=0
+# Retire legacy ebpf_exporter only after proofs:
+ssh contabo-server 'systemctl stop elite-ebpf-exporter'
+```
+
+---
+
+## Benchmarks
+
+```bash
+./benchmarks/run-overhead.sh              # Kubernetes
+./benchmarks/run-overhead.sh --mode systemd
+bash scripts/oneclick/forecaster-agrade.sh  # Contabo: 0-alloc + SWITCH_READY scorecard
+```
+
+SLO: agent CPU < 1% core fraction. Methodology: [benchmarks/BENCHMARKS.md](benchmarks/BENCHMARKS.md)
+
+---
+
+## Build from source
+
+```bash
+make generate-bpf-in-container
+make build-elite-agent    # → bin/elite-agent
+```
+
+Requires Linux, clang, Go 1.22+.
+
+---
+
+## Security
+
+- Loopback-only metrics bind by default (`127.0.0.1:9102`)
+- Hardened systemd: `NoNewPrivileges`, memory cap, minimal caps
+- Audit reports: [SECURITY_AUDIT_AND_METRICS.md](SECURITY_AUDIT_AND_METRICS.md), [HARDENED_PROOF_REPORT.md](HARDENED_PROOF_REPORT.md)
+
+---
+
+## Comparison
+
+Full market matrix (Retina, Tetragon, Pixie, DeepFlow, Hubble, Istio, Beyla, BCC, …): **[docs/WORLD_EBPF_COMPARISON.md](docs/WORLD_EBPF_COMPARISON.md)**. Executive: [docs/COMPETITIVE_PROOF.md](docs/COMPETITIVE_PROOF.md).
+
+| | Istio sidecar | OBI | Retina | Pixie | **Elite** |
+|---|--------------|-----|--------|-------|-----------|
+| Per-pod overhead | ~500m CPU | 0 | 0 | heavy agent class | **0** |
+| Socket physics metrics | No | Partial | Partial | Partial | **Yes** |
+| Predictive fault gauges | No | No | No | No | **`elite_predict_*`** |
+| Soft density actuate (VPS) | No | No | No | No | **Soft DCIC** |
+| Bare VPS one-click pack | No | No | Helm/K8s | K8s | **Physics Pack** |
+| SecOps attack-block | No | No | No | No | **DECLINE** (Tetragon's axis) |
+
+Speed/overhead proofs: `bash scripts/oneclick/competitive-speed-proof.sh` · `competitive-overhead-proof.sh`.
+
+---
+
+## License
+
+- Userspace: Apache-2.0 ([LICENSE-ELITE.md](LICENSE-ELITE.md))
+- BPF `/bpf`: GPL-2.0
+
+---
+
+## Docs
+
+- [Track C ECGF research](docs/research/MASTER_REPORT.md)
+- [ADR-005 Track C](docs/ADR-005-track-c-ecgf.md)
+- [World eBPF comparison](docs/WORLD_EBPF_COMPARISON.md)
+- [Competitive proof](docs/COMPETITIVE_PROOF.md)
+- [World best provider score](docs/WORLD_BEST_PROVIDER_SCORE.md)
+- [Physics metrics](docs/physics-metrics.md)
+- [Sidecar removal](docs/sidecar-removal.md)
+- [ADR-001: Elite architecture](docs/ADR-001-fork-base.md)
+- [ADR-003: One-click OSS compose](docs/ADR-003-oneclick-oss-compose.md)
+- [Predictive forecaster](docs/predictive-forecaster.md)
+- [Physics Pack README](scripts/oneclick/README.md)
+- [AUTHORS.md](AUTHORS.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)

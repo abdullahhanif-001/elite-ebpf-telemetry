@@ -1,0 +1,44 @@
+debugMode: false
+address: "127.0.0.1:9102"
+port: 9102
+enableController: false
+otel:
+  enabled: false
+  endpoint: "http://127.0.0.1:4317"
+  interval: 15s
+  batchSize: 256
+  service: elite-agent
+forecast:
+  enabled: true
+  interval: 1s
+  horizon: 5s
+  window: 8
+  alpha: 0.3
+  hardDropSeconds: 0.1
+  accThreshold: 0.001
+  mode: dry-run
+  semiCooldown: 60s
+  llcURL: "http://127.0.0.1:9104/metrics"
+  readPSI: true
+  decisionPath: "/var/lib/elite/predict-decision.json"
+  policyPath: "/var/lib/elite/predict-policy.bin"
+  policyMapPin: "/sys/fs/bpf/elite/policy"
+  targets:
+    - url: "http://127.0.0.1:9102/metrics"
+      series: ["elite_socketlatency", "elite_softirq"]
+metrics:
+  disableCompression: true
+  probes:
+    - name: socketlatency
+    - name: softirq
+    - name: packetloss
+    - name: tcpretrans
+    - name: connecttrace
+    - name: shrinklat
+event:
+  probes:
+    - name: socketlatency
+    - name: packetloss
+    - name: connecttrace
+  sinks:
+    - name: stderr
