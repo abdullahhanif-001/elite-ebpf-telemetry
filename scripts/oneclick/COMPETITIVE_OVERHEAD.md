@@ -1,7 +1,7 @@
 # Competitive Overhead
 
 **Generated:** 2026-08-24T09:27:25+02:00  
-**Host:** vmi3469243
+**Host:** production VPS (hostname redacted)
 
 ## Elite (measured or audited)
 

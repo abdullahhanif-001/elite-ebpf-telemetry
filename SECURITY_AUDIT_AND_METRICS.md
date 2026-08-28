@@ -17,8 +17,7 @@ PM2_GUARD_OK
 
 $ pm2 jlist | jq '[.[].name, .[].pm2_env.status, .[].pm2_env.restart_time]'
 {
-  "names": ["rider-tracker-api","restaurant-ai-license","xerosphere-ai",
-            "xerosphere-api","xerosphere-tax","xero-marketing"],
+  "names": ["app-api-1","app-api-2","app-api-3","app-api-4","app-api-5","app-api-6"],
   "status": ["online","online","online","online","online","online"],
   "restarts": [6, 20, 0, 88, 17, 0]
 }

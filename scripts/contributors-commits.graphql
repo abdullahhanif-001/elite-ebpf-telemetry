@@ -1,0 +1,1 @@
+{"query":"query { repository(owner: \"abdullahhanif-001\", name: \"elite-ebpf-telemetry\") { defaultBranchRef { target { ... on Commit { history(first: 5) { nodes { oid messageHeadline author { user { login } name email } committer { user { login } name email } } } } } } } }"}

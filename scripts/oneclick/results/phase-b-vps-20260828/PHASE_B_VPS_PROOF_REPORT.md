@@ -2,12 +2,12 @@
 
 **Repository:** [abdullahhanif-001/elite-ebpf-telemetry](https://github.com/abdullahhanif-001/elite-ebpf-telemetry)  
 **Generated:** 2026-08-28T20:23:08+05:00  
-**Host:** pc-55  
+**Host:** redacted-host  
 **Evidence root:** `C:\Users\Administrator\Downloads\update ebpf\scripts\oneclick\results\phase-b-vps-20260828`
 
 ## Executive verdict (read this first)
 
-Elite Phase B on Contabo is **not a demo** — it is a **PM2-safe, Sonar A-grade, reproducible proof suite** that no other eBPF product in our world matrix ships as a single bash orchestration:
+Elite Phase B on production VPS is **not a demo** — it is a **PM2-safe, Sonar A-grade, reproducible proof suite** that no other eBPF product in our world matrix ships as a single bash orchestration:
 
 | Proof | Verdict | Why it matters |
 |-------|---------|----------------|

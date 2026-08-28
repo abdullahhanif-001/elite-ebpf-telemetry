@@ -1,0 +1,1 @@
+{"query":"query { repository(owner: \"abdullahhanif-001\", name: \"elite-ebpf-telemetry\") { mentionableUsers(first: 30) { nodes { login } } collaborators(first: 10) { nodes { login } } } }"}

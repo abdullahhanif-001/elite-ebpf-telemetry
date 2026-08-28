@@ -50,8 +50,7 @@ $ pm2 jlist | jq '[.[].pm2_env.restart_time] | add'   # after all chaos tests
 
 ```text
 [
-  "rider-tracker-api", "restaurant-ai-license", "xerosphere-ai",
-  "xerosphere-api", "xerosphere-tax", "xero-marketing",
+  "app-api-1", "app-api-2", "app-api-3", "app-api-4", "app-api-5", "app-api-6",
   "online", "online", "online", "online", "online", "online",
   6, 20, 0, 88, 17, 0
 ]

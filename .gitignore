@@ -34,6 +34,13 @@ pnpm-debug.log*
 
 # IDE / agent artifacts
 .cursor/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Local session reports (not product artifacts)
+reports/
 *.plan.md
 agent-transcripts/
 

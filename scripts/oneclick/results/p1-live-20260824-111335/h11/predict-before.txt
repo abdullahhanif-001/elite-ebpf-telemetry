@@ -30,46 +30,46 @@ elite_predict_projected_5s_seconds 0.08439717420033391
 elite_predict_velocity 0.013911272407910024
 # HELP elite_socketlatency_read100ms The total count of read operations that took longer than 100 milliseconds.
 # TYPE elite_socketlatency_read100ms gauge
-elite_socketlatency_read100ms{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 24
+elite_socketlatency_read100ms{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 24
 # HELP elite_socketlatency_read1ms The total count of read operations that took longer than 1 millisecond.
 # TYPE elite_socketlatency_read1ms gauge
-elite_socketlatency_read1ms{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 998
+elite_socketlatency_read1ms{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 998
 # HELP elite_socketlatency_write100ms The total count of write operations that took longer than 100 milliseconds.
 # TYPE elite_socketlatency_write100ms gauge
-elite_socketlatency_write100ms{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 33
+elite_socketlatency_write100ms{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 33
 # HELP elite_socketlatency_write1ms The total count of write operations that took longer than 1 millisecond.
 # TYPE elite_socketlatency_write1ms gauge
-elite_socketlatency_write1ms{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 87
+elite_socketlatency_write1ms{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 87
 # HELP elite_softirq_excuteslow 
 # TYPE elite_softirq_excuteslow counter
-elite_softirq_excuteslow{k8s_node="vmi3469243",softirq_type="net_rx"} 0
+elite_softirq_excuteslow{k8s_node="elite-node",softirq_type="net_rx"} 0
 # HELP elite_softirq_excuteslow100ms 
 # TYPE elite_softirq_excuteslow100ms counter
-elite_softirq_excuteslow100ms{k8s_node="vmi3469243",softirq_type="net_rx"} 0
+elite_softirq_excuteslow100ms{k8s_node="elite-node",softirq_type="net_rx"} 0
 # HELP elite_softirq_schedslow 
 # TYPE elite_softirq_schedslow counter
-elite_softirq_schedslow{k8s_node="vmi3469243",softirq_type="net_rx"} 0
+elite_softirq_schedslow{k8s_node="elite-node",softirq_type="net_rx"} 0
 # HELP elite_softirq_schedslow100ms 
 # TYPE elite_softirq_schedslow100ms counter
-elite_softirq_schedslow100ms{k8s_node="vmi3469243",softirq_type="net_rx"} 0
+elite_softirq_schedslow100ms{k8s_node="elite-node",softirq_type="net_rx"} 0
 # HELP elite_tcpsummary_tcpclosewaitconn The total number of TCP connections in the CLOSE_WAIT state.
 # TYPE elite_tcpsummary_tcpclosewaitconn gauge
-elite_tcpsummary_tcpclosewaitconn{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 0
+elite_tcpsummary_tcpclosewaitconn{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 0
 # HELP elite_tcpsummary_tcpestablishedconn The total number of established TCP connections.
 # TYPE elite_tcpsummary_tcpestablishedconn gauge
-elite_tcpsummary_tcpestablishedconn{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 33
+elite_tcpsummary_tcpestablishedconn{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 33
 # HELP elite_tcpsummary_tcprxqueue The total size of the TCP receive queue.
 # TYPE elite_tcpsummary_tcprxqueue gauge
-elite_tcpsummary_tcprxqueue{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 0
+elite_tcpsummary_tcprxqueue{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 0
 # HELP elite_tcpsummary_tcpsynrecvconn The total number of TCP connections in the SYN_RECV state.
 # TYPE elite_tcpsummary_tcpsynrecvconn gauge
-elite_tcpsummary_tcpsynrecvconn{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 0
+elite_tcpsummary_tcpsynrecvconn{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 0
 # HELP elite_tcpsummary_tcpsynsentconn The total number of TCP connections in the SYN_SENT state.
 # TYPE elite_tcpsummary_tcpsynsentconn gauge
-elite_tcpsummary_tcpsynsentconn{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 0
+elite_tcpsummary_tcpsynsentconn{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 0
 # HELP elite_tcpsummary_tcptimewaitconn The total number of TCP connections in the TIME_WAIT state.
 # TYPE elite_tcpsummary_tcptimewaitconn gauge
-elite_tcpsummary_tcptimewaitconn{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 13
+elite_tcpsummary_tcptimewaitconn{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 13
 # HELP elite_tcpsummary_tcptxqueue The total size of the TCP transmit queue.
 # TYPE elite_tcpsummary_tcptxqueue gauge
-elite_tcpsummary_tcptxqueue{k8s_namespace="elite",k8s_node="vmi3469243",k8s_pod="contabo-host"} 0
+elite_tcpsummary_tcptxqueue{k8s_namespace="elite",k8s_node="elite-node",k8s_pod="elite-host"} 0

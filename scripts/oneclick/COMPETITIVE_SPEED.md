@@ -1,7 +1,7 @@
 # Competitive Speed Scorecard
 
 **Generated:** 2026-08-28T16:54:19+02:00  
-**Host:** vmi3469243 (Contabo VPS, PM2 neighbors active)  
+**Host:** production VPS (hostname redacted, PM2 neighbors active)  
 **Out:** `/tmp/elite-speed-20260828-165419`
 
 ```text

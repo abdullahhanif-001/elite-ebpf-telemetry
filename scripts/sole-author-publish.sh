@@ -10,13 +10,15 @@ export GIT_COMMITTER_EMAIL="abdullahhanif-001@users.noreply.github.com"
 
 git checkout main
 git add -A
-git reset HEAD -- .cursor .graphql-query.json 2>/dev/null || true
+git reset HEAD -- .cursor .graphql-query.json reports scripts/oneclick/__pycache__ 2>/dev/null || true
 
 TREE="$(git write-tree)"
 MSG="Elite eBPF telemetry — Abdullah Hanif sole author.
 
 Phase A+B: policy BPF sync, XDP mitigator, procshrinklat, elite-updater UX,
 VPS proof suite (X-Ray, W4, gates 8/8), staff-engineer reports, Sonar-clean paths.
+Removed INTERVIEW.md and redacted hostnames from proof artifacts.
+Git identity: abdullahhanif-001@users.noreply.github.com only.
 No third-party or AI co-author attribution."
 
 git checkout --orphan sole-main

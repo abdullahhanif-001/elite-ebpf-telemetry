@@ -2,8 +2,8 @@
 
 **Repository:** [abdullahhanif-001/elite-ebpf-telemetry](https://github.com/abdullahhanif-001/elite-ebpf-telemetry)  
 **Generated:** 2026-08-24T07:45:12+02:00 (Contabo) / Sonar re-polled after push  
-**Host:** vmi3469243  
-**Out dir:** `/tmp/elite-heavy-contabo-20260824-073310`  
+**Host:** production VPS (hostname redacted)  
+**Out dir:** `/tmp/elite-heavy-vps-20260824-073310`  
 **HEAD:** `a66a8a0` (+ CI follow-up for check workflow)
 
 ```text
