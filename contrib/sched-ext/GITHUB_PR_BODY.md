@@ -1,6 +1,6 @@
 # sched_ext: Add scx_rt_guard RT preemption interceptor (fixes #1202)
 
-### Summary
+## Summary
 
 - Adds reusable `scx_rt_guard.bpf.h` — sched_switch tracepoint interceptor
 - Calls `scx_bpf_reenqueue_local()` when next task is SCHED_FIFO/RR/DEADLINE
