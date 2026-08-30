@@ -1,19 +1,32 @@
 #!/usr/bin/env bash
-# Print steps to remove cursoragent from GitHub repo mentionable users.
+# Where to remove Cursor so cursoragent stops appearing on GitHub.
 set -euo pipefail
 cat <<'EOF'
-cursoragent appears because the Cursor GitHub App is installed on this repository.
-It is NOT listed as a contributor — commits are Abdullah Hanif only.
+cursoragent is NOT a code contributor — commits are Abdullah Hanif only.
+It appears because Cursor IDE / Cloud Agents linked GitHub via OAuth.
 
-Remove Cursor app access for this repo:
-  1. Open https://github.com/settings/installations
-  2. Click "Cursor" → Configure
-  3. Under "Repository access", remove elite-ebpf-telemetry
-     (or uninstall Cursor GitHub App if you do not need it)
+You are on the RIGHT page but the WRONG tab.
+
+On https://github.com/settings/applications
+
+  Tab 1: "Installed GitHub Apps"     → often only SonarQubeCloud (NOT Cursor)
+  Tab 2: "Authorized GitHub Apps"      → look for Cursor here → Revoke
+  Tab 3: "Authorized OAuth Apps"       → look for Cursor here → Revoke  ← most common
+
+Do all three tabs. Revoke Cursor anywhere it appears.
+
+Also disconnect inside Cursor:
+
+  1. Cursor: Ctrl+Shift+P → "Sign Out" (GitHub / Cursor account as needed)
+  2. https://cursor.com/dashboard → Settings → Integrations → Disconnect GitHub
+  3. Restart Cursor, sign in again with abdullahhanif-001 only
+
+Repo-level check (optional):
+  https://github.com/abdullahhanif-001/elite-ebpf-telemetry/settings/installations
 
 Verify contributors (should be abdullahhanif-001 only):
   gh api repos/abdullahhanif-001/elite-ebpf-telemetry/contributors --jq '.[].login'
 
-Use Abdullah Hanif git identity for pushes:
-  bash scripts/setup-git-noreply.sh
+Verify mentionable users (cursoragent should disappear after revoke):
+  gh api graphql --input scripts/contributors.graphql
 EOF
