@@ -4,7 +4,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 RESULTS="${SCRIPT_DIR}/results"
 OUT="${RESULTS}/g10-priority-pass-latest.txt"
-BUILD_ROOT="${ELITE_BUILD_ROOT:-/opt/elite-build}"
 BPF_PIN="${ELITE_BPF_PIN:-/sys/fs/bpf/elite}"
 
 mkdir -p "${RESULTS}"

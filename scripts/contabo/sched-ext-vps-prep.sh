@@ -131,8 +131,24 @@ phase_apply_patches() {
   if [[ -f "${CONTRIB}/selftests/rt_guard_stress.c" ]]; then
     cp "${CONTRIB}/selftests/rt_guard_stress.c" tools/testing/selftests/sched_ext/
     cp "${CONTRIB}/selftests/rt_guard_stress.bpf.c" tools/testing/selftests/sched_ext/ 2>/dev/null || true
-    grep -q rt_guard_stress tools/testing/selftests/sched_ext/Makefile || \
-      echo 'TEST_PROGS += rt_guard_stress' >> tools/testing/selftests/sched_ext/Makefile
+    if ! grep -q rt_guard_stress tools/testing/selftests/sched_ext/Makefile; then
+      if [[ -f "${ELITE_SRC}/scripts/contabo/patch-sched-ext-makefile.py" ]]; then
+        python3 "${ELITE_SRC}/scripts/contabo/patch-sched-ext-makefile.py"
+      else
+        python3 - <<'PY'
+import pathlib
+p = pathlib.Path("/opt/scx-kernel-build/tools/testing/selftests/sched_ext/Makefile")
+lines = p.read_text().splitlines()
+out = []
+for line in lines:
+    out.append(line)
+    if line.rstrip(" \\").endswith("rt_stall"):
+        out.append("\trt_guard_stress\t\t\t\\")
+p.write_text("\n".join(out) + "\n")
+print("Makefile updated")
+PY
+      fi
+    fi
   fi
   if [[ -f "${CONTRIB}/bpf/scx_rt_guard.bpf.h" ]]; then
     mkdir -p tools/sched_ext/include/scx

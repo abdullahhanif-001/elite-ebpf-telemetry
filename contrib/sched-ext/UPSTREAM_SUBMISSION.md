@@ -25,6 +25,7 @@
 > Partial switch mode is excluded.
 
 **Test plan:**
+
 - `tools/testing/selftests/sched_ext/rt_stall` PASS (ext_server required)
 - `rt_guard_stress` 60s soak PASS
 - Issue #1202 repro: no SCX_EXIT_ERROR_STALL
@@ -32,6 +33,7 @@
 ## Layer 3: scx_rt_guard BPF Interceptor (PR to sched-ext/scx)
 
 **Files:**
+
 - `bpf/scx_rt_guard.bpf.h` — reusable sched_switch interceptor
 - Integration example: add to `scheds/c/scx_bpfland` via `#include <scx/scx_rt_guard.bpf.h>`
 
@@ -65,6 +67,7 @@ Fixes sched-ext/scx#1202
 ## VPS Evidence Artifacts
 
 After `rt-guard-pass.sh`:
+
 - `scripts/oneclick/results/rt-guard-YYYYMMDD/verdict.txt` → `RT_GUARD_PASS fail=0`
 - Attach to LKML cover letter and scx PR
 

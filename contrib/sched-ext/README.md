@@ -31,6 +31,6 @@ bash benchmarks/sched-ext-gates/rt-guard-pass.sh
 
 ## References
 
-- https://github.com/sched-ext/scx/issues/1202
-- https://lwn.net/Articles/1055970/
-- https://github.com/torvalds/linux/commit/a3f5d48222532484c1e85ef27cc6893803e4cd17
+- [sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202)
+- [LWN sched_ext overview](https://lwn.net/Articles/1055970/)
+- [Linux commit a3f5d482](https://github.com/torvalds/linux/commit/a3f5d48222532484c1e85ef27cc6893803e4cd17)

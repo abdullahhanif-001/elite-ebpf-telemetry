@@ -12,9 +12,9 @@
 #include <time.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include "rt_guard_stress.bpf.skel.h"
 #include "scx_test.h"
 #include "../kselftest.h"
+#include "rt_guard_stress.bpf.skel.h"
 
 #define CORE_ID 1
 #define SOAK_SEC 60

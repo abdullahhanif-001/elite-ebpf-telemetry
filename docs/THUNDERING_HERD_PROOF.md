@@ -6,7 +6,7 @@ Reactive autoscalers and load balancers scale **after** kernel queues fill. Thun
 
 ## Physics model
 
-```
+```text
 λ_ewma from elite_tcpsummary_tcpestablishedconn
 ρ_proj = (λ_ewma + v·h + ½a·h²) / μ_est
 overload = clamp((ρ_proj - ρ_target)/(1 - ρ_target), 0, 1)

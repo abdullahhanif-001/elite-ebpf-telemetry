@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # rt-guard-pass.sh — full REAL gate suite G0-G6 on Contabo VPS.
+# shellcheck disable=SC2029
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
@@ -28,16 +29,16 @@ fi
 
 # G1: PM2 guard before
 log_gate 1 "pm2-guard before"
-if ssh "${HOST}" "bash ${ELITE_SRC}/scripts/contabo/pm2-guard-wrap.sh before rt-guard 2>/dev/null || true"; then
+if ssh "${SCX_SSH_OPTS[@]}" "${HOST}" "bash ${ELITE_SRC}/scripts/contabo/pm2-guard-wrap.sh before rt-guard 2>/dev/null || true"; then
   log_gate 1 "PASS (or baseline created)"
 else
   log_gate 1 "WARN pm2 baseline missing — creating"
-  ssh "${HOST}" "mkdir -p /opt/elite/baseline && pm2 jlist > /opt/elite/baseline/pm2-before.json 2>/dev/null || true"
+  ssh "${SCX_SSH_OPTS[@]}" "${HOST}" "mkdir -p /opt/elite/baseline && pm2 jlist > /opt/elite/baseline/pm2-before.json 2>/dev/null || true"
 fi
 
 # G2: rt_stall kselftest
 log_gate 2 "rt_stall kselftest"
-if ssh "${HOST}" "cd ${SCX_KERNEL_BUILD} && make -C tools/testing/selftests/sched_ext run_tests TEST_PROGS='rt_stall' 2>&1" | tee "${OUT}/g2-rt_stall.log"; then
+if ssh "${SCX_SSH_OPTS[@]}" "${HOST}" "cd ${SCX_KERNEL_BUILD} && make -C tools/testing/selftests/sched_ext run_tests TEST_PROGS='rt_stall' 2>&1" | tee "${OUT}/g2-rt_stall.log"; then
   log_gate 2 "PASS"
 else
   log_gate 2 "FAIL"
@@ -46,8 +47,8 @@ fi
 
 # G3: rt_guard_stress (contrib selftest)
 log_gate 3 "rt_guard_stress"
-if ssh "${HOST}" "test -f ${SCX_KERNEL_BUILD}/tools/testing/selftests/sched_ext/rt_guard_stress.c"; then
-  if ssh "${HOST}" "cd ${SCX_KERNEL_BUILD} && make -C tools/testing/selftests/sched_ext run_tests TEST_PROGS='rt_guard_stress' 2>&1" | tee "${OUT}/g3-rt_guard_stress.log"; then
+if ssh "${SCX_SSH_OPTS[@]}" "${HOST}" "test -f ${SCX_KERNEL_BUILD}/tools/testing/selftests/sched_ext/rt_guard_stress.c"; then
+  if ssh "${SCX_SSH_OPTS[@]}" "${HOST}" "cd ${SCX_KERNEL_BUILD} && make -C tools/testing/selftests/sched_ext run_tests TEST_PROGS='rt_guard_stress' 2>&1" | tee "${OUT}/g3-rt_guard_stress.log"; then
     log_gate 3 "PASS"
   else
     log_gate 3 "FAIL"
@@ -59,7 +60,6 @@ fi
 
 # G4: issue #1202 repro — must NOT stall after fix
 log_gate 4 "rt-monopolization-repro"
-REPRO_OUT="$(mktemp -d 2>/dev/null || echo "${OUT}/repro-tmp")"
 if bash "${GATES_DIR}/rt-monopolization-repro.sh" | tee "${OUT}/g4-repro.log"; then
   LATEST="$(ls -td "${ROOT}/scripts/oneclick/results/rt-guard-baseline-"* 2>/dev/null | head -1)"
   if [[ -n "${LATEST}" ]] && grep -qE 'SCX_EXIT_ERROR_STALL|runnable task stall' "${LATEST}/dmesg.txt" 2>/dev/null; then
@@ -75,12 +75,12 @@ fi
 
 # G5: ext_server debugfs
 log_gate 5 "ext_server status"
-ssh "${HOST}" "cat /sys/kernel/debug/sched/ext_server/status 2>/dev/null || echo 'ext_server debugfs N/A'" | tee "${OUT}/g5-ext_server.txt"
+ssh "${SCX_SSH_OPTS[@]}" "${HOST}" "cat /sys/kernel/debug/sched/ext_server/status 2>/dev/null || echo 'ext_server debugfs N/A'" | tee "${OUT}/g5-ext_server.txt"
 log_gate 5 "INFO captured"
 
 # G6: scx_bpfland 5min soak
 log_gate 6 "bpfland 5min soak"
-if ssh "${HOST}" bash -s <<'REMOTE' | tee "${OUT}/g6-soak.log"; then
+if ssh "${SCX_SSH_OPTS[@]}" "${HOST}" bash -s <<'REMOTE' | tee "${OUT}/g6-soak.log"; then
 set -euo pipefail
 if ! command -v scx_loader >/dev/null; then echo "SKIP scx_loader"; exit 0; fi
 dmesg -C
@@ -102,7 +102,7 @@ else
 fi
 
 # G1 after: PM2 guard
-ssh "${HOST}" "bash ${ELITE_SRC}/scripts/contabo/pm2-guard-wrap.sh after rt-guard 2>/dev/null || true"
+ssh "${SCX_SSH_OPTS[@]}" "${HOST}" "bash ${ELITE_SRC}/scripts/contabo/pm2-guard-wrap.sh after rt-guard 2>/dev/null || true"
 
 if [[ "${FAIL}" -eq 0 ]]; then
   echo "RT_GUARD_PASS fail=0 host=${HOST}" | tee "${OUT}/verdict.txt"

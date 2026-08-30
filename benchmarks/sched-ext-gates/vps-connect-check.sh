@@ -6,7 +6,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 HOST="${SCX_VPS_HOST}"
 EXPECTED="${SCX_EXPECTED_HOST}"
 
-out="$(ssh ${SCX_SSH_OPTS} "${HOST}" bash -s <<'REMOTE'
+out="$(ssh "${SCX_SSH_OPTS[@]}" "${HOST}" bash -s <<'REMOTE'
 set -euo pipefail
 echo "hostname=$(hostname)"
 echo "kernel=$(uname -r)"

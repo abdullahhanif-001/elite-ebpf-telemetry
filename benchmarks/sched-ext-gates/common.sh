@@ -20,9 +20,15 @@ repo_root() {
 }
 
 SCX_VPS_HOST="${SCX_VPS_HOST:-root@169.58.83.156}"
+SCX_SSH_OPTS=(
+  -o BatchMode=yes
+  -o ConnectTimeout=15
+  -o StrictHostKeyChecking=accept-new
+)
 _id_file="${HOME}/.ssh/id_rsa_contabo"
-[[ -f "${_id_file}" ]] && _id_opt="-i ${_id_file}" || _id_opt=""
-SCX_SSH_OPTS="${SCX_SSH_OPTS:--o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new ${_id_opt}}"
+if [[ -f "${_id_file}" ]]; then
+  SCX_SSH_OPTS+=(-i "${_id_file}")
+fi
 SCX_EXPECTED_HOST="${SCX_EXPECTED_HOST:-vmi3469243}"
 SCX_KERNEL_BUILD="${SCX_KERNEL_BUILD:-/opt/scx-kernel-build}"
 SCX_ROOT="${SCX_ROOT:-/opt/scx}"

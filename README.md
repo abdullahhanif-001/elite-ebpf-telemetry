@@ -4,7 +4,7 @@
 
 Bakeoff scorecards and category claims: [docs/CLAIM_CHARTER.md](docs/CLAIM_CHARTER.md) · [docs/WORLD_BEST_PROVIDER_SCORE.md](docs/WORLD_BEST_PROVIDER_SCORE.md) · [docs/COMPETITIVE_PROOF.md](docs/COMPETITIVE_PROOF.md).
 
-### Zero-Buffer Overload Controller (v1.0)
+## Zero-Buffer Overload Controller (v1.0)
 
 Kernel-native admission at XDP: token buckets, priority tiers, ringbuf λ, 50ms forecaster, federation push. Policy map v3 (80B) in [`bpf/policy_map.h`](bpf/policy_map.h).
 

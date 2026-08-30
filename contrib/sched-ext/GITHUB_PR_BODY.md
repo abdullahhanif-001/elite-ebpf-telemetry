@@ -1,4 +1,4 @@
-## sched_ext: Add scx_rt_guard RT preemption interceptor (fixes #1202)
+# sched_ext: Add scx_rt_guard RT preemption interceptor (fixes #1202)
 
 ### Summary
 

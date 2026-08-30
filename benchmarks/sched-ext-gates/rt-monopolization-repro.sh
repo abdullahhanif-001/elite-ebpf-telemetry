@@ -8,11 +8,11 @@ OUT="$(repo_root)/scripts/oneclick/results/rt-guard-baseline-$(date +%Y%m%d-%H%M
 mkdir -p "${OUT}"
 
 # sched_ext required for meaningful repro; capture state anyway
-if ! ssh ${SCX_SSH_OPTS} "${HOST}" 'test -f /boot/config-$(uname -r) && grep -q ^CONFIG_SCHED_CLASS_EXT=y /boot/config-$(uname -r)'; then
+if ! ssh "${SCX_SSH_OPTS[@]}" "${HOST}" 'test -f /boot/config-$(uname -r) && grep -q ^CONFIG_SCHED_CLASS_EXT=y /boot/config-$(uname -r)'; then
   echo "WARN: sched_ext=NO — repro will capture baseline only (no scx_loader)"
 fi
 
-ssh ${SCX_SSH_OPTS} "${HOST}" bash -s <<'REMOTE' | tee "${OUT}/remote.log"
+ssh "${SCX_SSH_OPTS[@]}" "${HOST}" bash -s <<'REMOTE' | tee "${OUT}/remote.log"
 set -euo pipefail
 export REAL_ONLY=1
 dmesg -C 2>/dev/null || true
@@ -52,7 +52,7 @@ else
 fi
 REMOTE
 
-scp ${SCX_SSH_OPTS} "${HOST}:/tmp/rt-repro-dmesg.txt" "${OUT}/dmesg.txt" 2>/dev/null || echo "no dmesg captured" > "${OUT}/dmesg.txt"
+scp "${SCX_SSH_OPTS[@]}" "${HOST}:/tmp/rt-repro-dmesg.txt" "${OUT}/dmesg.txt" 2>/dev/null || echo "no dmesg captured" > "${OUT}/dmesg.txt"
 
 {
   echo "RT_REPRO_CAPTURED"

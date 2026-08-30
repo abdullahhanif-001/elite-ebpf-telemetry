@@ -22,6 +22,6 @@ Target verdict: `scripts/oneclick/results/rt-guard-*/verdict.txt` → `RT_GUARD_
 
 ## References
 
-- https://github.com/sched-ext/scx/issues/1202
-- https://lwn.net/Articles/1055970/
-- git://git.kernel.org/pub/scm/linux/kernel/git/arighi/linux.git scx-dl-server
+- [sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202)
+- [LWN sched_ext overview](https://lwn.net/Articles/1055970/)
+- `git://git.kernel.org/pub/scm/linux/kernel/git/arighi/linux.git scx-dl-server`

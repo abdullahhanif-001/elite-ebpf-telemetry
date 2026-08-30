@@ -9,7 +9,7 @@ mkdir -p "$(dirname "${OUT}")"
 {
   echo "=== three-node federate demo ==="
   echo "Start elite-controller:"
-  echo "  ELITE_CONTROLLER_NODES=http://node1:9102/metrics,http://node2:9102/metrics go run ./cmd/elite-controller"
+  echo "  ELITE_CONTROLLER_NODES=http://node1:9102/metrics,http://node2:9102/metrics go run ${REPO_ROOT}/cmd/elite-controller"
   echo "Query: curl -s http://127.0.0.1:9200/policy"
   echo "Each node: elite-agent with trafficEnabled + policyMapPin"
   echo "Federated max_rho drives regional shed_ppm caps (manual or controller pull)"

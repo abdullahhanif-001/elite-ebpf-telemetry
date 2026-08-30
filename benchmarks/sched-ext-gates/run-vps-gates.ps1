@@ -21,6 +21,7 @@ switch ($Phase) {
         scp -r benchmarks/sched-ext-gates contabo-server:/opt/elite/src/benchmarks/
         scp scripts/contabo/sched-ext-vps-prep.sh contabo-server:/opt/elite/src/scripts/contabo/
         scp scripts/contabo/apply-rt-watchdog-patch.sh contabo-server:/opt/elite/src/scripts/contabo/
+        scp scripts/contabo/patch-sched-ext-makefile.py contabo-server:/opt/elite/src/scripts/contabo/
         scp -r contrib/sched-ext contabo-server:/opt/elite/src/contrib/
         Invoke-Vps "chmod +x /opt/elite/src/benchmarks/sched-ext-gates/*.sh /opt/elite/src/scripts/contabo/*.sh"
         Write-Host "DEPLOY_OK"

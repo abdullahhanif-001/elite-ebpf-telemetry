@@ -60,7 +60,7 @@ On one VPS, with XDP attached to **`lo`** and traffic generated locally:
 
 Physics sketch (implemented in code, not “AI magic”):
 
-```
+```text
 ρ_proj(h) = (λ_ewma + v·t + ½a·h²) / μ_est
 shed_fraction = clamp((ρ_proj − ρ_target)^γ, 0, 1)
 ```
@@ -117,7 +117,7 @@ The polished report previously mixed numbers from **different runs** (normal for
 |-------------|--------------------------------------|------|--------|
 | `w4-xdp-inject-latency.sh` (500×, count=1) | (script uses first line only) | **9.334** | raw dump § W4 script |
 | `go test … -benchtime=500x -count=3` | 8193 / 7923 / 9455 | 8.19 / 7.92 / 9.46 | raw dump (2026-08-30 re-run) |
-| `holy-grail-verify.sh` inner bench (200×) | 10651 | 10.65 | raw dump (same re-run) |
+| `zero-buffer-root-verify.sh` inner bench (200×) | 10651 | 10.65 | raw dump (same re-run) |
 
 Earlier session runs (same gate, different timestamps): ~6.5 µs, ~7.595 µs, ~6971 ns/op (~6.97 µs) — **same benchmark, run-to-run jitter**, all **PASS** against the 100 µs SLO.
 
@@ -125,7 +125,7 @@ Earlier session runs (same gate, different timestamps): ~6.5 µs, ~7.595 µs, ~6
 
 ### 4.3 Excerpt — environment + XDP state (from raw file)
 
-```
+```text
 HOST=vmi3469243
 KERNEL=6.8.0-138-generic
 lo  xdp_dispatcher skb → xdp_mitigator tag 683a911fc08e4c81
@@ -135,7 +135,7 @@ elite_policy pinned: key 4B value 80B (map id 284)
 
 ### 4.4 Excerpt — herd + W5 (from raw file)
 
-```
+```text
 W5_PASS: RSS stable rss_before=3788 rss_after=3812
 THUNDERING_HERD_PASS rss_pct=100 ct_pct=102
 rss_before_kb=109312 conntrack_before=49
@@ -146,7 +146,7 @@ rss_after_kb=109312 conntrack_after=50
 
 From the same raw capture (after fixing a false `eth0` grep — see footnote):
 
-```
+```text
 SUMMARY pass=9 fail=0
 ZERO_BUFFER_ROOT_VERIFY_PASS
 ```

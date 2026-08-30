@@ -8,7 +8,7 @@ EXPECTED="${SCX_EXPECTED_HOST}"
 OUT="$(repo_root)/scripts/oneclick/results/rt-guard-baseline-audit-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "${OUT}"
 
-out="$(ssh ${SCX_SSH_OPTS} "${HOST}" bash -s <<'REMOTE'
+out="$(ssh "${SCX_SSH_OPTS[@]}" "${HOST}" bash -s <<'REMOTE'
 set -euo pipefail
 echo "hostname=$(hostname)"
 echo "kernel=$(uname -r)"
