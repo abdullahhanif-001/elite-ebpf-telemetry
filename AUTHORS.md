@@ -10,4 +10,4 @@ No third-party or AI agents are listed as contributors to this project.
 
 Verified sole contributor: Abdullah Hanif (@abdullahhanif-001).
 
-If GitHub shows **cursoragent** in assignee or mention lists, revoke Cursor on GitHub — not under *Installed GitHub Apps* (that tab is usually SonarQube only). Use **Authorized OAuth Apps** and **Authorized GitHub Apps** at [github.com/settings/applications](https://github.com/settings/applications). Also disconnect in Cursor dashboard → Integrations. Run `bash scripts/remove-cursor-github-app.sh` for full steps. Commits use `abdullahhanif-001@users.noreply.github.com` only.
+If GitHub shows **cursoragent** in assign/mention lists, the **Cursor GitHub App** is installed on this repo (via [cursor.com Integrations](https://cursor.com/dashboard)) — not via OAuth Apps in user settings. Remove at [github.com/apps/cursor/installations](https://github.com/apps/cursor/installations) and disconnect in Cursor dashboard. Full RCA: [docs/RCA_CURSORAGENT_GITHUB.md](docs/RCA_CURSORAGENT_GITHUB.md). Run `bash scripts/remove-cursor-github-app.sh`.

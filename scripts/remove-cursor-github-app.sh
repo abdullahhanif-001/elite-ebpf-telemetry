@@ -1,32 +1,50 @@
 #!/usr/bin/env bash
-# Where to remove Cursor so cursoragent stops appearing on GitHub.
+# RCA + fix: cursoragent on repo (NOT in GitHub OAuth / Installed Apps tabs).
 set -euo pipefail
-cat <<'EOF'
-cursoragent is NOT a code contributor — commits are Abdullah Hanif only.
-It appears because Cursor IDE / Cloud Agents linked GitHub via OAuth.
+REPO="abdullahhanif-001/elite-ebpf-telemetry"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-You are on the RIGHT page but the WRONG tab.
-
-On https://github.com/settings/applications
-
-  Tab 1: "Installed GitHub Apps"     → often only SonarQubeCloud (NOT Cursor)
-  Tab 2: "Authorized GitHub Apps"      → look for Cursor here → Revoke
-  Tab 3: "Authorized OAuth Apps"       → look for Cursor here → Revoke  ← most common
-
-Do all three tabs. Revoke Cursor anywhere it appears.
-
-Also disconnect inside Cursor:
-
-  1. Cursor: Ctrl+Shift+P → "Sign Out" (GitHub / Cursor account as needed)
-  2. https://cursor.com/dashboard → Settings → Integrations → Disconnect GitHub
-  3. Restart Cursor, sign in again with abdullahhanif-001 only
-
-Repo-level check (optional):
-  https://github.com/abdullahhanif-001/elite-ebpf-telemetry/settings/installations
-
-Verify contributors (should be abdullahhanif-001 only):
-  gh api repos/abdullahhanif-001/elite-ebpf-telemetry/contributors --jq '.[].login'
-
-Verify mentionable users (cursoragent should disappear after revoke):
-  gh api graphql --input scripts/contributors.graphql
-EOF
+echo "=== ROOT CAUSE: cursoragent on ${REPO} ==="
+echo ""
+echo "cursoragent is NOT a contributor. Commits are Abdullah Hanif only."
+echo "It appears in GitHub assign/mention lists because the CURSOR GITHUB APP"
+echo "was installed on this repo via cursor.com Integrations (Cloud Agents)."
+echo ""
+echo "That install is SEPARATE from your personal GitHub Settings tabs:"
+echo "  - Installed GitHub Apps (SonarQube) — different apps"
+echo "  - Authorized OAuth Apps (GitHub CLI) — different auth"
+echo "  - Authorized GitHub Apps (Sonar) — different"
+echo ""
+echo "Evidence from GitHub API:"
+if command -v gh >/dev/null 2>&1; then
+  echo "  Contributors:"
+  gh api "repos/${REPO}/contributors" --jq '.[].login' 2>/dev/null | sed 's/^/    /' || echo "    (gh api failed)"
+  echo "  Mentionable users (includes app bot if Cursor app installed on repo):"
+  gh api graphql --input "${ROOT}/scripts/contributors.graphql" --jq '.data.repository.mentionableUsers.nodes[].login' 2>/dev/null | sed 's/^/    /' || true
+  echo "  Collaborators:"
+  gh api "repos/${REPO}/collaborators" --jq '.[].login' 2>/dev/null | sed 's/^/    /' || true
+fi
+echo ""
+echo "=== FIX (do all steps) ==="
+echo ""
+echo "1. Cursor GitHub App — remove THIS repo:"
+echo "   https://github.com/apps/cursor/installations"
+echo "   → Configure → Repository access → remove elite-ebpf-telemetry"
+echo ""
+echo "2. Repo integrations page (logged in as abdullahhanif-001):"
+echo "   https://github.com/${REPO}/settings/installations"
+echo "   → Uninstall Cursor if listed"
+echo ""
+echo "3. Cursor dashboard — disconnect GitHub (clears Cursor backend cache):"
+echo "   https://cursor.com/dashboard → Integrations → Disconnect GitHub"
+echo "   Or in browser console while logged into cursor.com:"
+echo "   fetch('/api/dashboard/disconnect-github', {method: 'POST', credentials: 'include'})"
+echo ""
+echo "4. Cursor IDE: Ctrl+Shift+P → Sign Out → restart → login abdullahhanif-001 only"
+echo ""
+echo "5. Verify (cursoragent should disappear from mentionable list):"
+echo "   gh api graphql --input scripts/contributors.graphql"
+echo ""
+echo "If cursoragent STILL appears after 24h: stale Cursor server cache."
+echo "Email hi@cursor.com — ask to flush GitHub app installation for ${REPO}."
+echo ""
