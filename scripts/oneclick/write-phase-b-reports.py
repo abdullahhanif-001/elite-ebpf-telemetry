@@ -289,4 +289,41 @@ VERDICT=PHASE_B_STAFF_ENGINEER_PASS
 (SCRIPT_DIR / "PHASE_B_VPS_PROOF_REPORT.md").write_text(flagship, encoding="utf-8")
 (RESULTS_DIR / "PHASE_B_VPS_PROOF_REPORT.md").write_text(flagship, encoding="utf-8")
 
+zero_buffer = f"""# Elite Zero-Buffer Overload Controller — Proof Pack
+
+**Generated:** {GEN_ISO}  
+**Host:** {HOST}
+
+## One command
+
+```bash
+bash scripts/oneclick/elite-zero-buffer-complete.sh
+```
+
+## Gates (zero-buffer)
+
+| Gate | Script | Verdict key |
+|------|--------|-------------|
+| G6 | traffic-engine-proof.sh | LAMBDA_LEADS_PASS |
+| G7 | w5-xdp-graduated-shed.sh | W5_PASS |
+| G8 | thundering-herd-proof.sh | THUNDERING_HERD_PASS |
+
+## Microsoft review
+
+See [docs/MICROSOFT_REVIEW_PACK.md](../../docs/MICROSOFT_REVIEW_PACK.md)
+
+## Physics
+
+ρ_proj from connection-rate λ; shed_ppm at XDP via policy map v2.
+
+```text
+ZERO_BUFFER_REPORT
+w4_p99_us={w4_p99}
+gates_pass={gates_pass}
+gates_fail={gates_fail}
+```
+"""
+
+(SCRIPT_DIR / "ZERO_BUFFER_REPORT.md").write_text(zero_buffer, encoding="utf-8")
+
 print(f"PHASE_B_REPORTS_OK out={RESULTS_DIR}")

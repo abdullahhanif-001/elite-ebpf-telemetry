@@ -1,0 +1,13 @@
+VPS_BASELINE_AUDIT
+host=vmi3469243
+ip=169.58.83.156
+generated=2026-08-30
+kernel=6.8.0-138-generic
+sched_ext=NO
+cpus=4
+mem_total=7.8Gi
+swap_count=0
+stress_ng=UNKNOWN
+pm2_apps=5
+blocker=CONFIG_SCHED_CLASS_EXT missing — kernel upgrade required
+ssh_alias=contabo-server (PowerShell OpenSSH)

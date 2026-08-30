@@ -2,7 +2,17 @@
 
 **Zero-instrumentation kernel telemetry — one agent per node, under 1% CPU.**
 
-Category claim (Contabo physics-speed Soft closed-loop VPS bakeoff — [docs/CLAIM_CHARTER.md](docs/CLAIM_CHARTER.md)): **`WORLD_BEST_PHYSICS_SPEED_VPS`** + **`CATEGORY_BAKEOFF_PASS`** + **`ECGF_PROVEN_SUPERIOR`**. Not global eBPF #1. Docs: [docs/WORLD_BEST_PROVIDER_SCORE.md](docs/WORLD_BEST_PROVIDER_SCORE.md) · [docs/CATEGORY_NUMBER_ONE_SCORECARD.md](docs/CATEGORY_NUMBER_ONE_SCORECARD.md) · [docs/WORLD_EBPF_COMPARISON.md](docs/WORLD_EBPF_COMPARISON.md) · [docs/COMPETITIVE_PROOF.md](docs/COMPETITIVE_PROOF.md) · [docs/research/MASTER_REPORT.md](docs/research/MASTER_REPORT.md).
+Bakeoff scorecards and category claims: [docs/CLAIM_CHARTER.md](docs/CLAIM_CHARTER.md) · [docs/WORLD_BEST_PROVIDER_SCORE.md](docs/WORLD_BEST_PROVIDER_SCORE.md) · [docs/COMPETITIVE_PROOF.md](docs/COMPETITIVE_PROOF.md).
+
+### Zero-Buffer Overload Controller (v1.0)
+
+Kernel-native admission at XDP: token buckets, priority tiers, ringbuf λ, 50ms forecaster, federation push. Policy map v3 (80B) in [`bpf/policy_map.h`](bpf/policy_map.h).
+
+```bash
+bash scripts/oneclick/elite-zero-buffer-complete.sh
+```
+
+Docs: [docs/ADR-007-xdp-v3-admission.md](docs/ADR-007-xdp-v3-admission.md) · [docs/ADR-006-predictive-xdp-shedding.md](docs/ADR-006-predictive-xdp-shedding.md) · [docs/MICROSOFT_REVIEW_PACK.md](docs/MICROSOFT_REVIEW_PACK.md) · [docs/RELEASE_v1.0_ZERO_BUFFER.md](docs/RELEASE_v1.0_ZERO_BUFFER.md)
 
 Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or systemd service) that exports physics-layer metrics: socket latency, softirq delay, packet loss, and TCP summary.
 

@@ -76,7 +76,7 @@ check_xdp_ready() {
   command -v ethtool >/dev/null 2>&1 || skip "ethtool not installed"
   [[ -d "/sys/class/net/${IFACE}" ]] || skip "interface ${IFACE} not found"
   local driver
-  driver="$(ethtool -i "${IFACE}" 2>/dev/null | awk '/^driver:/ {print $2}')"
+  driver="$(ethtool -i "${IFACE}" 2>/dev/null | awk '/^driver:/ {print $2; exit}' || true)"
   log "driver=${driver:-unknown} iface=${IFACE}"
   if [[ "${ELITE_XDP_FORCE:-0}" != "1" ]]; then
     case "${driver}" in
@@ -100,7 +100,11 @@ canonical_policy_pin() {
   fi
   if [[ ! -e "${POLICY_PIN}" ]] && command -v bpftool >/dev/null 2>&1; then
     local id
-    id="$(bpftool map show 2>/dev/null | awk -F: '/name elite_policy/ {gsub(/:/,"",$1); print $1; exit}')"
+    # Prefer v3 map (80B value) when multiple elite_policy maps exist
+    id="$(bpftool map show 2>/dev/null | awk -F: '/name elite_policy/ {gsub(/:/,"",$1); print $1}' | while read -r mid; do
+      vsz=$(bpftool map show id "$mid" 2>/dev/null | awk '/value [0-9]+B/{print $2; exit}')
+      echo "${vsz} ${mid}"
+    done | sort -rn | head -1 | awk '{print $2}')"
     if [[ -n "${id}" ]]; then
       bpftool map pin id "${id}" "${POLICY_PIN}" 2>/dev/null || true
       log "pinned elite_policy id=${id} → ${POLICY_PIN}"
@@ -133,6 +137,29 @@ cmd_load() {
   log "xdp-loader load -m ${mode} -p ${BPF_PIN} ${IFACE} ${obj}"
   xdp-loader load -m "${mode}" -p "${BPF_PIN}" "${IFACE}" "${obj}"
   canonical_policy_pin
+  # Safe default: actuate=0 until forecaster sets policy (ELITE_XDP_ACTUATE gate)
+  if [[ -e "${POLICY_PIN}" ]] && command -v bpftool >/dev/null 2>&1; then
+    bpftool map update pinned "${POLICY_PIN}" key hex 00 00 00 00 \
+      value hex 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2>/dev/null || \
+    bpftool map update pinned "${POLICY_PIN}" key hex 00 00 00 00 \
+      value hex 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2>/dev/null || true
+    log "policy map actuate=0 default (forecaster enables actuate on sync)"
+  fi
+  if [[ -e "${BPF_PIN}/elite_xdp_stats" ]] && command -v bpftool >/dev/null 2>&1; then
+    bpftool map pin pinned "${BPF_PIN}/elite_xdp_stats" "${BPF_PIN}/xdp_stats" 2>/dev/null || true
+  fi
+  if [[ -e "${BPF_PIN}/elite_lambda_ring" ]] && command -v bpftool >/dev/null 2>&1; then
+    bpftool map pin pinned "${BPF_PIN}/elite_lambda_ring" "${BPF_PIN}/lambda_ring" 2>/dev/null || true
+  fi
+  if [[ -e "${BPF_PIN}/elite_devmap" ]] && command -v bpftool >/dev/null 2>&1; then
+    bpftool map pin pinned "${BPF_PIN}/elite_devmap" "${BPF_PIN}/devmap" 2>/dev/null || true
+  fi
 
   pm2_guard_wrap after xdp-load
   log "XDP_ATTACH_OK iface=${IFACE} pin=${BPF_PIN}"

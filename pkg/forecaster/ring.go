@@ -65,3 +65,36 @@ func (r *Ring) Snapshot(dst []float64) int {
 	}
 	return n
 }
+
+// VelocityLS estimates slope (units/sampleInterval) via least squares on ring samples.
+func (r *Ring) VelocityLS(sampleIntervalSec float64) float64 {
+	r.mu.Lock()
+	n := r.len
+	if n < 2 {
+		r.mu.Unlock()
+		return 0
+	}
+	start := 0
+	if r.len == r.cap {
+		start = r.head
+	}
+	var sumX, sumY, sumXY, sumXX float64
+	for i := 0; i < n; i++ {
+		x := float64(i)
+		y := r.buf[(start+i)%r.cap]
+		sumX += x
+		sumY += y
+		sumXY += x * y
+		sumXX += x * x
+	}
+	r.mu.Unlock()
+	denom := float64(n)*sumXX - sumX*sumX
+	if denom == 0 {
+		return 0
+	}
+	slopePerStep := (float64(n)*sumXY - sumX*sumY) / denom
+	if sampleIntervalSec <= 0 {
+		sampleIntervalSec = 1
+	}
+	return slopePerStep / sampleIntervalSec
+}

@@ -39,6 +39,16 @@ type ForecastConfig struct {
 	PolicyPath      string                 `yaml:"policyPath" mapstructure:"policyPath" json:"policyPath"`
 	PolicyMapPin    string                 `yaml:"policyMapPin" mapstructure:"policyMapPin" json:"policyMapPin"`
 	Targets         []ForecastTargetConfig `yaml:"targets" mapstructure:"targets" json:"targets"`
+	TrafficEnabled  bool                   `yaml:"trafficEnabled" mapstructure:"trafficEnabled" json:"trafficEnabled"`
+	TrafficAgentURL string                 `yaml:"trafficAgentURL" mapstructure:"trafficAgentURL" json:"trafficAgentURL"`
+	RhoTarget       float64                `yaml:"rhoTarget" mapstructure:"rhoTarget" json:"rhoTarget"`
+	MuEst           float64                `yaml:"muEst" mapstructure:"muEst" json:"muEst"`
+	MuEstSource     string                 `yaml:"muEstSource" mapstructure:"muEstSource" json:"muEstSource"`
+	ShedGamma       float64                `yaml:"shedGamma" mapstructure:"shedGamma" json:"shedGamma"`
+	RedirectIfindex uint32                 `yaml:"redirectIfindex" mapstructure:"redirectIfindex" json:"redirectIfindex"`
+	KernelRingbuf   bool                   `yaml:"kernelRingbuf" mapstructure:"kernelRingbuf" json:"kernelRingbuf"`
+	FastInterval    string                 `yaml:"fastInterval" mapstructure:"fastInterval" json:"fastInterval"`
+	PolicyPushToken string                 `yaml:"policyPushToken" mapstructure:"policyPushToken" json:"policyPushToken"`
 }
 
 type ForecastTargetConfig struct {

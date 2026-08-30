@@ -232,10 +232,12 @@ func init() {
 }
 
 type inspServer struct {
-	configPath    string
-	ctx           context.Context
-	metricsServer *MetricsServer
-	eventServer   *EventServer
+	configPath      string
+	ctx             context.Context
+	metricsServer   *MetricsServer
+	eventServer     *EventServer
+	forecastRunner  *forecaster.Runner
+	policyPushToken string
 }
 
 func (i *inspServer) WatchConfig(done <-chan struct{}) error {
@@ -366,6 +368,9 @@ func (i *inspServer) newHTTPServer(cfg *InspServerConfig) (*http.Server, net.Lis
 		}
 		defaultPage(w, r)
 	})
+	if i.policyPushToken != "" || i.forecastRunner != nil {
+		mux.HandleFunc("/internal/forecast/policy", i.forecastPolicyPush)
+	}
 
 	listener, err := i.createListener(cfg)
 	if err != nil {
@@ -474,6 +479,8 @@ func (i *inspServer) start(cfg *InspServerConfig) error {
 			restored: append([]ProbeConfig(nil), cfg.EventConfig.Probes...),
 		}
 		runner, coll := forecaster.NewRunner(fcfg, shed)
+		i.forecastRunner = runner
+		i.policyPushToken = cfg.Forecast.PolicyPushToken
 		if coll != nil {
 			if err := i.metricsServer.Registry().Register(coll); err != nil {
 				log.Warnf("forecaster metrics register: %v", err)
@@ -577,6 +584,59 @@ func (i *inspServer) statusPage(w http.ResponseWriter, _ *http.Request) {
 	w.Write(rawText) // nolint
 }
 
+func (i *inspServer) forecastPolicyPush(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if i.policyPushToken != "" && r.Header.Get("X-Elite-Policy-Token") != i.policyPushToken {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	var body struct {
+		Fault            bool    `json:"fault"`
+		Cause            string  `json:"cause"`
+		Projected        float64 `json:"projected"`
+		EWMA             float64 `json:"ewma"`
+		OverloadFraction float64 `json:"overload_fraction"`
+		ShedPPM          uint32  `json:"shed_ppm"`
+		RhoProjected     float64 `json:"rho_projected"`
+		ConnRate         float64 `json:"conn_rate"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	snap := forecaster.Snapshot{
+		Fault:            body.Fault,
+		Cause:            body.Cause,
+		Projected:        body.Projected,
+		EWMA:             body.EWMA,
+		OverloadFraction: body.OverloadFraction,
+		ShedPPM:          body.ShedPPM,
+		RhoProjected:     body.RhoProjected,
+		ConnRate:         body.ConnRate,
+	}
+	if i.forecastRunner != nil {
+		if err := i.forecastRunner.PushSnapshot(snap); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		pin := os.Getenv("ELITE_POLICY_PIN")
+		if pin == "" {
+			http.Error(w, "no runner", http.StatusServiceUnavailable)
+			return
+		}
+		if err := forecaster.PushPolicySnapshot(pin, snap, 0); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
+}
+
 func toForecasterConfig(c ForecastConfig) forecaster.Config {
 	interval, _ := time.ParseDuration(c.Interval)
 	horizon, _ := time.ParseDuration(c.Horizon)
@@ -585,6 +645,7 @@ func toForecasterConfig(c ForecastConfig) forecaster.Config {
 	for _, t := range c.Targets {
 		targets = append(targets, forecaster.Target{URL: t.URL, Series: t.Series})
 	}
+	fastInt, _ := time.ParseDuration(c.FastInterval)
 	return forecaster.Config{
 		Enabled:         c.Enabled,
 		Interval:        interval,
@@ -601,6 +662,15 @@ func toForecasterConfig(c ForecastConfig) forecaster.Config {
 		DecisionPath:    c.DecisionPath,
 		PolicyPath:      c.PolicyPath,
 		PolicyMapPin:    c.PolicyMapPin,
+		TrafficEnabled:  c.TrafficEnabled,
+		TrafficAgentURL: c.TrafficAgentURL,
+		RhoTarget:       c.RhoTarget,
+		MuEst:           c.MuEst,
+		MuEstSource:     c.MuEstSource,
+		ShedGamma:       c.ShedGamma,
+		RedirectIfindex: c.RedirectIfindex,
+		KernelRingbuf:   c.KernelRingbuf,
+		FastInterval:    fastInt,
 	}
 }
 

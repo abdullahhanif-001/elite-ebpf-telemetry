@@ -1,0 +1,90 @@
+From: Elite eBPF Contrib <noreply@users.noreply.github.com>
+To: tj@kernel.org, arighi@nvidia.com, peterz@infradead.org
+Cc: sched-ext@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: [PATCH] sched_ext: RT-aware watchdog stall detection (sched-ext/scx#1202)
+
+When CPU-intensive RT tasks monopolize a CPU, SCHED_EXT tasks confined to
+that CPU cannot proceed. The watchdog currently treats this as
+SCX_EXIT_ERROR_STALL and unloads the BPF scheduler — a false positive
+when the root cause is RT class priority, not a BPF scheduler bug.
+
+This patch adds RT-pressure detection in check_rq_for_timeouts():
+
+1. Per-CPU kthread exception: if nr_cpus_allowed==1 and rq->curr is RT,
+   skip stall check (arighi, sched-ext/scx#1202).
+
+2. Full-mode RT mask check: if NOT partial switch, iterate p->cpus_ptr;
+   if any allowed CPU has rt_nr_running==0, the task is genuinely stalled.
+   If ALL allowed CPUs have RT tasks, skip stall (RT pressure).
+
+Partial mode (SCX_OPS_SWITCH_PARTIAL) is excluded — FAIR tasks may hog
+CPU without RT involvement.
+
+References: https://github.com/sched-ext/scx/issues/1202
+Tested: rt_stall + rt_guard_stress kselftests on Contabo VPS (vmi3469243)
+
+---
+ kernel/sched/ext.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/kernel/sched/ext.c b/kernel/sched/ext.c
+index 0000000..1111111 100644
+--- a/kernel/sched/ext.c
++++ b/kernel/sched/ext.c
+@@ -3380,6 +3380,44 @@ static bool scx_partial_switch(void)
+ 	return static_branch_unlikely(&__scx_switched_all);
+ }
+ 
++/*
++ * Returns true if a runnable stall is likely caused by RT monopolization
++ * rather than a BPF scheduler bug. See sched-ext/scx#1202.
++ */
++static bool scx_stall_caused_by_rt(struct task_struct *p, struct rq *rq)
++{
++	const struct cpumask *mask;
++	int cpu;
++
++	/* Per-CPU kthread starved by RT on this CPU — not a BPF bug. */
++	if (p->nr_cpus_allowed == 1 &&
++	    rq->curr && rq->curr->sched_class == &rt_sched_class)
++		return true;
++
++	/* RT mask check only in full switch mode. */
++	if (scx_partial_switch())
++		return false;
++
++	mask = p->cpus_ptr;
++	if (!mask)
++		return false;
++
++	rcu_read_lock();
++	for_each_cpu(cpu, mask) {
++		struct rq *cpu_rq = cpu_rq(cpu);
++
++		if (cpu_rq->rt.rt_nr_running == 0) {
++			rcu_read_unlock();
++			return false; /* CPU free of RT — genuine stall */
++		}
++	}
++	rcu_read_unlock();
++
++	/* All allowed CPUs have RT tasks running. */
++	return true;
++}
++
+ static bool check_rq_for_timeouts(struct rq *rq)
+ {
+ 	struct scx_sched *sch;
+@@ -3395,6 +3433,13 @@ static bool check_rq_for_timeouts(struct rq *rq)
+ 		if (unlikely(time_after(jiffies,
+ 					last_runnable + READ_ONCE(sch->watchdog_timeout)))) {
++			/*
++			 * Skip false-positive stall when RT tasks monopolize
++			 * all CPUs available to this task (sched-ext/scx#1202).
++			 */
++			if (scx_stall_caused_by_rt(p, rq))
++				continue;
++
+ 			struct scx_dispatch_q *dsq = READ_ONCE(p->scx.dsq);
+ 			u32 dur_ms = jiffies_to_msecs(jiffies - last_runnable);
+ 

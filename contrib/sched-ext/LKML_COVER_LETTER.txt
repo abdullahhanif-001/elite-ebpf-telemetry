@@ -1,0 +1,32 @@
+To: tj@kernel.org, arighi@nvidia.com, peterz@infradead.org
+Cc: sched-ext@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: [PATCH] sched_ext: RT-aware watchdog stall detection (sched-ext/scx#1202)
+
+When CPU-intensive RT tasks fully occupy a CPU, SCHED_EXT tasks confined to
+that CPU cannot proceed. The watchdog treats this as SCX_EXIT_ERROR_STALL
+and unloads the BPF scheduler — a false positive when RT monopolization is
+the root cause, not a BPF scheduler bug.
+
+This patch adds scx_stall_caused_by_rt() in kernel/sched/ext.c:
+
+1. Per-CPU kthread exception: nr_cpus_allowed==1 and rq->curr is RT class.
+2. Full-mode RT mask check: skip stall only when every CPU in p->cpus_ptr
+   has rt_nr_running > 0. Partial switch mode (SCX_OPS_SWITCH_PARTIAL) is
+   excluded.
+
+Complements Andrea Righi's ext_server DL server patchset (Layer 1) and the
+scx_rt_guard BPF sched_switch interceptor (Layer 3, sched-ext/scx contrib).
+
+Tested on Contabo VPS vmi3469243:
+- tools/testing/selftests/sched_ext/rt_stall (requires ext_server kernel)
+- rt_guard_stress 60s soak (contrib selftest)
+
+References: https://github.com/sched-ext/scx/issues/1202
+
+Abdullah Hanif (1):
+  sched_ext: RT-aware watchdog stall detection
+
+ .../sched-ext/kernel/0001-sched_ext-rt-aware-watchdog.patch | 1 +
+ 1 file changed, 1 insertion(+)
+
+Patch available in elite-ebpf-telemetry contrib/sched-ext/kernel/

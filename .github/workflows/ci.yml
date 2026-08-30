@@ -40,6 +40,15 @@ jobs:
           bash -n scripts/oneclick/write-phase-b-reports.sh
           bash -n scripts/oneclick/ebpf-xray-real-proof.sh
           bash -n scripts/oneclick/elite-run-complete.sh
+          bash -n scripts/oneclick/elite-zero-buffer-complete.sh
+          bash -n scripts/oneclick/traffic-engine-proof.sh
+          bash -n scripts/oneclick/thundering-herd-proof.sh
+          bash -n benchmarks/contabo-gates/w5-xdp-graduated-shed.sh
+          bash -n benchmarks/thundering-herd/run.sh
+          bash -n benchmarks/zero-buffer/matrix.sh
+          bash -n benchmarks/zero-buffer/g14-multicore.sh
+          bash -n scripts/oneclick/g10-priority-pass-proof.sh
+          bash -n scripts/oneclick/g15-federate-propagation-proof.sh
           bash -n scripts/oneclick/elite-oneclick.sh
           bash -n scripts/oneclick/elite-pm2-uninstall-guard.sh
           bash -n scripts/oneclick/elite-vps-uninstall-safe.sh
@@ -59,8 +68,9 @@ jobs:
 
       - name: Go test
         run: |
-          go test ./pkg/export/... ./pkg/exporter/... ./pkg/forecaster/... ./pkg/dcic/... ./pkg/llc/... ./pkg/ecgf/... -coverprofile=coverage.out -covermode=atomic -timeout 10m
+          go test ./pkg/export/... ./pkg/exporter/... ./pkg/forecaster/... ./pkg/dcic/... ./pkg/llc/... ./pkg/ecgf/... ./pkg/elitecontroller/... -coverprofile=coverage.out -covermode=atomic -timeout 10m
           go test ./cmd/elite-updater/... -timeout 2m
+          go build -o /tmp/elite-controller ./cmd/elite-controller/
           (cd pkg/controller && go mod tidy && go test ./... -timeout 5m)
 
       - name: Upload coverage artifact

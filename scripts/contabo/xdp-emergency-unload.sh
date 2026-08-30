@@ -7,6 +7,6 @@ echo "Emergency: unload XDP on ${IFACE} and clear policy fault"
 command -v xdp-loader >/dev/null 2>&1 && xdp-loader unload "${IFACE}" || true
 if [[ -e "${POLICY_PIN}" ]] && command -v bpftool >/dev/null 2>&1; then
   bpftool map update pinned "${POLICY_PIN}" key hex 00 00 00 00 \
-    value hex 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2>/dev/null || true
+    value hex 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2>/dev/null || true
 fi
 echo "XDP_EMERGENCY_DONE"

@@ -7,11 +7,11 @@ import (
 
 // EngineConfig tunes the EWMA + derivative projection loop.
 type EngineConfig struct {
-	Alpha         float64
-	Window        int
-	Horizon       time.Duration
-	HardDrop      float64 // seconds
-	AccThreshold  float64 // seconds^-2
+	Alpha          float64
+	Window         int
+	Horizon        time.Duration
+	HardDrop       float64 // seconds
+	AccThreshold   float64 // seconds^-2
 	SampleInterval time.Duration
 }
 
@@ -37,22 +37,18 @@ type Snapshot struct {
 	Fault        bool
 	Cause        string // network|llc|psi|mixed|none
 	Samples      int
+	// Zero-buffer overload (Track D)
+	OverloadFraction float64
+	ShedPPM          uint32
+	RhoProjected     float64
+	ConnRate         float64
 }
 
-// Engine tracks latency with EWMA, velocity, and acceleration,
-// projecting Horizon ahead when the series is accelerating upward.
+// Engine tracks latency with EWMA, velocity, and acceleration.
 type Engine struct {
-	cfg EngineConfig
-
-	mu       sync.Mutex
-	ring     *Ring
-	ewma     EWMA
-	prevEWMA float64
-	prevVel  float64
-	havePrev bool
-	lastAt   time.Time
-
-	snap Snapshot
+	tracker *KinematicTracker
+	snap    Snapshot
+	mu      sync.Mutex
 }
 
 // NewEngine builds an engine from cfg (zero fields filled from defaults).
@@ -77,66 +73,34 @@ func NewEngine(cfg EngineConfig) *Engine {
 		cfg.SampleInterval = d.SampleInterval
 	}
 	return &Engine{
-		cfg:  cfg,
-		ring: NewRing(cfg.Window),
-		ewma: NewEWMA(cfg.Alpha),
+		tracker: NewKinematicTracker(KinematicConfig{
+			Alpha:          cfg.Alpha,
+			Window:         cfg.Window,
+			Horizon:        cfg.Horizon,
+			HardDrop:       cfg.HardDrop,
+			AccThreshold:   cfg.AccThreshold,
+			SampleInterval: cfg.SampleInterval,
+		}),
 	}
 }
 
 // Observe ingests one latency sample in seconds at time now.
 func (e *Engine) Observe(raw float64, now time.Time) Snapshot {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-
-	e.ring.Push(raw)
-	s := e.ewma.Update(raw)
-
-	var vel, acc float64
-	if e.havePrev {
-		dt := now.Sub(e.lastAt).Seconds()
-		if dt <= 0 {
-			dt = e.cfg.SampleInterval.Seconds()
-			if dt <= 0 {
-				dt = 1
-			}
-		}
-		vel = (s - e.prevEWMA) / dt
-		acc = (vel - e.prevVel) / dt
-	}
-
-	h := e.cfg.Horizon.Seconds()
-	projected := s
-	fault := false
-	if e.havePrev && vel > 0 && acc > e.cfg.AccThreshold {
-		// kinematic projection: s + v*t + 0.5*a*t^2
-		projected = s + vel*h + 0.5*acc*h*h
-		// Require EWMA already climbing (30% of hard drop) to reject flap false positives
-		// while still tripping on real surges within one interval.
-		if projected >= e.cfg.HardDrop && s >= e.cfg.HardDrop*0.3 {
-			fault = true
-		}
-	} else if s >= e.cfg.HardDrop {
-		// already over limit
-		projected = s
-		fault = true
-	}
-
-	e.prevVel = vel
-	e.prevEWMA = s
-	e.lastAt = now
-	e.havePrev = true
-
-	e.snap = Snapshot{
-		Raw:          raw,
-		EWMA:         s,
-		Velocity:     vel,
-		Acceleration: acc,
-		Projected:    projected,
-		Fault:        fault,
+	kin := e.tracker.Observe(raw, now)
+	snap := Snapshot{
+		Raw:          kin.Raw,
+		EWMA:         kin.EWMA,
+		Velocity:     kin.Velocity,
+		Acceleration: kin.Acceleration,
+		Projected:    kin.Projected,
+		Fault:        kin.Fault,
 		Cause:        CauseNone,
-		Samples:      e.ring.Len(),
+		Samples:      kin.Samples,
 	}
-	return e.snap
+	e.mu.Lock()
+	e.snap = snap
+	e.mu.Unlock()
+	return snap
 }
 
 // Snapshot returns the latest computed state.
@@ -145,4 +109,15 @@ func (e *Engine) Snapshot() Snapshot {
 	s := e.snap
 	e.mu.Unlock()
 	return s
+}
+
+// ApplyOverload merges traffic overload into latency snapshot for export.
+func ApplyOverload(snap *Snapshot, o OverloadSnapshot) {
+	snap.OverloadFraction = o.Overload
+	snap.ShedPPM = o.ShedPPM
+	snap.RhoProjected = o.Traffic.RhoProjected
+	snap.ConnRate = o.Traffic.LambdaEWMA
+	if o.CombinedFault && !snap.Fault {
+		snap.Fault = true
+	}
 }

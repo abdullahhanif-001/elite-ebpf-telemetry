@@ -23,6 +23,13 @@ forecast:
   llcURL: "http://127.0.0.1:9104/metrics"
   readPSI: true
   decisionPath: "/var/lib/elite/predict-decision.json"
+  trafficEnabled: true
+  trafficAgentURL: "http://127.0.0.1:9102/metrics"
+  rhoTarget: 0.7
+  muEst: 1000
+  shedGamma: 2.0
+  kernelRingbuf: true
+  fastInterval: 50ms
   targets:
     - url: "http://127.0.0.1:9435/metrics"
       series: ["softirq_wait_seconds"]

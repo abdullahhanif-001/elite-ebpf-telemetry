@@ -1,0 +1,42 @@
+RT_GUARD_IMPLEMENTATION_STATUS
+generated=2026-08-30
+host=vmi3469243
+ssh=contabo-server (169.58.83.156)
+
+## Completed (local + VPS)
+
+- [x] benchmarks/sched-ext-gates/ — vps-connect-check, baseline-audit, rt-monopolization-repro, rt-guard-pass, deploy, run-vps-gates.ps1
+- [x] scripts/contabo/sched-ext-vps-prep.sh — swap, deps, kernel clone/config/build/install
+- [x] scripts/contabo/apply-rt-watchdog-patch.sh — Layer 2 applied on VPS ext.c
+- [x] contrib/sched-ext/bpf/scx_rt_guard.bpf.h — Layer 3 BPF interceptor
+- [x] contrib/sched-ext/selftests/rt_guard_stress.{c,bpf.c}
+- [x] contrib/sched-ext/LKML_COVER_LETTER.txt + GITHUB_PR_BODY.md
+- [x] VPS: 4GB swap, libbpf-dev, stress-ng installed
+- [x] VPS: arighi/linux scx-dl-server cloned (/opt/scx-kernel-build) — ext_server present
+- [x] VPS: CONFIG_SCHED_CLASS_EXT=y in .config
+- [x] VPS: Layer 2 watchdog patch applied (scx_stall_caused_by_rt)
+- [x] VPS: sched-ext/scx cloned (/opt/scx)
+- [x] Baseline: RT throttling activated on 6.8 kernel (pre-upgrade)
+
+## In Progress
+
+- [ ] Kernel build: make -j2 bindeb-pkg (log: /tmp/scx-kernel-build.log)
+- [ ] kernel-install + reboot into 6.19-scx-dl
+- [ ] rt_stall + rt_guard_stress kselftests
+- [ ] RT_GUARD_PASS verdict
+
+## After Reboot (manual)
+
+```powershell
+ssh contabo-server "bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh kernel-install"
+ssh contabo-server "reboot"
+# wait 2 min
+.\benchmarks\sched-ext-gates\run-vps-gates.ps1 -Phase connect
+.\benchmarks\sched-ext-gates\run-vps-gates.ps1 -Phase pass
+```
+
+## Upstream Submission
+
+- Layer 1: track arighi scx-dl-server merge (already in test kernel)
+- Layer 2: send LKML_COVER_LETTER.txt + patch to tj@kernel.org
+- Layer 3: open PR on github.com/sched-ext/scx with GITHUB_PR_BODY.md

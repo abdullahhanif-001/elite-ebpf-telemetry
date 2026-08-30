@@ -7,7 +7,7 @@
 
 - Staff pack: [scripts/oneclick/PHASE_B_VPS_PROOF_REPORT.md](../scripts/oneclick/PHASE_B_VPS_PROOF_REPORT.md)
 - eBPF X-Ray: [scripts/oneclick/EBPF_XRAY_REPORT.md](../scripts/oneclick/EBPF_XRAY_REPORT.md) (`REAL_EBPF_XRAY_PASS`)
-- W4 gate: [scripts/oneclick/W4_XDP_GATE_REPORT.md](../scripts/oneclick/W4_XDP_GATE_REPORT.md) (p99 ≈ 7.9 µs)
+- W4 gate: [scripts/oneclick/W4_XDP_GATE_REPORT.md](../scripts/oneclick/W4_XDP_GATE_REPORT.md) (p99 from `results/w4-xdp-inject-latest.txt` after VPS run)
 - Gates 8/8: [scripts/oneclick/GATES_8_8_REPORT.md](../scripts/oneclick/GATES_8_8_REPORT.md)
 
 **Evidence roots:**

@@ -1,0 +1,222 @@
+=== RAW UNEDITED TERMINAL DUMP (do not edit) ===
+START_UTC=2026-08-30T06:58:09Z
+HOST=vmi3469243
+KERNEL=6.8.0-138-generic
+USER=root
+PWD=/root
+ELITE_SRC=/opt/elite/src
+
+
+################################################################
+### CMD: systemctl is-active elite-agent
+################################################################
+active
+### EXIT: 0
+
+################################################################
+### CMD: curl http://127.0.0.1:9102/metrics | grep ^elite_predict_
+################################################################
+elite_predict_acceleration 0.0015075133569749718
+elite_predict_conn_rate 0.017661348237571473
+elite_predict_fault 1
+elite_predict_fault_cause{cause="llc"} 1
+elite_predict_fault_cause{cause="mixed"} 0
+elite_predict_fault_cause{cause="network"} 0
+elite_predict_fault_cause{cause="psi"} 0
+elite_predict_faults_total 138
+elite_predict_latency_ewma_seconds 0.11305951702317257
+elite_predict_latency_raw_seconds 0.11553401183802336
+elite_predict_mode 1
+elite_predict_overload_fraction 1
+elite_predict_projected_5s_seconds 0.13720593333615685
+elite_predict_rho_projected 0.0009336344025078323
+elite_predict_shed_ppm 1e+06
+elite_predict_velocity 0.0010604998701594284
+### EXIT: 0
+
+################################################################
+### CMD: xdp-loader unload --all eth0
+################################################################
+No XDP program loaded on eth0
+### EXIT: 1
+
+################################################################
+### CMD: xdp-loader status
+################################################################
+CURRENT XDP PROGRAM STATUS:
+
+Interface        Prio  Program name      Mode     ID   Tag               Chain actions
+--------------------------------------------------------------------------------------
+lo                     xdp_dispatcher    skb      448  4d7e87c0d30db711 
+ =>              50     xdp_mitigator             457  683a911fc08e4c81  XDP_PASS
+eth0                   <No XDP program loaded!>
+docker0                <No XDP program loaded!>
+veth511bbb0            <No XDP program loaded!>
+
+### EXIT: 0
+
+################################################################
+### CMD: bpftool net show
+################################################################
+xdp:
+lo(1) generic id 448
+
+tc:
+
+flow_dissector:
+
+netfilter:
+
+### EXIT: 0
+
+################################################################
+### CMD: bpftool net show dev eth0
+################################################################
+xdp:
+
+tc:
+
+flow_dissector:
+
+netfilter:
+
+### EXIT: 0
+
+################################################################
+### CMD: bpftool net show dev lo
+################################################################
+xdp:
+lo(1) generic id 448
+
+tc:
+
+flow_dissector:
+
+netfilter:
+
+### EXIT: 0
+
+################################################################
+### CMD: bpftool map show pinned /sys/fs/bpf/elite/policy
+################################################################
+284: hash  name elite_policy  flags 0x0
+	key 4B  value 80B  max_entries 8  memlock 2880B
+	btf_id 407
+### EXIT: 0
+
+################################################################
+### CMD: bpftool map show name elite_policy
+################################################################
+188: hash  name elite_policy  flags 0x0
+	key 4B  value 48B  max_entries 8  memlock 2496B
+	btf_id 318
+284: hash  name elite_policy  flags 0x0
+	key 4B  value 80B  max_entries 8  memlock 2880B
+	btf_id 407
+### EXIT: 0
+
+################################################################
+### CMD: w4-xdp-inject-latency.sh (FULL)
+################################################################
+=== W4 xdp-inject-latency 20260830T065809Z ===
+threshold_p99_us=100 samples=500
+[PASS] W4 — p99≈9.334 µs (≤100) pin=/sys/fs/bpf/elite/policy (go ebpf sync)
+PHASE_B_REPORTS_OK out=/opt/elite/src/scripts/oneclick/results/phase-b-vps-20260830-085810
+### EXIT: 0
+
+################################################################
+### CMD: go test -bench=BenchmarkSyncPolicyToBPFMap -benchtime=500x -count=3
+################################################################
+goos: linux
+goarch: amd64
+pkg: github.com/alibaba/kubeskoop/pkg/forecaster
+cpu: AMD EPYC Processor (with IBPB)
+BenchmarkSyncPolicyToBPFMap-4   	     500	      8193 ns/op
+BenchmarkSyncPolicyToBPFMap-4   	     500	      7923 ns/op
+BenchmarkSyncPolicyToBPFMap-4   	     500	      9455 ns/op
+PASS
+ok  	github.com/alibaba/kubeskoop/pkg/forecaster	0.049s
+### EXIT: 0
+
+################################################################
+### CMD: w5-xdp-graduated-shed.sh (FULL)
+################################################################
+=== W5 xdp-graduated-shed 20260830T065811Z iface=lo ===
+rss_before=3784 rss_after=3784 drops_hint=0
+W5_PASS: RSS stable rss_before=3784 rss_after=3784
+### EXIT: 0
+
+################################################################
+### CMD: thundering-herd/run.sh (FULL)
+################################################################
+=== thundering-herd v2 spike=5000 dur=10s ===
+rss_before_kb=109340 conntrack_before=50
+rss_after_kb=109340 conntrack_after=56
+rss_pct=100 conntrack_pct=112
+THUNDERING_HERD_PASS rss_pct=100 ct_pct=112
+### EXIT: 0
+
+################################################################
+### CMD: holy-grail-verify.sh (FULL) — author-written self-check
+################################################################
+============================================================
+ ELITE ZERO-BUFFER v1.0 — HOLY GRAIL ROOT VERIFY
+ Host: vmi3469243 Kernel: 6.8.0-138-generic
+ Date: 2026-08-30T06:58:20Z
+ IFACE_SAFE=lo
+============================================================
+
+=== FLOW 1: Userspace physics (forecaster) ===
+[PASS] FLOW_AGENT — elite-agent active
+  rho_proj=0.18594188266432465 conn_rate=0.6003776927127276 shed_ppm=999999
+[PASS] FLOW_PHYSICS — elite_predict_* live
+
+=== FLOW 2: Kernel XDP v3 admission (lo) ===
+[PASS] FLOW_XDP_V3 — xdp_mitigator v3 tag on lo
+[PASS] FLOW_ETH0_SAFE — eth0 clean (SSH safe)
+[PASS] FLOW_POLICY_V3 — elite_policy map value=80B (v3 ABI)
+
+=== FLOW 3: Control loop → map write (W4 bench) ===
+BenchmarkSyncPolicyToBPFMap-4   	     200	     10651 ns/op
+PASS
+ok  	github.com/alibaba/kubeskoop/pkg/forecaster	0.029s
+[PASS] FLOW_W4_BENCH — map sync 10651 ns/op
+
+=== FLOW 4: Shed under load (W5 + herd) ===
+[PASS] GATE_W5 — RSS stable + XDP drop path
+[PASS] GATE_G8 — thundering herd RSS+conntrack stable
+
+=== FLOW 5: Predict-before-queue (G6) ===
+LAMBDA_LEADS_PASS
+G11_LAMBDA_LEADS_50MS_PASS fast_interval=50ms
+rho_proj=0.00825903112934732 ewma=0.1138547654167621 conn_rate=0.15623420097688887
+[PASS] GATE_G6 — rho_proj leads under load
+
+=== ARTIFACT SUMMARY ===
+  g0-baseline-latest.txt: === G0_BASELINE template ===
+  w6-xdp-token-bucket-latest.txt: G9_TOKEN_BUCKET_PPS=PENDING_VPS_RUN
+  w4-xdp-inject-latest.txt: === W4 xdp-inject-latency artifact ===
+  g10-priority-pass-latest.txt: === G10 priority pass proof ===
+  g15-federate-propagation-latest.txt: === G15 federation propagation target_ms=500 ===
+
+=== HOLY GRAIL VERDICT (honest) ===
+ROOT_SOLVED_ON_VPS:
+  [x] Physics: rho_proj + lambda kinematics in userspace
+  [x] Kernel: token-bucket + tier maps at XDP (before sk_buff on lo)
+  [x] Actuation: policy map sync p99 < 100us (W4)
+  [x] Herd: connection storm without RSS/conntrack explosion (G8)
+  [x] PM2 co-resident apps guarded during XDP load
+STILL_PILOT_NOT_MAGLEV:
+  [ ] 10M users/sec single-node claim
+  [ ] eth0 native line-rate G14 (optional staging)
+  [ ] Global federation <500ms on 3 live nodes
+
+SUMMARY pass=9 fail=0
+REPORT=/opt/elite-build/logs/HOLY_GRAIL_VERIFY_20260830-085820.txt
+HOLY_GRAIL_ROOT_VERIFY_PASS
+### EXIT: 0
+
+END_UTC=2026-08-30T06:58:29Z
+RAW_DUMP_FILE=/opt/elite-build/logs/RAW_TERMINAL_DUMP_20260830.txt
+7796 /opt/elite-build/logs/RAW_TERMINAL_DUMP_20260830.txt
+RAW_DUMP_COMPLETE

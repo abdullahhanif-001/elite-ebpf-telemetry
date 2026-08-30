@@ -23,6 +23,14 @@ forecast:
   decisionPath: "/var/lib/elite/predict-decision.json"
   policyPath: "/var/lib/elite/predict-policy.bin"
   policyMapPin: "/sys/fs/bpf/elite/policy"
+  trafficEnabled: true
+  trafficAgentURL: "http://127.0.0.1:9102/metrics"
+  rhoTarget: 0.7
+  muEst: 1000
+  muEstSource: idle_baseline
+  shedGamma: 2.0
+  kernelRingbuf: true
+  fastInterval: 50ms
   targets:
     - url: "http://127.0.0.1:9102/metrics"
       series: ["elite_socketlatency", "elite_softirq"]
@@ -35,6 +43,7 @@ metrics:
     - name: tcpretrans
     - name: connecttrace
     - name: shrinklat
+    - name: tcpsummary
 event:
   probes:
     - name: socketlatency

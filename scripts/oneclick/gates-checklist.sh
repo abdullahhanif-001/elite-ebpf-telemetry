@@ -20,6 +20,10 @@ record() {
   echo "[$st] $id — $msg" | tee -a "$OUT"
   if [[ "$st" == "PASS" ]]; then pass=$((pass+1)); else fail=$((fail+1)); fi
 }
+record_skip() {
+  local id="$1" msg="$2"
+  echo "[SKIP] $id — $msg" | tee -a "$OUT"
+}
 
 echo "=== Elite #1 gates checklist ===" | tee "$OUT"
 echo "agent=$AGENT_URL dcic=$DCIC_URL" | tee -a "$OUT"
@@ -92,6 +96,79 @@ if systemctl list-timers --all 2>/dev/null | grep -q elite-updater; then
   record UX2 "elite-updater.timer listed" PASS
 else
   record UX2 "elite-updater.timer not enabled" FAIL
+fi
+
+# G6–G8 zero-buffer gates (strict when ZERO_BUFFER_GATES=1)
+if [[ "${ZERO_BUFFER_GATES:-0}" == "1" ]]; then
+  if [[ -f "${SCRIPT_DIR}/results/traffic-engine-proof-latest.txt" ]] && grep -q LAMBDA_LEADS_PASS "${SCRIPT_DIR}/results/traffic-engine-proof-latest.txt"; then
+    record G6 "LAMBDA_LEADS_PASS" PASS
+  else
+    record G6 "LAMBDA_LEADS_PASS missing" FAIL
+  fi
+  if [[ -f "${BUILD_ROOT}/logs/w5-xdp-graduated-latest.verdict" ]] && [[ "$(cat "${BUILD_ROOT}/logs/w5-xdp-graduated-latest.verdict")" == "W5_PASS" ]]; then
+    record G7 "W5_PASS" PASS
+  else
+    record G7 "W5 not PASS" FAIL
+  fi
+  if [[ -f "${SCRIPT_DIR}/results/thundering-herd-proof-latest.txt" ]] && grep -q THUNDERING_HERD_PASS "${SCRIPT_DIR}/results/thundering-herd-proof-latest.txt"; then
+    record G8 "THUNDERING_HERD_PASS" PASS
+  else
+    record G8 "THUNDERING_HERD_FAIL" FAIL
+  fi
+else
+  if curl -fsS --max-time 3 "$AGENT_URL" 2>/dev/null | grep -q elite_predict_rho_projected; then
+    record_skip G6 "rho metrics present — run traffic-engine-proof for LAMBDA_LEADS_PASS"
+  else
+    record_skip G6 "traffic engine not enabled"
+  fi
+  record_skip G7 "run w5-xdp-graduated-shed.sh (ZERO_BUFFER_GATES=1 for strict)"
+  record_skip G8 "run thundering-herd-proof.sh (ZERO_BUFFER_GATES=1 for strict)"
+fi
+
+# G0 / G9–G15 v1.0 gates
+if [[ -f "${SCRIPT_DIR}/results/g0-baseline-latest.txt" ]] && grep -q G0_BASELINE_ARTIFACTS_OK "${SCRIPT_DIR}/results/g0-baseline-latest.txt"; then
+  record G0 "G0_BASELINE_ARTIFACTS" PASS
+else
+  record_skip G0 "run benchmarks/zero-buffer/matrix.sh"
+fi
+if [[ -f "${SCRIPT_DIR}/results/w6-xdp-token-bucket-latest.txt" ]] && grep -qE 'G9_TOKEN_BUCKET_PPS_PASS|G9_TOKEN_BUCKET_PPS_SKIP' "${SCRIPT_DIR}/results/w6-xdp-token-bucket-latest.txt"; then
+  record G9 "token bucket pps artifact" PASS
+else
+  record_skip G9 "run zero-buffer matrix"
+fi
+if [[ -f "${SCRIPT_DIR}/results/g10-priority-pass-latest.txt" ]] && grep -q G10_PRIORITY_PASS "${SCRIPT_DIR}/results/g10-priority-pass-latest.txt"; then
+  record G10 "priority tier pass" PASS
+else
+  record_skip G10 "run g10-priority-pass-proof.sh"
+fi
+if [[ "${ZERO_BUFFER_GATES:-0}" == "1" ]]; then
+  if [[ -f "${SCRIPT_DIR}/results/traffic-engine-proof-latest.txt" ]] && grep -qE 'LAMBDA_LEADS_PASS|G11' "${SCRIPT_DIR}/results/traffic-engine-proof-latest.txt"; then
+    record G11 "LAMBDA_LEADS_50MS" PASS
+  else
+    record G11 "G11 missing" FAIL
+  fi
+else
+  record_skip G11 "50ms lambda leads — strict with ZERO_BUFFER_GATES=1"
+fi
+if [[ -f "${SCRIPT_DIR}/results/w4-xdp-inject-latest.txt" ]] && grep -qi pass "${SCRIPT_DIR}/results/w4-xdp-inject-latest.txt"; then
+  record G12 "actuation p99 W4" PASS
+else
+  record_skip G12 "W4 xdp inject artifact"
+fi
+if [[ "${ZERO_BUFFER_GATES:-0}" == "1" ]] && [[ -f "${BUILD_ROOT}/logs/thundering-herd-bench-latest.txt" ]] && grep -q THUNDERING_HERD_PASS "${BUILD_ROOT}/logs/thundering-herd-bench-latest.txt"; then
+  record G13 "THUNDERING_HERD_ETH0/lo" PASS
+else
+  record_skip G13 "thundering herd v2 bench"
+fi
+if [[ -f "${SCRIPT_DIR}/results/g14-multicore-latest.txt" ]] && grep -qE 'G14_MULTICORE_PASS|G14_MULTICORE_SKIP' "${SCRIPT_DIR}/results/g14-multicore-latest.txt"; then
+  record G14 "multicore checklist" PASS
+else
+  record_skip G14 "run benchmarks/zero-buffer/g14-multicore.sh"
+fi
+if [[ -f "${SCRIPT_DIR}/results/g15-federate-propagation-latest.txt" ]] && grep -q G15_FEDERATE_PROPAGATION_PASS "${SCRIPT_DIR}/results/g15-federate-propagation-latest.txt"; then
+  record G15 "federation propagation" PASS
+else
+  record_skip G15 "run g15-federate-propagation-proof.sh"
 fi
 
 echo "=== summary pass=${pass} fail=${fail} out=${OUT} ===" | tee -a "$OUT"

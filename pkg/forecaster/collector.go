@@ -13,15 +13,19 @@ type Collector struct {
 	mode   string
 	faults atomic.Uint64
 
-	descEWMA   *prometheus.Desc
-	descVel    *prometheus.Desc
-	descAcc    *prometheus.Desc
-	descProj   *prometheus.Desc
-	descFault  *prometheus.Desc
-	descFaults *prometheus.Desc
-	descMode   *prometheus.Desc
-	descRaw    *prometheus.Desc
-	descCause  *prometheus.Desc
+	descEWMA     *prometheus.Desc
+	descVel      *prometheus.Desc
+	descAcc      *prometheus.Desc
+	descProj     *prometheus.Desc
+	descFault    *prometheus.Desc
+	descFaults   *prometheus.Desc
+	descMode     *prometheus.Desc
+	descRaw      *prometheus.Desc
+	descCause    *prometheus.Desc
+	descConnRate *prometheus.Desc
+	descRhoProj  *prometheus.Desc
+	descOverload *prometheus.Desc
+	descShedPPM  *prometheus.Desc
 }
 
 // NewCollector binds to runner double-buffer slots.
@@ -78,6 +82,26 @@ func NewCollector(snaps *[2]Snapshot, idx *atomic.Uint32, mode string) *Collecto
 			"1 when fault cause matches label (network|llc|psi|mixed).",
 			[]string{"cause"}, nil,
 		),
+		descConnRate: prometheus.NewDesc(
+			"elite_predict_conn_rate",
+			"EWMA connection arrival rate (conn/s).",
+			nil, nil,
+		),
+		descRhoProj: prometheus.NewDesc(
+			"elite_predict_rho_projected",
+			"Projected utilization rho at horizon (lambda/mu_est).",
+			nil, nil,
+		),
+		descOverload: prometheus.NewDesc(
+			"elite_predict_overload_fraction",
+			"Overload fraction 0-1 for graduated XDP shedding.",
+			nil, nil,
+		),
+		descShedPPM: prometheus.NewDesc(
+			"elite_predict_shed_ppm",
+			"Target XDP drop probability in parts per million.",
+			nil, nil,
+		),
 	}
 }
 
@@ -92,6 +116,10 @@ func (c *Collector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- c.descMode
 	ch <- c.descRaw
 	ch <- c.descCause
+	ch <- c.descConnRate
+	ch <- c.descRhoProj
+	ch <- c.descOverload
+	ch <- c.descShedPPM
 }
 
 // Collect implements prometheus.Collector.
@@ -116,6 +144,10 @@ func (c *Collector) Collect(ch chan<- prometheus.Metric) {
 	ch <- prometheus.MustNewConstMetric(c.descFaults, prometheus.CounterValue, float64(c.faults.Load()))
 	ch <- prometheus.MustNewConstMetric(c.descMode, prometheus.GaugeValue, modeVal)
 	ch <- prometheus.MustNewConstMetric(c.descRaw, prometheus.GaugeValue, s.Raw)
+	ch <- prometheus.MustNewConstMetric(c.descConnRate, prometheus.GaugeValue, s.ConnRate)
+	ch <- prometheus.MustNewConstMetric(c.descRhoProj, prometheus.GaugeValue, s.RhoProjected)
+	ch <- prometheus.MustNewConstMetric(c.descOverload, prometheus.GaugeValue, s.OverloadFraction)
+	ch <- prometheus.MustNewConstMetric(c.descShedPPM, prometheus.GaugeValue, float64(s.ShedPPM))
 	for _, cause := range []string{CauseNetwork, CauseLLC, CausePSI, CauseMixed} {
 		v := 0.0
 		if s.Fault && s.Cause == cause {

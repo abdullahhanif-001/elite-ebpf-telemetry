@@ -2,6 +2,7 @@ package forecaster
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -33,12 +34,22 @@ type Config struct {
 	Mode            string
 	Targets         []Target
 	SemiCooldown    time.Duration
-	LLCURL          string  // optional elite_llc metrics e.g. http://127.0.0.1:9104/metrics
-	ReadPSI         bool    // read /proc/pressure/cpu
-	DecisionPath    string  // shared decision bus for Soft DCIC
-	PolicyPath      string  // binary hot path for elite-dcic
-	PolicyMapPin    string  // pinned BPF map for XDP mitigator
+	LLCURL          string
+	ReadPSI         bool
+	DecisionPath    string
+	PolicyPath      string
+	PolicyMapPin    string
 	Weights         FuseWeights
+	// Track D — traffic / zero-buffer
+	TrafficEnabled  bool
+	TrafficAgentURL string
+	RhoTarget       float64
+	MuEst           float64
+	MuEstSource     string
+	ShedGamma       float64
+	RedirectIfindex uint32
+	KernelRingbuf   bool
+	FastInterval    time.Duration
 }
 
 // sampleSource abstracts scrape for tests.
@@ -48,13 +59,18 @@ type sampleSource interface {
 
 // Runner owns scrape → engine → metrics → optional semi action.
 type Runner struct {
-	cfg     Config
-	engine  *Engine
-	scraper sampleSource
-	snaps   [2]Snapshot
-	idx     atomic.Uint32
-	coll    *Collector
-	shedder EventShedder
+	cfg            Config
+	engine         *Engine
+	traffic        *TrafficEngine
+	trafficScraper *TrafficScraper
+	shedCtrl       *ShedController
+	scraper        sampleSource
+	snaps          [2]Snapshot
+	idx            atomic.Uint32
+	coll           *Collector
+	shedder        EventShedder
+	kernelSig      *KernelSignalReader
+	muEst          *MuEstimator
 
 	mu           sync.Mutex
 	shedding     bool
@@ -103,6 +119,18 @@ func NewRunner(cfg Config, shedder EventShedder) (*Runner, *Collector) {
 	if cfg.DecisionPath == "" {
 		cfg.DecisionPath = "/var/lib/elite/predict-decision.json"
 	}
+	if cfg.RhoTarget <= 0 {
+		cfg.RhoTarget = 0.7
+	}
+	if cfg.MuEst <= 0 {
+		cfg.MuEst = 1000
+	}
+	if cfg.ShedGamma <= 0 {
+		cfg.ShedGamma = 2.0
+	}
+	if cfg.TrafficAgentURL == "" {
+		cfg.TrafficAgentURL = "http://127.0.0.1:9102/metrics"
+	}
 
 	r := &Runner{
 		cfg: cfg,
@@ -116,6 +144,31 @@ func NewRunner(cfg Config, shedder EventShedder) (*Runner, *Collector) {
 		}),
 		scraper: NewScraper(cfg.Targets),
 		shedder: shedder,
+	}
+	if cfg.TrafficEnabled {
+		r.traffic = NewTrafficEngine(TrafficConfig{
+			Horizon:        cfg.Horizon,
+			RhoTarget:      cfg.RhoTarget,
+			MuEst:          cfg.MuEst,
+			Gamma:          cfg.ShedGamma,
+			SampleInterval: cfg.Interval,
+			Window:         cfg.Window,
+			Alpha:          cfg.Alpha,
+			AccThreshold:   cfg.AccThreshold,
+		})
+		r.trafficScraper = NewTrafficScraper(cfg.TrafficAgentURL)
+	}
+	if cfg.PolicyMapPin != "" {
+		r.shedCtrl = NewShedController(cfg.ShedGamma)
+		r.muEst = NewMuEstimator(cfg.MuEst)
+		if cfg.KernelRingbuf {
+			r.kernelSig = NewKernelSignalReader(cfg.PolicyMapPin)
+		}
+		if cfg.FastInterval > 0 {
+			cfg.Interval = cfg.FastInterval
+		} else if cfg.Interval >= time.Second {
+			cfg.Interval = 50 * time.Millisecond
+		}
 	}
 	r.coll = NewCollector(&r.snaps, &r.idx, cfg.Mode)
 	return r, r.coll
@@ -134,10 +187,13 @@ func (r *Runner) Run(ctx context.Context) {
 	if r == nil {
 		return
 	}
+	if r.kernelSig != nil {
+		go r.kernelSig.Run(ctx)
+	}
 	t := time.NewTicker(r.cfg.Interval)
 	defer t.Stop()
-	log.Infof("forecaster started mode=%s interval=%s horizon=%s hardDrop=%.3fs",
-		r.cfg.Mode, r.cfg.Interval, r.cfg.Horizon, r.cfg.HardDropSeconds)
+	log.Infof("forecaster started mode=%s interval=%s horizon=%s hardDrop=%.3fs traffic=%v",
+		r.cfg.Mode, r.cfg.Interval, r.cfg.Horizon, r.cfg.HardDropSeconds, r.cfg.TrafficEnabled)
 
 	for {
 		select {
@@ -154,7 +210,6 @@ func (r *Runner) tick(ctx context.Context, now time.Time) {
 	netRaw, err := r.scraper.Sample(now)
 	if err != nil {
 		log.Debugf("forecaster scrape: %v", err)
-		// still try LLC/PSI for blame path
 		netRaw = 0
 	}
 	vec := SignalVector{Network: netRaw}
@@ -185,17 +240,49 @@ func (r *Runner) applySample(ctx context.Context, raw float64, cause string, now
 	} else {
 		snap.Cause = CauseNone
 	}
+
+	xdpStats := ReadXDPStats(r.cfg.PolicyMapPin)
+
+	var overload OverloadSnapshot
+	connRate := 0.0
+	if r.kernelSig != nil {
+		ev := r.kernelSig.Latest()
+		if ev.PktCount > 0 {
+			connRate = KernelLambdaRate(ev)
+		}
+	}
+	if r.traffic != nil {
+		if connRate > 0 {
+			tr := r.traffic.ObserveLambda(connRate, now)
+			overload = FuseOverload(snap, tr, r.cfg.ShedGamma)
+			ApplyOverload(&snap, overload)
+		} else if r.trafficScraper != nil {
+			if conn, err := r.trafficScraper.SampleConn(now); err == nil {
+				tr := r.traffic.ObserveConn(conn, now)
+				overload = FuseOverload(snap, tr, r.cfg.ShedGamma)
+				ApplyOverload(&snap, overload)
+			}
+		}
+		if r.muEst != nil {
+			liveMu := r.muEst.Observe(xdpStats, snap.OverloadFraction, now)
+			r.traffic.SetMuEst(liveMu)
+		}
+		if r.shedCtrl != nil && overload.ShedPPM > 0 {
+			snap.ShedPPM = r.shedCtrl.Adjust(overload.ShedPPM, xdpStats)
+		}
+	}
+
 	next := 1 - (r.idx.Load() % 2)
 	r.snaps[next] = snap
 	r.idx.Store(next)
 	_ = WriteDecision(r.cfg.DecisionPath, snap)
 	_ = WritePolicyState(r.cfg.PolicyPath, snap)
-	_ = SyncPolicyToBPFMap(r.cfg.PolicyMapPin, snap)
+	_ = SyncPolicyToBPFMap(r.cfg.PolicyMapPin, snap, r.cfg.RedirectIfindex)
 
 	if snap.Fault && !r.prevFault {
 		r.coll.IncFaults()
-		log.Warnf("forecaster FAULT cause=%s projected=%.4fs ewma=%.4fs vel=%.4f acc=%.4f mode=%s",
-			snap.Cause, snap.Projected, snap.EWMA, snap.Velocity, snap.Acceleration, r.cfg.Mode)
+		log.Warnf("forecaster FAULT cause=%s projected=%.4fs ewma=%.4fs rho=%.3f overload=%.3f shed_ppm=%d mode=%s",
+			snap.Cause, snap.Projected, snap.EWMA, snap.RhoProjected, snap.OverloadFraction, snap.ShedPPM, r.cfg.Mode)
 		if r.cfg.Mode == ModeSemi && r.shedder != nil && ShouldShedEvents(snap.Cause) {
 			r.maybeShed(ctx, now)
 		}
@@ -247,4 +334,12 @@ func (r *Runner) maybeRestore(ctx context.Context) {
 	r.restoreAfter = time.Time{}
 	r.mu.Unlock()
 	log.Infof("forecaster semi: event probes restored")
+}
+
+// PushSnapshot applies federation/controller policy without full tick.
+func (r *Runner) PushSnapshot(snap Snapshot) error {
+	if r == nil {
+		return fmt.Errorf("runner nil")
+	}
+	return SyncPolicyToBPFMap(r.cfg.PolicyMapPin, snap, r.cfg.RedirectIfindex)
 }
