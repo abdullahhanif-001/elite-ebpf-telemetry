@@ -63,7 +63,7 @@ except Exception as e:
   echo '```'
   echo ""
   echo "### sched_ext / ftrace"
-  kv "CONFIG_SCHED_CLASS_EXT" "$(grep -q '^CONFIG_SCHED_CLASS_EXT=y' /boot/config-$(uname -r) 2>/dev/null && echo yes || echo no)"
+  kv "CONFIG_SCHED_CLASS_EXT" "$(grep -q '^CONFIG_SCHED_CLASS_EXT=y' "/boot/config-$(uname -r)" 2>/dev/null && echo yes || echo no)"
   kv "ftrace_enabled" "$(cat /proc/sys/kernel/ftrace_enabled 2>/dev/null || echo no)"
   echo ""
   echo "### dmesg tail (stall/sched_ext)"

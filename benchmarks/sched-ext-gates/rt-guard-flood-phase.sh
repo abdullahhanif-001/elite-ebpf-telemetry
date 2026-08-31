@@ -27,7 +27,8 @@ if [[ -z "${FLOOD_OUT:-}" ]]; then
   if [[ -n "${latest}" && -f "${latest}/checkpoint.json" ]]; then
     export FLOOD_OUT="${latest}"
   else
-    export FLOOD_OUT="${ROOT}/scripts/oneclick/results/rt-guard-flood-safe-$(date +%Y%m%d-%H%M%S)"
+    FLOOD_OUT="${ROOT}/scripts/oneclick/results/rt-guard-flood-safe-$(date +%Y%m%d-%H%M%S)"
+    export FLOOD_OUT
   fi
 fi
 mkdir -p "${FLOOD_OUT}"

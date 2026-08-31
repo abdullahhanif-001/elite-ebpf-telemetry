@@ -32,8 +32,8 @@ while IFS= read -r -d '' f; do
   rel="${rel//\\//}"
   lh="$(hash_file "${f}")"
   vps_h=""
-  if ssh -o ConnectTimeout=8 -o BatchMode=yes "${VPS_HOST}" "test -f ${VPS_ROOT}/${rel}" 2>/dev/null; then
-    vps_h="$(ssh -o ConnectTimeout=8 -o BatchMode=yes "${VPS_HOST}" "sha256sum ${VPS_ROOT}/${rel} 2>/dev/null | awk '{print \$1}'" 2>/dev/null || true)"
+  if ssh -n -o ConnectTimeout=8 -o BatchMode=yes "${VPS_HOST}" "test -f ${VPS_ROOT}/${rel}" 2>/dev/null; then
+    vps_h="$(ssh -n -o ConnectTimeout=8 -o BatchMode=yes "${VPS_HOST}" "sha256sum ${VPS_ROOT}/${rel} 2>/dev/null | awk '{print \$1}'" 2>/dev/null || true)"
   fi
   if [[ -n "${vps_h}" && "${vps_h}" != "${lh}" ]]; then
     log "DRIFT ${rel} local=${lh} vps=${vps_h}"

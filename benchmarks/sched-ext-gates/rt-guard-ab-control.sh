@@ -46,7 +46,12 @@ if [[ "${FLOOD_SAFE_MODE:-0}" == "1" ]]; then
     echo "ARM_B=FAIL rt_stall EXT<4%" | tee -a "${OUT}/ab.log"
     FAIL=$((FAIL + 1))
   fi
-  prior="$(ls -td "${ROOT}"/scripts/oneclick/results/rt-guard-*/verdict.txt 2>/dev/null | grep -v flood | head -1 || true)"
+  prior=""
+  for cand in $(ls -td "${ROOT}"/scripts/oneclick/results/rt-guard-*/verdict.txt 2>/dev/null); do
+    [[ "${cand}" == *flood* ]] && continue
+    prior="${cand}"
+    break
+  done
   if [[ -n "${prior}" ]] && grep -q RT_GUARD_PASS "${prior}" 2>/dev/null; then
     echo "ARM_B_BASELINE=${prior}" | tee -a "${OUT}/ab.log"
   fi

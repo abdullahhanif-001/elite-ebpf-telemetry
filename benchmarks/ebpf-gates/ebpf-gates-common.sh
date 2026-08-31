@@ -12,7 +12,6 @@ ebpf_repo_root() {
 
 OUR_GOAL_DIR="${OUR_GOAL_DIR:-$(ebpf_repo_root)/scripts/oneclick/results/our-goal}"
 OUR_GOAL_MD="${OUR_GOAL_DIR}/OUR_GOAL.md"
-OUR_GOAL_LOG="${OUR_GOAL_DIR}/run.log"
 
 ebpf_ensure_our_goal() {
   mkdir -p "${OUR_GOAL_DIR}/audit" "${OUR_GOAL_DIR}/phases"

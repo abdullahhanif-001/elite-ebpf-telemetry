@@ -12,7 +12,16 @@ source "${GATES}/flood-common.sh"
 OUT_JSON="${OUR_GOAL_DIR}/holy-grail-matrix.json"
 OUT_TXT="${OUR_GOAL_DIR}/HOLY_GRAIL_VERDICT.txt"
 FLOOD_DIR="${1:-$(ls -td "${ROOT}"/scripts/oneclick/results/rt-guard-flood-safe-* 2>/dev/null | head -1 || true)}"
-RT_GUARD_DIR="${2:-$(ls -td "${ROOT}"/scripts/oneclick/results/rt-guard-202* 2>/dev/null | grep -v flood | head -1 || true)}"
+if [[ -n "${2:-}" ]]; then
+  RT_GUARD_DIR="${2}"
+else
+  RT_GUARD_DIR=""
+  for cand in $(ls -td "${ROOT}"/scripts/oneclick/results/rt-guard-202* 2>/dev/null); do
+    [[ "${cand}" == *flood* ]] && continue
+    RT_GUARD_DIR="${cand}"
+    break
+  done
+fi
 
 ebpf_ensure_our_goal
 FAIL=0
@@ -124,7 +133,6 @@ if [[ -f "${FLOOD_DIR}/scheduler-matrix.json" ]]; then
 fi
 check_h H12 "${h12}" "6/6 PASS_LOADER (5/6+lavd SKIP ok)"
 
-TOTAL=$((PASS))
 python3 - "${OUT_JSON}" "${PASS}" "${FAIL}" <<'PY'
 import json, sys
 path, p, f = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
