@@ -1,3 +1,0 @@
-elite_dcic_noise_score 0.202970
-elite_dcic_be_quota_percent 100
-elite_dcic_fault 1
