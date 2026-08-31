@@ -73,12 +73,12 @@ After `rt-guard-pass.sh`:
 
 ## Submission Checklist
 
-- [ ] VPS kernel >= 6.19 with CONFIG_SCHED_CLASS_EXT=y
-- [ ] arighi scx-dl-server branch (ext_server)
-- [ ] Layer 2 patch applied and kernel rebuilt
-- [ ] rt_stall PASS (EXT >= 4% runtime)
-- [ ] rt_guard_stress PASS (60s soak)
-- [ ] rt-monopolization-repro.sh → STALL_DETECTED=NO
-- [ ] PM2_GUARD_OK (5 neighbor apps unchanged)
-- [ ] Email Layer 2 to LKML / sched_ext list
+- [x] VPS kernel >= 6.19 with CONFIG_SCHED_CLASS_EXT=y
+- [x] arighi scx-dl-server branch (ext_server)
+- [x] Layer 2 patch applied and kernel rebuilt
+- [x] rt_stall PASS (EXT >= 4% runtime)
+- [x] rt_guard_stress PASS (60s soak)
+- [x] rt-monopolization-repro.sh → STALL_DETECTED=NO
+- [x] PM2_GUARD_OK (5 neighbor apps unchanged)
+- [ ] Email Layer 2 to LKML / sched_ext list (pack: `submit-rt-guard-upstream.sh`)
 - [ ] Open Layer 3 PR on github.com/sched-ext/scx

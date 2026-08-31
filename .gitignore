@@ -55,3 +55,14 @@ bin
 .eslintcache
 .stylelintcache
 
+# VPS proof runs (local only — publish docs/GLOBAL_EBPF_VERIFICATION_REPORT.md instead)
+scripts/oneclick/results/**/*
+!scripts/oneclick/results/.gitkeep
+
+# Private session / interview artifacts
+docs/MICROSOFT_INTERVIEW_REPORT.md
+docs/MICROSOFT_REVIEW_PACK.md
+
+# Windows duplicate path artifacts
+benchmarks\\**
+
