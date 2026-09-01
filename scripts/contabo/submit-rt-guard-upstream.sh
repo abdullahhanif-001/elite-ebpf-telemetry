@@ -42,14 +42,8 @@ cat > "${OUT}/SUBMIT_COMMANDS.txt" <<EOF
 #     --subject "[PATCH] sched_ext: RT-aware watchdog stall detection (sched-ext/scx#1202)" \\
 #     ${OUT}/0001-sched_ext-rt-aware-watchdog.patch
 #
-# Layer 3 — github.com/sched-ext/scx PR
-# Fork sched-ext/scx, branch rt-guard, add:
-#   - tools/sched_ext/include/scx/scx_rt_guard.bpf.h
-#   - tools/testing/selftests/sched_ext/rt_guard_stress.{c,bpf.c}
-# PR body: ${OUT}/GITHUB_PR_BODY.md
-#
-#   gh pr create --repo sched-ext/scx --title "sched_ext: Add scx_rt_guard RT preemption interceptor (fixes #1202)" \\
-#     --body-file ${OUT}/GITHUB_PR_BODY.md
+# Layer 3 — github.com/sched-ext/scx PR (OPEN: https://github.com/sched-ext/scx/pull/3780)
+# Branch: abdullahhanif-001:rt-guard-scx-1202
 #
 # Layer 1 — track only (Andrea Righi scx-dl-server); do not re-submit.
 EOF
