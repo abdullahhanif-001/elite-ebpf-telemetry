@@ -1,3 +1,0 @@
-=== G0_BASELINE template ===
-iface=lo
-G0_BASELINE_ARTIFACTS_OK=PENDING_VPS_RUN

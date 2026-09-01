@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# commit-msg hook — reject AI/agent watermarks in commit messages.
+set -euo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+MSG_FILE="${1:?}"
+bash "${ROOT}/scripts/audit-commit.sh" "$(cat "${MSG_FILE}")"

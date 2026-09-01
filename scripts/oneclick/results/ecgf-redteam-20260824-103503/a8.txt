@@ -1,1 +1,0 @@
-bash: line 1: /var/lib/elite/predict-decision.json: Permission denied

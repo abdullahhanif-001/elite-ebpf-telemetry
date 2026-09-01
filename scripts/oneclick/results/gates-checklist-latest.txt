@@ -1,5 +1,0 @@
-=== Elite #1 gates checklist (template) ===
-Run on Contabo: bash scripts/oneclick/gates-checklist.sh
-Zero-buffer strict: ZERO_BUFFER_GATES=1 bash scripts/oneclick/gates-checklist.sh
-=== summary pass=0 fail=0 out=template ===
-GATES_TEMPLATE — run gates-checklist.sh on live VPS for GATES_8_8_PASS

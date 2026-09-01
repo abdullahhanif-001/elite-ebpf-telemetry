@@ -1,9 +1,0 @@
-PHASE_B_VPS_PROOF
-host=pc-55
-generated=2026-08-28T20:23:08+05:00
-xray=PENDING
-w4=PENDING
-w4_p99_us=?
-gates_pass=0
-gates_fail=0
-speed=SPEED_PASS

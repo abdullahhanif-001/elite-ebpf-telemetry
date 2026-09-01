@@ -1,3 +1,0 @@
-elite_cpu=0.02 elite_rss_mb=94.6 pid=1005719
-elite_cpu=0.046667 elite_rss_mb=94.6 pid=1005719
-elite_cpu=0.046667 elite_rss_mb=94.6 pid=1005719

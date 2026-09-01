@@ -1,7 +1,0 @@
-=== W4 xdp-inject-latency artifact ===
-Run on VPS with pinned policy map:
-  bash benchmarks/contabo-gates/w4-xdp-inject-latency.sh
-Gate SLO: W4_p99_us <= 100000 (100 µs)
-Local dev: go test ./pkg/forecaster -bench=BenchmarkSyncPolicyToBPFMap (requires ELITE_POLICY_PIN)
-W4_bench_ns_per_op=PENDING_VPS_RUN
-W4_p99_us=PENDING_VPS_RUN

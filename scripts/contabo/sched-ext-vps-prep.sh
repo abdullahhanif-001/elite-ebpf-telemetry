@@ -109,11 +109,25 @@ phase_scx_clone() {
 
 phase_scx_build() {
   cd "${SCX_ROOT}"
-  log "building scx schedulers"
-  if [[ -f install.sh ]]; then
-    ./install.sh bpfland qmap 2>&1 || make -C scheds/c bpfland qmap 2>&1 || true
+  log "building scx rust schedulers (bpfland lavd rusty flash rustland layered)"
+  apt-get install -y -qq libseccomp-dev lld clang llvm pkg-config libelf-dev libbpf-dev 2>/dev/null || true
+  if [[ -f "${HOME}/.cargo/env" ]]; then
+    # shellcheck disable=SC1091
+    source "${HOME}/.cargo/env"
+  else
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable || true
+    # shellcheck disable=SC1091
+    source "${HOME}/.cargo/env"
   fi
-  command -v scx_loader && scx_loader --version || log "scx_loader build pending kernel reboot"
+  rustc --version || { log "FAIL rustc missing"; return 1; }
+  for sched in bpfland lavd rusty flash rustland layered; do
+    dir="${SCX_ROOT}/scheds/rust/scx_${sched}"
+    if [[ -d "${dir}" ]]; then
+      log "cargo build scx_${sched}"
+      (cd "${dir}" && cargo build --release) 2>&1 || log "WARN scx_${sched} build failed"
+    fi
+  done
+  ls -la "${SCX_ROOT}/target/release/scx_"* 2>/dev/null || log "no scx binaries yet"
 }
 
 phase_apply_patches() {

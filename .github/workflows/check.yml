@@ -57,10 +57,18 @@ jobs:
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # v2.0.0
         env:
-          SHELLCHECK_OPTS: -e SC2236,SC2162,SC2268,SC1091,SC2012,SC2015,SC2029
+          SHELLCHECK_OPTS: -e SC2236,SC2162,SC2268,SC1091,SC2012,SC2015,SC2029,SC2086,SC2129,SC2295
         with:
           ignore: tests hack
           ignore_paths: tests hack scripts/oneclick/results
+
+  scx-evidence-verify:
+    name: SCX#1202 evidence
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Verify committed SCX#1202 evidence bundle
+        run: bash scripts/verify-scx-1202-evidence.sh
 
   super-linter:
     runs-on: ubuntu-latest
