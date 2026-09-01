@@ -8,9 +8,12 @@ StartLimitBurst=5
 Type=simple
 Environment=KUBESKOOP_POD_NAMESPACE=elite
 Environment=KUBESKOOP_POD_NAME=elite-host
+Environment=INSPECTOR_NODENAME=%H
 # Skip slow BTF mirror download when cache exists
-ExecStartPre=/bin/sh -c 'test -f /opt/elite/btf/vmlinux || /opt/elite/bin/btfhack discover -p /opt/elite/btf/'
+ExecStartPre=/bin/sh -c 'mkdir -p /opt/elite/logs && test -f /opt/elite/btf/vmlinux || /opt/elite/bin/btfhack discover -p /opt/elite/btf/'
 ExecStart=/opt/elite/bin/elite-agent server --sidecar -c /opt/elite/config/config.yaml
+StandardOutput=append:/opt/elite/logs/agent.log
+StandardError=append:/opt/elite/logs/agent.err
 Restart=on-failure
 RestartSec=10
 TimeoutStartSec=180

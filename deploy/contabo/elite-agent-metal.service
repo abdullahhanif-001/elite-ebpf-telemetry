@@ -1,0 +1,34 @@
+[Unit]
+Description=Elite eBPF Physics Agent (bare-metal, no K8s sidecar)
+After=network.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+Environment=INSPECTOR_NODENAME=%H
+ExecStartPre=/bin/sh -c 'mkdir -p /opt/elite/logs /opt/elite/btf && test -f /opt/elite/btf/vmlinux || /opt/elite/bin/btfhack discover -p /opt/elite/btf/'
+ExecStart=/opt/elite/bin/elite-agent server -c /opt/elite/config/config.yaml
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=180
+StandardOutput=append:/opt/elite/logs/agent.log
+StandardError=append:/opt/elite/logs/agent.err
+
+CPUQuota=5%
+MemoryMax=160M
+MemoryHigh=128M
+Nice=10
+IOSchedulingClass=idle
+
+NoNewPrivileges=true
+AmbientCapabilities=CAP_BPF CAP_PERFMON CAP_SYS_ADMIN CAP_NET_ADMIN
+CapabilityBoundingSet=CAP_BPF CAP_PERFMON CAP_SYS_ADMIN CAP_NET_ADMIN
+PrivateTmp=true
+ProtectHome=true
+ReadWritePaths=/opt/elite/btf /opt/elite/logs /opt/elite/bin /var/lib/elite /sys/fs/bpf
+RestrictRealtime=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

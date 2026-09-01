@@ -14,7 +14,7 @@ Do not open public issues for security vulnerabilities.
 
 ## Agent Privileges
 
-Elite requires `NET_ADMIN`, `SYS_ADMIN`, `SYS_PTRACE` for eBPF. Run as DaemonSet with minimal RBAC.
+Elite requires `CAP_BPF`, `CAP_PERFMON`, `CAP_SYS_ADMIN`, and `CAP_NET_ADMIN` for eBPF (see `deploy/contabo/elite-agent.service`). Run as DaemonSet with minimal RBAC.
 
 ## License
 

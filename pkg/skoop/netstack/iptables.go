@@ -472,8 +472,7 @@ type Physdev struct {
 }
 
 func (physdev *Physdev) Match(_ context.Context, _ *model.Packet, _, _ string) (bool, error) {
-	//FIXME 这里有问题
-	return true, nil
+	return false, &ErrIptablesUnsupported{Message: "physdev match not implemented"}
 }
 
 func (physdev *Physdev) String() string {
@@ -486,8 +485,7 @@ type Socket struct {
 }
 
 func (s *Socket) Socket(_ context.Context, _ *model.Packet, _, _ string) (bool, error) {
-	//FIXME 这里有问题
-	return true, nil
+	return false, &ErrIptablesUnsupported{Message: "socket match not implemented"}
 }
 
 func (s *Socket) String() string {
