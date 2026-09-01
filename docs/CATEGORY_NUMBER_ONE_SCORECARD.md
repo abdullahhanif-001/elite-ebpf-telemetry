@@ -1,5 +1,7 @@
 # Category Number One Scorecard
 
+> **Deprecated:** Use [TEST_BENCHMARK_REGISTRY.md](TEST_BENCHMARK_REGISTRY.md) for current gate definitions. This file retains historical bakeoff verdict data.
+
 **Generated:** 2026-08-24T11:17:10+02:00
 **Host out:** `/opt/elite/src/scripts/oneclick/results/category-bakeoff-20260824-111658`
 

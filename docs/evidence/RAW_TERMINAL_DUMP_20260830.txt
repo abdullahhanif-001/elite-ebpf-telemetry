@@ -1,6 +1,6 @@
 === RAW UNEDITED TERMINAL DUMP (do not edit) ===
 START_UTC=2026-08-30T06:58:09Z
-HOST=vmi3469243
+HOST=#####
 KERNEL=6.8.0-138-generic
 USER=root
 PWD=/root
@@ -161,7 +161,7 @@ THUNDERING_HERD_PASS rss_pct=100 ct_pct=112
 ################################################################
 ============================================================
  ELITE ZERO-BUFFER v1.0 — HOLY GRAIL ROOT VERIFY
- Host: vmi3469243 Kernel: 6.8.0-138-generic
+ Host: ##### Kernel: 6.8.0-138-generic
  Date: 2026-08-30T06:58:20Z
  IFACE_SAFE=lo
 ============================================================

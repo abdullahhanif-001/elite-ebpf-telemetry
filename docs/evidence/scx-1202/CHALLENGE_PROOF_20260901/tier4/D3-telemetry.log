@@ -1,0 +1,28 @@
+T8_tcpretrans COMPILE_PASS tcpretrans.c loader=tracetcpretrans
+OUR_GOAL_LOG phase=T8_tcpretrans result=PASS
+T3_kernel COMPILE_PASS kernellatency.c loader=tracekernel
+OUR_GOAL_LOG phase=T3_kernel result=PASS
+T7_softirq COMPILE_PASS softirq.c loader=tracesoftirq
+OUR_GOAL_LOG phase=T7_softirq result=PASS
+T2_flow COMPILE_PASS flow.c loader=flow
+OUR_GOAL_LOG phase=T2_flow result=PASS
+T10_bio COMPILE_PASS tracebiolatency.c loader=tracebiolatency
+OUR_GOAL_LOG phase=T10_bio result=PASS
+T5_packetloss COMPILE_PASS packetloss.c loader=tracepacketloss
+OUR_GOAL_LOG phase=T5_packetloss result=PASS
+T6_socket COMPILE_PASS socketlatency.c loader=tracesocketlatency
+OUR_GOAL_LOG phase=T6_socket result=PASS
+T4_netiftx COMPILE_PASS netiftxlatency.c loader=tracenetiftxlatency
+OUR_GOAL_LOG phase=T4_netiftx result=PASS
+T11_virtcmd COMPILE_PASS virtcmdlatency.c loader=tracevirtcmdlat
+OUR_GOAL_LOG phase=T11_virtcmd result=PASS
+T9_tcpreset COMPILE_PASS tcpreset.c loader=tracetcpreset
+OUR_GOAL_LOG phase=T9_tcpreset result=PASS
+T1_connect COMPILE_SKIP connect_trace.c — bpf2go embed present
+OUR_GOAL_LOG phase=T1_connect result=PASS
+GO_PROBE_TEST_PASS
+OUR_GOAL_LOG phase=D3_go_probe result=PASS
+VPS_METRICS=scraped
+OUR_GOAL_LOG phase=D3_metrics result=PASS
+TELEMETRY_PROBE_GATE_PASS fail=0
+OUR_GOAL_LOG phase=D3_telemetry result=PASS

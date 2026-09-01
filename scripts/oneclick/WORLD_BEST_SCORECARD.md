@@ -1,5 +1,7 @@
 # World Best Provider Score (Physics-Speed Axes)
 
+> **Deprecated:** Use [docs/TEST_BENCHMARK_REGISTRY.md](../../docs/TEST_BENCHMARK_REGISTRY.md) and [docs/EBPF_FEATURE_INVENTORY.md](../../docs/EBPF_FEATURE_INVENTORY.md) for current documentation. This file retains historical Phase B verdict data.
+
 **Repository:** [abdullahhanif-001/elite-ebpf-telemetry](https://github.com/abdullahhanif-001/elite-ebpf-telemetry)
 **Status:** Hard category score after Contabo LIVE proof (2026-08-28 Phase B). See [CLAIM_CHARTER.md](CLAIM_CHARTER.md).
 

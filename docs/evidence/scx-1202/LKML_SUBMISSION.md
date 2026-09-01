@@ -44,7 +44,7 @@ Or send manually from your email client with patch attached and cover letter as 
 ## Email body addition (paste after cover letter)
 
 ```
-Verified on Contabo VPS (kernel 6.19.0-rc7, CONFIG_SCHED_CLASS_EXT=y):
+Verified on sched_ext proof host (kernel 6.19.0-rc7, CONFIG_SCHED_CLASS_EXT=y):
   RT_GUARD_PASS fail=0
   rt_stall + rt_guard_stress kselftests PASS
 

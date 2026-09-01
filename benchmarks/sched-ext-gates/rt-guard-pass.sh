@@ -122,26 +122,28 @@ log_gate 5 "ext_server status"
 vps_cmd "cat /sys/kernel/debug/sched/ext_server/status 2>/dev/null || echo 'ext_server debugfs N/A'" | tee "${OUT}/g5-ext_server.txt"
 log_gate 5 "INFO captured"
 
-# G6: scx_bpfland 5min soak (skip when scx_loader absent)
+# G6: scx_bpfland 5min soak (direct binary — scx_loader v1.x is DBus daemon, no `load` subcommand)
 log_gate 6 "bpfland 5min soak"
 if vps_cmd bash -s <<'REMOTE' | tee "${OUT}/g6-soak.log"; then
 set -euo pipefail
-if ! command -v scx_loader >/dev/null; then echo "SKIP scx_loader"; exit 0; fi
+BIN="${SCX_BIN_DIR:-/opt/scx/target/release}/scx_bpfland"
+if [[ ! -x "${BIN}" ]]; then echo "SKIP scx_bpfland"; exit 0; fi
 dmesg -C
-scx_loader load bpfland &
+"${BIN}" &
 LP=$!
 sleep 300
-kill $LP 2>/dev/null || true
+kill "${LP}" 2>/dev/null || true
+pkill -f '/opt/scx/target/release/scx_bpfland' 2>/dev/null || true
 if dmesg | grep -qE 'runnable task stall|SCX_EXIT_ERROR_STALL'; then
   echo "SOAK_FAIL stall detected"
   dmesg | tail -20
   exit 1
 fi
-echo "SOAK_PASS"
+echo "SOAK_PASS LOADER=bpfland"
 REMOTE
-  if grep -q 'SKIP scx_loader' "${OUT}/g6-soak.log"; then
+  if grep -qE 'SKIP scx_bpfland|SKIP scx_loader' "${OUT}/g6-soak.log"; then
     if sched_ext_enabled; then
-      log_gate 6 "FAIL scx_loader required on sched_ext kernel"
+      log_gate 6 "FAIL scx_bpfland required on sched_ext kernel"
       FAIL=$((FAIL + 1))
     else
       log_gate 6 "SKIP (sched_ext not enabled)"

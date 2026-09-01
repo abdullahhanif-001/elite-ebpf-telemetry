@@ -1,0 +1,27 @@
+[safe-gate] sched_ext=YES kernel=6.19.0-rc7-g9854922412d3-dirty
+[safe-gate] swap=YES
+[safe-gate] mem_avail=7033MB (>=4096MB)
+[safe-gate] load_1m=1.83 (<3.0)
+[safe-gate] no_build_jobs=OK
+FLOOD_SAFE_GATE_PASS host=##### avail_mb=7033 load=1.83
+PM2_WRAP before rt-guard-flood
+PM2_GUARD_SKIP_RESTART[before-rt-guard-flood] rider-tracker-api (excluded from restart_time check)
+PM2_GUARD_OK[before-rt-guard-flood] apps=6
+PM2_GUARD_SKIP_RESTART rider-tracker-api base=0 cur=0
+PM2_GUARD_OK
+PM2_WRAP_OK before rt-guard-flood
+[AB] Arm A — pre-fix / broken baseline evidence
+ARM_A=WARN (no baseline audit dir — documenting issue #1202 expectation)
+[AB] Arm B — live fixed repro (safe mode: kselftest proof)
+ARM_B=PASS (cached rt_stall EXT>=4% from /opt/elite/src/scripts/oneclick/results/rt-guard-20260901-083635/g2-rt_stall.log)
+ARM_B_EXT_RUNTIME=PASS (>=4%)
+AB_CONTROL_PASS fail=0
+<stdin>:11: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+CHECKPOINT P1=PASS
+PM2_WRAP after rt-guard-flood
+PM2_GUARD_SKIP_RESTART[after-rt-guard-flood] rider-tracker-api (excluded from restart_time check)
+PM2_GUARD_OK[after-rt-guard-flood] apps=6
+PM2_GUARD_SKIP_RESTART rider-tracker-api base=0 cur=0
+PM2_GUARD_OK
+PM2_WRAP_OK after rt-guard-flood
+ssh_ok phase=P1 out=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260901-094409

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # sched-ext-vps-prep.sh — one-time VPS prep: swap, toolchain, kernel, scx, patches.
 # Run ON VPS: bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh [phase]
-# Phases: all | swap | deps | kernel-clone | kernel-config | kernel-build | kernel-install | scx-clone | scx-build | apply-patches | verify
+# Phases: all | swap | deps | kernel-clone | kernel-config | kernel-build | kernel-install | scx-clone | scx-build | scx-loader | apply-patches | kselftest-build | verify
 set -euo pipefail
 
 export REAL_ONLY=1
@@ -10,6 +10,7 @@ export REAL_ONLY=1
 PHASE="${1:-all}"
 SCX_KERNEL_BUILD="${SCX_KERNEL_BUILD:-/opt/scx-kernel-build}"
 SCX_ROOT="${SCX_ROOT:-/opt/scx}"
+SCX_LOADER_ROOT="${SCX_LOADER_ROOT:-/opt/scx-loader}"
 CONTRIB="${ELITE_SRC:-/opt/elite/src}/contrib/sched-ext"
 KERNEL_GIT="${KERNEL_GIT:-https://git.kernel.org/pub/scm/linux/kernel/git/arighi/linux.git}"
 KERNEL_BRANCH="${KERNEL_BRANCH:-scx-dl-server}"
@@ -130,6 +131,65 @@ phase_scx_build() {
   ls -la "${SCX_ROOT}/target/release/scx_"* 2>/dev/null || log "no scx binaries yet"
 }
 
+phase_scx_loader() {
+  log "building and installing scx_loader (sched-ext/scx-loader)"
+  apt-get install -y -qq libseccomp-dev lld clang llvm pkg-config libelf-dev libbpf-dev 2>/dev/null || true
+  if [[ -f "${HOME}/.cargo/env" ]]; then
+    # shellcheck disable=SC1091
+    source "${HOME}/.cargo/env"
+  else
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable || true
+    # shellcheck disable=SC1091
+    source "${HOME}/.cargo/env"
+  fi
+  export PATH="${HOME}/.cargo/bin:${PATH}"
+
+  installed=0
+  if command -v scx_loader >/dev/null 2>&1; then
+    log "scx_loader already in PATH: $(command -v scx_loader)"
+    installed=1
+  elif cargo install scx_loader 2>&1; then
+    log "scx_loader installed via cargo install"
+    installed=1
+  else
+    log "cargo install scx_loader failed — building from scx-loader git"
+    if [[ ! -d "${SCX_LOADER_ROOT}/.git" ]]; then
+      git clone --depth 1 https://github.com/sched-ext/scx-loader.git "${SCX_LOADER_ROOT}" || true
+    else
+      (cd "${SCX_LOADER_ROOT}" && git pull --ff-only) || true
+    fi
+    if [[ -f "${SCX_LOADER_ROOT}/Cargo.toml" ]]; then
+      (cd "${SCX_LOADER_ROOT}" && cargo build --release) 2>&1 || log "WARN scx-loader repo build failed"
+      if [[ -x "${SCX_LOADER_ROOT}/target/release/scx_loader" ]]; then
+        install -Dm755 "${SCX_LOADER_ROOT}/target/release/scx_loader" /usr/local/bin/scx_loader
+        installed=1
+      fi
+    fi
+  fi
+
+  if [[ "${installed}" -eq 0 ]] && [[ -x "${HOME}/.cargo/bin/scx_loader" ]]; then
+    install -Dm755 "${HOME}/.cargo/bin/scx_loader" /usr/local/bin/scx_loader
+    installed=1
+  fi
+
+  if [[ "${installed}" -eq 1 ]]; then
+    log "scx_loader installed: $(command -v scx_loader)"
+  else
+    log "WARN scx_loader not installed — G6 will SKIP until scx-loader builds"
+  fi
+}
+
+phase_kselftest_build() {
+  log "rebuilding sched_ext kselftests (rt_stall rt_guard_stress)"
+  cd "${SCX_KERNEL_BUILD}/tools/testing/selftests/sched_ext"
+  if [[ -f Makefile ]]; then
+    make -j"${BUILD_JOBS}" rt_stall rt_guard_stress 2>&1 || make -j"${BUILD_JOBS}" 2>&1 || log "WARN kselftest make failed"
+  else
+    log "WARN kselftest dir missing at ${SCX_KERNEL_BUILD}/tools/testing/selftests/sched_ext"
+  fi
+  ls -la rt_stall rt_guard_stress 2>/dev/null || true
+}
+
 phase_apply_patches() {
   log "applying contrib patches (Layer 2 watchdog + Layer 3 selftest)"
   if [[ ! -d "${CONTRIB}" ]]; then
@@ -210,7 +270,17 @@ phase_verify() {
     echo "sched_ext=NO — reboot into scx-dl kernel or rerun kernel-install"
     exit 1
   fi
-  command -v scx_loader && echo "scx_loader=YES" || echo "scx_loader=NO"
+  if command -v scx_loader >/dev/null 2>&1; then
+    echo "scx_loader=YES path=$(command -v scx_loader)"
+  elif [[ -x /usr/local/bin/scx_loader ]]; then
+    echo "scx_loader=YES path=/usr/local/bin/scx_loader"
+  elif [[ -x "${HOME}/.cargo/bin/scx_loader" ]]; then
+    echo "scx_loader=YES path=${HOME}/.cargo/bin/scx_loader"
+  else
+    echo "scx_loader=NO"
+  fi
+  grep -E 'CONFIG_SCHED_CLASS_EXT|CONFIG_FUNCTION_TRACER' "/boot/config-${k}" 2>/dev/null || true
+  cat /sys/kernel/debug/sched/ext_server/status 2>/dev/null | head -3 || echo "ext_server=unknown"
   swapon --show
   mkdir -p /opt/elite/baseline
   pm2 jlist > /opt/elite/baseline/pm2-before.json 2>/dev/null || true
@@ -228,7 +298,9 @@ run_phase() {
     scx-clone) phase_scx_clone ;;
     scx-build) phase_scx_build ;;
     scx-loader-build) phase_scx_loader_build ;;
+    scx-loader) phase_scx_loader ;;
     apply-patches) phase_apply_patches ;;
+    kselftest-build) phase_kselftest_build ;;
     verify) phase_verify ;;
     all)
       phase_swap
@@ -240,7 +312,8 @@ run_phase() {
       phase_scx_clone
       phase_scx_build
       phase_apply_patches
-      log "REBOOT REQUIRED — then run: $0 verify && $0 scx-loader-build"
+      log "REBOOT REQUIRED — then run: $0 verify && $0 scx-build && $0 scx-loader && $0 kselftest-build"
+      log "  (or: $0 scx-loader-build after scx-clone)"
       ;;
     *) echo "unknown phase: $1"; exit 1 ;;
   esac

@@ -2,7 +2,7 @@
 
 **Zero-instrumentation kernel telemetry — one agent per node, under 1% CPU.**
 
-Bakeoff scorecards and category claims: [docs/CLAIM_CHARTER.md](docs/CLAIM_CHARTER.md) · [docs/WORLD_BEST_PROVIDER_SCORE.md](docs/WORLD_BEST_PROVIDER_SCORE.md) · [docs/COMPETITIVE_PROOF.md](docs/COMPETITIVE_PROOF.md).
+Engineering references: [docs/TEST_BENCHMARK_REGISTRY.md](docs/TEST_BENCHMARK_REGISTRY.md) · [docs/EBPF_FEATURE_INVENTORY.md](docs/EBPF_FEATURE_INVENTORY.md) · [docs/CLAIM_CHARTER.md](docs/CLAIM_CHARTER.md)
 
 ## Zero-Buffer Overload Controller (v1.0)
 
@@ -30,7 +30,17 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 
 **Problem:** RT tasks monopolize CPU → EXT scheduler tasks stall → kernel watchdog ejects the BPF scheduler ([sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202)).
 
-**Status:** **Development in progress** — verified on Contabo sched_ext kernel (`REAL_ONLY=1`). Upstream PR withdrawn temporarily while we finish dev (scx_loader, full gate matrix). Issue [#1202](https://github.com/sched-ext/scx/issues/1202) open.
+**Status:** **Challenge proof suite ready** — full Linux + eBPF + SCX#1202 verification via `run-linux-ebpf-challenge-proof.sh`. Upstream PR #3780 closed during dev; issue [#1202](https://github.com/sched-ext/scx/issues/1202) open.
+
+**Full challenge proof (one command on sched_ext host):**
+
+```bash
+export REAL_ONLY=1 ELITE_SRC=/opt/elite/src
+bash scripts/contabo/run-linux-ebpf-challenge-proof.sh
+# → docs/evidence/scx-1202/CHALLENGE_PROOF_<date>/
+```
+
+Q&A for any reviewer question: [docs/evidence/scx-1202/CHALLENGE_QA_PLAYBOOK.md](docs/evidence/scx-1202/CHALLENGE_QA_PLAYBOOK.md)
 
 **Solution (verified on real VPS, `REAL_ONLY=1`, no mocks):**
 
@@ -40,11 +50,11 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 | L2 | RT-aware watchdog | [`contrib/sched-ext/kernel/0001-sched_ext-rt-aware-watchdog.patch`](contrib/sched-ext/kernel/0001-sched_ext-rt-aware-watchdog.patch) |
 | L3 | BPF preemption interceptor | [`contrib/sched-ext/bpf/scx_rt_guard.bpf.h`](contrib/sched-ext/bpf/scx_rt_guard.bpf.h) + [`rt_guard_stress`](contrib/sched-ext/selftests/) selftest |
 
-**Proof (Contabo VPS, kernel `6.19.0-rc7` + ftrace + sched_ext):**
+**Proof (sched_ext proof host, kernel `6.19.0-rc7` + ftrace + sched_ext):**
 
 | Gate | Verdict |
 |------|---------|
-| Holy Grail H1–H12 (#1202 matrix) | **12/12 PASS** — `HOLY_GRAIL_1202_SOLVED=YES` |
+| SCX#1202 matrix H1–H12 | **12/12 PASS** — `HOLY_GRAIL_1202_SOLVED=YES` |
 | #1202 repro with bpfland | **`STALL_DETECTED=NO`** |
 | Global eBPF D1–D6 | **`GLOBAL_EBPF_PASS`** (`fail=0`) |
 | RT Guard flood P1–P5 | **`RT_GUARD_FLOOD_PASS`** |
@@ -72,7 +82,7 @@ Upstream submission: [`scripts/contabo/submit-rt-guard-upstream.sh`](scripts/con
 
 ### Elite Physics Pack (OSS compose under systemd)
 
-Production-shaped **compose**, not a demo script: pinned GitHub release digests (`versions.env`), Cloudflare `ebpf_exporter` + optional Inspektor Gadget + `bpfcc-tools`, dedicated systemd units with CPUQuota, localhost-only Prometheus scrape glue, Grafana dashboard JSON, and a Contabo proof harness that samples process CPU without touching co-resident PM2 apps.
+Production-shaped **compose**, not a demo script: pinned GitHub release digests (`versions.env`), Cloudflare `ebpf_exporter` + optional Inspektor Gadget + `bpfcc-tools`, dedicated systemd units with CPUQuota, localhost-only Prometheus scrape glue, Grafana dashboard JSON, and a VPS proof harness that samples process CPU without touching co-resident PM2 apps.
 
 ```bash
 sudo bash scripts/oneclick/elite-physics-pack.sh install
@@ -97,7 +107,7 @@ Userspace **control-plane** fault projection over physics latency series — pur
 
 One-click: `sudo bash scripts/oneclick/elite-oneclick.sh install --profile closed-loop` then `test --suite after-working`. ADR-004.
 
-Contabo A-grade gate (`forecaster-agrade.sh`): benchmem **0 B/op / 0 allocs/op** on parse/observe hot paths, PM2 process-set invariant before/after — only claim switch-readiness when `VERDICT=SWITCH_READY` ([scripts/oneclick/SCORECARD_SWITCH.md](scripts/oneclick/SCORECARD_SWITCH.md)). `SOFT_ONLY` is success when hardware lacks resctrl.
+Forecaster gate (`forecaster-agrade.sh`): benchmem **0 B/op / 0 allocs/op** on parse/observe hot paths, PM2 process-set invariant before/after — only claim switch-readiness when `VERDICT=SWITCH_READY` ([scripts/oneclick/SCORECARD_SWITCH.md](scripts/oneclick/SCORECARD_SWITCH.md)). `SOFT_ONLY` is success when hardware lacks resctrl.
 
 ```yaml
 forecast:
@@ -200,19 +210,19 @@ helm install elite ./deploy/helm/elite \
 
 See [deploy/contabo/](deploy/contabo/) — systemd unit, PM2 guard, Prometheus/Grafana on localhost only.
 
-**Contabo repro (VPS only — no local go test on Windows):**
+**VPS repro (Linux only — no local `go test` on Windows):**
 
 ```bash
 # From PC: sync src only (never overwrite /opt/elite/scripts)
-scp -r update-ebpf/* contabo-server:/opt/elite/src/
+scp -r update-ebpf/* #####:/opt/elite/src/
 
 # On VPS: PM2-safe real proof suite (no mock inject, no pm2 restart)
-ssh contabo-server 'bash /opt/elite/src/scripts/oneclick/elite-run-safe.sh'
+ssh ##### 'bash /opt/elite/src/scripts/oneclick/elite-run-safe.sh'
 
 # Pass verdicts: REAL_CLOSED_LOOP_PASS, H11_PASS_LIVE, SPEED_PASS,
 # CATEGORY_BAKEOFF_PASS, PM2_GUARD_OK, ADVERSARIAL AUDIT FAILURES=0
 # Retire legacy ebpf_exporter only after proofs:
-ssh contabo-server 'systemctl stop elite-ebpf-exporter'
+ssh ##### 'systemctl stop elite-ebpf-exporter'
 ```
 
 ---
@@ -222,7 +232,7 @@ ssh contabo-server 'systemctl stop elite-ebpf-exporter'
 ```bash
 ./benchmarks/run-overhead.sh              # Kubernetes
 ./benchmarks/run-overhead.sh --mode systemd
-bash scripts/oneclick/forecaster-agrade.sh  # Contabo: 0-alloc + SWITCH_READY scorecard
+bash scripts/oneclick/forecaster-agrade.sh  # VPS: 0-alloc + SWITCH_READY scorecard
 ```
 
 SLO: agent CPU < 1% core fraction. Methodology: [benchmarks/BENCHMARKS.md](benchmarks/BENCHMARKS.md)
@@ -274,13 +284,15 @@ Speed/overhead proofs: `bash scripts/oneclick/competitive-speed-proof.sh` · `co
 
 ## Docs
 
+- [Test and benchmark registry](docs/TEST_BENCHMARK_REGISTRY.md)
+- [eBPF feature inventory](docs/EBPF_FEATURE_INVENTORY.md)
 - [Global eBPF verification report (#1202)](docs/GLOBAL_EBPF_VERIFICATION_REPORT.md)
 - [sched_ext RT Guard upstream pack](contrib/sched-ext/README.md)
+- [SCX#1202 evidence index](docs/evidence/scx-1202/README.md)
 - [Track C ECGF research](docs/research/MASTER_REPORT.md)
 - [ADR-005 Track C](docs/ADR-005-track-c-ecgf.md)
 - [World eBPF comparison](docs/WORLD_EBPF_COMPARISON.md)
 - [Competitive proof](docs/COMPETITIVE_PROOF.md)
-- [World best provider score](docs/WORLD_BEST_PROVIDER_SCORE.md)
 - [Physics metrics](docs/physics-metrics.md)
 - [Sidecar removal](docs/sidecar-removal.md)
 - [ADR-001: Elite architecture](docs/ADR-001-fork-base.md)
