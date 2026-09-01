@@ -30,7 +30,7 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 
 **Problem:** RT tasks monopolize CPU → EXT scheduler tasks stall → kernel watchdog ejects the BPF scheduler ([sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202)).
 
-**Status:** **Verified fix** on sched_ext kernel (Contabo VPS, `REAL_ONLY=1`). Upstream PR [#3780](https://github.com/sched-ext/scx/pull/3780) open — issue [#1202](https://github.com/sched-ext/scx/issues/1202) remains **open** until merge.
+**Status:** **Development in progress** — verified on Contabo sched_ext kernel (`REAL_ONLY=1`). Upstream PR withdrawn temporarily while we finish dev (scx_loader, full gate matrix). Issue [#1202](https://github.com/sched-ext/scx/issues/1202) open.
 
 **Solution (verified on real VPS, `REAL_ONLY=1`, no mocks):**
 

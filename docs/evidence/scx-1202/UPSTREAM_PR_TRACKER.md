@@ -6,9 +6,8 @@
 
 | Field | Value |
 |-------|-------|
-| PR | https://github.com/sched-ext/scx/pull/3780 |
-| Branch | `abdullahhanif-001:rt-guard-scx-1202` |
-| Status | **OPEN — awaiting maintainer review** |
+| PR | ~~#3780~~ **CLOSED** (withdrawn for dev — reopen when ready) |
+| Status | **Development in progress** — not ready for maintainer review |
 | Fixes | [#1202](https://github.com/sched-ext/scx/issues/1202) |
 | Issue comment | https://github.com/sched-ext/scx/issues/1202#issuecomment-5489342030 |
 
