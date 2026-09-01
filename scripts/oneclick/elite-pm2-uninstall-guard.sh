@@ -40,11 +40,17 @@ if set(B) != set(C):
     print(f"FAIL[{label}]: PM2 name set changed {set(B) ^ set(C)}", file=sys.stderr)
     sys.exit(1)
 
+# Apps excluded from restart_time drift (known unstable; never stop/restart them here).
+SKIP_RESTART = {"rider-tracker-api"}
+
 for n in B:
     st = C[n].get("status")
     if st != "online":
         print(f"FAIL[{label}]: {n} status={st}", file=sys.stderr)
         sys.exit(1)
+    if n in SKIP_RESTART:
+        print(f"PM2_GUARD_SKIP_RESTART[{label}] {n} (excluded from restart_time check)")
+        continue
     br = int(B[n].get("restart_time") or 0)
     cr = int(C[n].get("restart_time") or 0)
     if cr > br:

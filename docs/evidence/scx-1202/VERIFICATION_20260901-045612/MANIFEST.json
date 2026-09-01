@@ -1,0 +1,19 @@
+{
+  "verification_stamp": "20260901-045612",
+  "commit_sha": "694556c4641f739236993f1f00d50e593f8bf2b4",
+  "kernel": "6.19.0-rc7-g9854922412d3-dirty",
+  "host_class": "Contabo VPS 4vCPU sched_ext",
+  "real_only": 1,
+  "gates": [
+    "rt-guard-pass",
+    "holy-grail-verify",
+    "global-ebpf-aggregate",
+    "rt-guard-flood-aggregate"
+  ],
+  "verdicts": {
+    "RT_GUARD_PASS": "fail=0",
+    "HOLY_GRAIL": "12/12",
+    "GLOBAL_EBPF": "fail=0",
+    "RT_GUARD_FLOOD": "fail=0"
+  }
+}

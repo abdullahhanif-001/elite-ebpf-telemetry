@@ -39,6 +39,7 @@ jobs:
           bash -n scripts/oneclick/gates-checklist.sh
           bash -n scripts/oneclick/write-phase-b-reports.sh
           bash -n scripts/oneclick/ebpf-xray-real-proof.sh
+          for f in benchmarks/ebpf-gates/*.sh; do bash -n "$f"; done
           bash -n scripts/oneclick/elite-run-complete.sh
           bash -n scripts/oneclick/elite-zero-buffer-complete.sh
           bash -n scripts/oneclick/traffic-engine-proof.sh

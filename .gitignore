@@ -55,3 +55,19 @@ bin
 .eslintcache
 .stylelintcache
 
+# VPS proof runs (local only — publish docs/GLOBAL_EBPF_VERIFICATION_REPORT.md instead)
+scripts/oneclick/results/**/*
+!scripts/oneclick/results/.gitkeep
+
+# Private session / interview artifacts
+docs/MICROSOFT_INTERVIEW_REPORT.md
+docs/MICROSOFT_REVIEW_PACK.md
+
+# Windows duplicate path artifacts
+benchmarks\\**
+
+# Committed SCX#1202 evidence (verdict bundles only; raw oneclick logs stay ignored)
+!docs/evidence/scx-1202/README.md
+!docs/evidence/scx-1202/IMPLEMENTATION_STATUS.md
+!docs/evidence/scx-1202/VERIFICATION_*/
+!docs/evidence/scx-1202/VERIFICATION_*/**
