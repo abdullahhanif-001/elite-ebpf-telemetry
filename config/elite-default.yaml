@@ -41,7 +41,6 @@ metrics:
   disableCompression: true
   probes:
     - name: socketlatency
-    - name: kernellatency
     - name: softirq
     - name: packetloss
     - name: tcpsummary
@@ -50,7 +49,6 @@ metrics:
 event:
   probes:
     - name: socketlatency
-    - name: kernellatency
     - name: connecttrace
     - name: packetloss
   sinks:

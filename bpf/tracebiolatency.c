@@ -81,7 +81,7 @@ int biolat_finish(struct pt_regs *ctx)
            struct insp_biolat_event_t event = {0};
            event.latency = latency;
            event.pid = biot->pid;
-           bpf_probe_read(&event.target,sizeof(event.target),&biot->target);
+           bpf_probe_read_kernel(&event.target,sizeof(event.target),&biot->target);
            bpf_perf_event_output(ctx, &insp_biolat_evts, BPF_F_CURRENT_CPU, &event, sizeof(event));
 	   }
        bpf_map_delete_elem(&insp_biolat_entry, &rq);

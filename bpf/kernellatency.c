@@ -92,10 +92,10 @@ static inline int update_rxlat(void *ctx, struct sk_buff * skb, struct rxlatency
             event.cpu = bpf_get_smp_processor_id();
 			event.direction = RX_KLATENCY;
 			event.latency = latency;
-			bpf_probe_read(&event.point1,sizeof(event.point1),&lat->rcv);
-			bpf_probe_read(&event.point2,sizeof(event.point1),&lat->rcvfinish);
-			bpf_probe_read(&event.point3,sizeof(event.point1),&lat->local);
-			bpf_probe_read(&event.point4,sizeof(event.point1),&lat->localfinish);
+			bpf_probe_read_kernel(&event.point1,sizeof(event.point1),&lat->rcv);
+			bpf_probe_read_kernel(&event.point2,sizeof(event.point1),&lat->rcvfinish);
+			bpf_probe_read_kernel(&event.point3,sizeof(event.point1),&lat->local);
+			bpf_probe_read_kernel(&event.point4,sizeof(event.point1),&lat->localfinish);
 			bpf_perf_event_output(ctx, &insp_klatency_event, BPF_F_CURRENT_CPU, &event, sizeof(event));
 		}
 	}
@@ -116,10 +116,10 @@ static inline int update_txlat(void *ctx, struct sk_buff * skb, struct txlatency
             event.cpu = bpf_get_smp_processor_id();
 			event.direction = TX_KLATENCY;
 			event.latency = latency;
-			bpf_probe_read(&event.point1,sizeof(event.point1),&lat->queuexmit);
-			bpf_probe_read(&event.point2,sizeof(event.point1),&lat->local);
-			bpf_probe_read(&event.point3,sizeof(event.point1),&lat->output);
-			bpf_probe_read(&event.point4,sizeof(event.point1),&lat->finish);
+			bpf_probe_read_kernel(&event.point1,sizeof(event.point1),&lat->queuexmit);
+			bpf_probe_read_kernel(&event.point2,sizeof(event.point1),&lat->local);
+			bpf_probe_read_kernel(&event.point3,sizeof(event.point1),&lat->output);
+			bpf_probe_read_kernel(&event.point4,sizeof(event.point1),&lat->finish);
 			// bpf_core_read(&event.latency,sizeof(event.latency),&lat);
 			bpf_perf_event_output(ctx, &insp_klatency_event, BPF_F_CURRENT_CPU, &event, sizeof(event));
 		}

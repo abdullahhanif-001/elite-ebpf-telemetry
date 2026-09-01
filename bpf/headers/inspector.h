@@ -65,7 +65,7 @@ static __always_inline u16 get_sock_protocol(struct sock *sock) {
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0))
   // kernel 4.18-5.5: sk_protocol bit-field: use sk_gso_max_segs field and go
   // back 24 bits to reach sk_protocol field index.
-  bpf_probe_read(&protocol, 1, (void *)(&sock->sk_gso_max_segs) - 3);
+  bpf_probe_read_kernel(&protocol, 1, (void *)(&sock->sk_gso_max_segs) - 3);
 #else
   // kernel 5.6
   protocol = READ_KERN(sock->sk_protocol);
@@ -195,7 +195,7 @@ static __always_inline int set_tuple(struct sk_buff *skb, struct tuple *tpl) {
     return -1;
 
   ip = (struct iphdr *)(skb_head + l3_off);
-  bpf_probe_read(&iphdr_first_byte, 1, ip);
+  bpf_probe_read_kernel(&iphdr_first_byte, 1, ip);
   ip_vsn = iphdr_first_byte >> 4;
   ihl = iphdr_first_byte & 0x0f;
 
@@ -204,18 +204,18 @@ static __always_inline int set_tuple(struct sk_buff *skb, struct tuple *tpl) {
       return -1;
     if (l3_off + (ihl * 4) > skb_len)
       return -1;
-    bpf_probe_read(&tpl->saddr, sizeof(tpl->saddr.v4addr), &ip->saddr);
-    bpf_probe_read(&tpl->daddr, sizeof(tpl->daddr.v4addr), &ip->daddr);
-    bpf_probe_read(&tpl->l4_proto, 1, &ip->protocol);
+    bpf_probe_read_kernel(&tpl->saddr, sizeof(tpl->saddr.v4addr), &ip->saddr);
+    bpf_probe_read_kernel(&tpl->daddr, sizeof(tpl->daddr.v4addr), &ip->daddr);
+    bpf_probe_read_kernel(&tpl->l4_proto, 1, &ip->protocol);
     tpl->l3_proto = ETH_P_IP;
     l4_off = l3_off + (ihl * 4);
   } else if (ip_vsn == 6) {
     if (l3_off + sizeof(struct ipv6hdr) > skb_len)
       return -1;
     struct ipv6hdr *ip6 = (struct ipv6hdr *)ip;
-    bpf_probe_read(&tpl->saddr, sizeof(tpl->saddr), &ip6->saddr);
-    bpf_probe_read(&tpl->daddr, sizeof(tpl->daddr), &ip6->daddr);
-    bpf_probe_read(&tpl->l4_proto, 1, &ip6->nexthdr);
+    bpf_probe_read_kernel(&tpl->saddr, sizeof(tpl->saddr), &ip6->saddr);
+    bpf_probe_read_kernel(&tpl->daddr, sizeof(tpl->daddr), &ip6->daddr);
+    bpf_probe_read_kernel(&tpl->l4_proto, 1, &ip6->nexthdr);
     tpl->l3_proto = ETH_P_IPV6;
     l4_off = l3_off + sizeof(struct ipv6hdr);
   } else {
@@ -229,14 +229,14 @@ static __always_inline int set_tuple(struct sk_buff *skb, struct tuple *tpl) {
     if (l4_off + sizeof(struct tcphdr) > skb_len)
       return -1;
     struct tcphdr *tcp = (struct tcphdr *)(skb_head + l4_off);
-    bpf_probe_read(&tpl->sport, sizeof(tpl->sport), &tcp->source);
-    bpf_probe_read(&tpl->dport, sizeof(tpl->dport), &tcp->dest);
+    bpf_probe_read_kernel(&tpl->sport, sizeof(tpl->sport), &tcp->source);
+    bpf_probe_read_kernel(&tpl->dport, sizeof(tpl->dport), &tcp->dest);
   } else if (tpl->l4_proto == IPPROTO_UDP) {
     if (l4_off + sizeof(struct udphdr) > skb_len)
       return -1;
     struct udphdr *udp = (struct udphdr *)(skb_head + l4_off);
-    bpf_probe_read(&tpl->sport, sizeof(tpl->sport), &udp->source);
-    bpf_probe_read(&tpl->dport, sizeof(tpl->dport), &udp->dest);
+    bpf_probe_read_kernel(&tpl->sport, sizeof(tpl->sport), &udp->source);
+    bpf_probe_read_kernel(&tpl->dport, sizeof(tpl->dport), &udp->dest);
   }
 
   tpl->sport = bpf_htons(tpl->sport);
@@ -271,12 +271,15 @@ static __always_inline void set_tuple_sock(struct sock *sk, struct tuple *tpl) {
   short unsigned int skc_family;
   skc_family = BPF_CORE_READ(sk, __sk_common.skc_family);
   if (skc_family == PF_INET6) {
-    // TODO: add v6 sock support
+    bpf_probe_read_kernel(&tpl->saddr, sizeof(tpl->saddr),
+                        &sk->__sk_common.skc_v6_rcv_saddr);
+    bpf_probe_read_kernel(&tpl->daddr, sizeof(tpl->daddr),
+                        &sk->__sk_common.skc_v6_daddr);
     tpl->l3_proto = ETH_P_IPV6;
   } else {
-    bpf_probe_read(&tpl->saddr, sizeof(tpl->saddr.v4addr),
+    bpf_probe_read_kernel(&tpl->saddr, sizeof(tpl->saddr.v4addr),
                    &sk->__sk_common.skc_rcv_saddr);
-    bpf_probe_read(&tpl->daddr, sizeof(tpl->daddr.v4addr),
+    bpf_probe_read_kernel(&tpl->daddr, sizeof(tpl->daddr.v4addr),
                    &sk->__sk_common.skc_daddr);
     tpl->l3_proto = ETH_P_IP;
   }

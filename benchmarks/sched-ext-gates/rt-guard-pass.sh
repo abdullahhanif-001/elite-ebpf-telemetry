@@ -19,6 +19,14 @@ fi
 
 log_gate() { echo "[G$1] $2" | tee -a "${OUT}/gates.log"; }
 
+sched_ext_enabled() {
+  if [[ "${RUN_LOCAL}" -eq 1 ]]; then
+    [[ -f "/boot/config-$(uname -r)" ]] && grep -q '^CONFIG_SCHED_CLASS_EXT=y' "/boot/config-$(uname -r)" 2>/dev/null
+  else
+    vps_cmd "test -f /boot/config-\$(uname -r) && grep -q '^CONFIG_SCHED_CLASS_EXT=y' /boot/config-\$(uname -r)" 2>/dev/null
+  fi
+}
+
 vps_cmd() {
   if [[ "${RUN_LOCAL}" -eq 1 ]]; then
     bash -c "$*"
@@ -80,7 +88,12 @@ if vps_cmd "test -f ${SCX_KERNEL_BUILD}/tools/testing/selftests/sched_ext/rt_gua
     FAIL=$((FAIL + 1))
   fi
 else
-  log_gate 3 "SKIP (install contrib selftest via sched-ext-vps-prep.sh apply-patches)"
+  if sched_ext_enabled; then
+    log_gate 3 "FAIL (rt_guard_stress missing on sched_ext kernel)"
+    FAIL=$((FAIL + 1))
+  else
+    log_gate 3 "SKIP (sched_ext not enabled)"
+  fi
 fi
 
 # G4: issue #1202 repro — must NOT stall after fix
@@ -92,6 +105,9 @@ if RUN_LOCAL="${RUN_LOCAL}" bash "${GATES_DIR}/rt-monopolization-repro.sh" | tee
     FAIL=$((FAIL + 1))
   elif grep -q 'STALL_DETECTED=YES' "${OUT}/g4-repro.log" 2>/dev/null; then
     log_gate 4 "FAIL stall detected in repro"
+    FAIL=$((FAIL + 1))
+  elif sched_ext_enabled && grep -qE 'LOADER=SKIP' "${OUT}/g4-repro.log" 2>/dev/null; then
+    log_gate 4 "FAIL scx_loader required on sched_ext kernel"
     FAIL=$((FAIL + 1))
   else
     log_gate 4 "PASS no stall"
@@ -124,9 +140,17 @@ fi
 echo "SOAK_PASS"
 REMOTE
   if grep -q 'SKIP scx_loader' "${OUT}/g6-soak.log"; then
-    log_gate 6 "SKIP (scx_loader not built)"
-  else
+    if sched_ext_enabled; then
+      log_gate 6 "FAIL scx_loader required on sched_ext kernel"
+      FAIL=$((FAIL + 1))
+    else
+      log_gate 6 "SKIP (sched_ext not enabled)"
+    fi
+  elif grep -q 'SOAK_PASS' "${OUT}/g6-soak.log"; then
     log_gate 6 "PASS"
+  else
+    log_gate 6 "FAIL soak"
+    FAIL=$((FAIL + 1))
   fi
 else
   log_gate 6 "FAIL"

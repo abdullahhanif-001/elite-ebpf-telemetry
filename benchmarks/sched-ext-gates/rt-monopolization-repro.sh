@@ -51,6 +51,12 @@ if grep -qE 'runnable task stall|SCX_EXIT_ERROR_STALL|sched_ext.*disabled' /tmp/
 else
   echo "STALL_DETECTED=NO"
 fi
+if [[ "${REAL_ONLY}" == "1" ]] && test -f "/boot/config-$(uname -r)" && grep -q '^CONFIG_SCHED_CLASS_EXT=y' "/boot/config-$(uname -r)"; then
+  if ! command -v scx_loader >/dev/null 2>&1; then
+    echo "FAIL: REAL_ONLY=1 requires scx_loader on sched_ext kernel" >&2
+    exit 1
+  fi
+fi
 REMOTE
 }
 

@@ -1,6 +1,6 @@
 module github.com/kubeskoop/webconsole
 
-go 1.25.0
+go 1.25.7
 
 require (
 	github.com/appleboy/gin-jwt/v2 v2.10.3

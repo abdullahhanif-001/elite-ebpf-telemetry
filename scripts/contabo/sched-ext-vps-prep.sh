@@ -171,6 +171,35 @@ PY
   log "patches applied — rebuild kernel if watchdog patch was new"
 }
 
+phase_scx_loader_build() {
+  log "building scx_loader"
+  cd "${SCX_ROOT}"
+  source "${HOME}/.cargo/env" 2>/dev/null || true
+  local loader_dir=""
+  for candidate in rust/scx_loader scx_loader loader/scx_loader; do
+    if [[ -f "${SCX_ROOT}/${candidate}/Cargo.toml" ]]; then
+      loader_dir="${SCX_ROOT}/${candidate}"
+      break
+    fi
+  done
+  if [[ -z "${loader_dir}" ]]; then
+    log "WARN scx_loader Cargo.toml not found under ${SCX_ROOT}"
+    return 1
+  fi
+  (cd "${loader_dir}" && cargo build --release) 2>&1 | tee /tmp/scx-loader-build.log
+  local bin="${loader_dir}/target/release/scx_loader"
+  if [[ ! -x "${bin}" ]]; then
+    bin="${SCX_ROOT}/target/release/scx_loader"
+  fi
+  if [[ -x "${bin}" ]]; then
+    install -m 0755 "${bin}" /usr/local/bin/scx_loader
+    log "scx_loader installed to /usr/local/bin/scx_loader"
+  else
+    log "FAIL scx_loader binary missing after build"
+    return 1
+  fi
+}
+
 phase_verify() {
   log "verify sched_ext"
   k="$(uname -r)"
@@ -198,6 +227,7 @@ run_phase() {
     kernel-install) phase_kernel_install ;;
     scx-clone) phase_scx_clone ;;
     scx-build) phase_scx_build ;;
+    scx-loader-build) phase_scx_loader_build ;;
     apply-patches) phase_apply_patches ;;
     verify) phase_verify ;;
     all)
@@ -208,8 +238,9 @@ run_phase() {
       phase_kernel_build
       phase_kernel_install
       phase_scx_clone
+      phase_scx_build
       phase_apply_patches
-      log "REBOOT REQUIRED — then run: $0 verify && $0 scx-build"
+      log "REBOOT REQUIRED — then run: $0 verify && $0 scx-loader-build"
       ;;
     *) echo "unknown phase: $1"; exit 1 ;;
   esac

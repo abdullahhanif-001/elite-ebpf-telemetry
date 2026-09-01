@@ -1,4 +1,4 @@
-# sched_ext: Add scx_rt_guard RT preemption interceptor (fixes #1202)
+# sched_ext: Add scx_rt_guard RT preemption interceptor (draft for sched-ext/scx)
 
 ## Summary
 
@@ -18,15 +18,18 @@ the pattern from scx_qmap (kernel >= 6.19, a3f5d48).
 - `tools/testing/selftests/sched_ext/rt_guard_stress.c`
 - `tools/testing/selftests/sched_ext/rt_guard_stress.bpf.c`
 
-## Test plan (verified on Contabo sched_ext kernel)
+## Test plan (must pass before upstream PR)
 
 Evidence: [`docs/evidence/scx-1202/`](../../docs/evidence/scx-1202/) — run `bash scripts/verify-scx-1202-evidence.sh` from repo root.
 
-- [x] rt_stall kselftest PASS — `VERIFICATION_*/01-RT_GUARD_PASS.verdict` (`RT_GUARD_PASS fail=0`)
-- [x] rt_guard_stress 60s soak — same bundle (G3 in rt-guard-pass)
-- [x] Issue #1202 repro `STALL_DETECTED=NO` — `VERIFICATION_*/02-HOLY_GRAIL.verdict` (H5)
-- [x] PM2_GUARD_OK — see [GLOBAL_EBPF_VERIFICATION_REPORT.md](../../docs/GLOBAL_EBPF_VERIFICATION_REPORT.md) §Runtime Environment
+- [ ] `RT_GUARD_PASS fail=0` on sched_ext kernel (G0–G6, no SKIP when sched_ext enabled)
+- [ ] `rt_stall` kselftest PASS
+- [ ] `rt_guard_stress` 60s soak PASS
+- [ ] Issue #1202 repro `STALL_DETECTED=NO` with `LOADER=bpfland` (not SKIP)
+- [ ] `scx_loader` built and on PATH for G6 soak
+
+**Status:** Development in progress. Previous PR #3780 withdrawn. Issue #1202 remains open until full gate matrix passes on DO VPS (`143.244.164.216`).
 
 Reproduce: [`docs/evidence/scx-1202/README.md`](../../docs/evidence/scx-1202/README.md)
 
-Fixes sched-ext/scx#1202
+Related: sched-ext/scx#1202 (not yet closed)

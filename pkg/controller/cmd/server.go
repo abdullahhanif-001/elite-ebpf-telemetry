@@ -32,6 +32,13 @@ const (
 	defaultHTTPPort  = 10264
 )
 
+func controllerBindAddr() string {
+	if v := strings.TrimSpace(os.Getenv("ELITE_CONTROLLER_BIND")); v != "" {
+		return v
+	}
+	return "127.0.0.1"
+}
+
 type Server struct {
 	config         ServerConfig
 	controller     service.ControllerService
@@ -74,7 +81,7 @@ func (s *Server) RunAgentServer(port int, done <-chan struct{}) {
 	rpc.RegisterControllerRegisterServiceServer(grpcServer, s.controller)
 	rpc.RegisterIPCacheServiceServer(grpcServer, s.ipCacheService)
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", controllerBindAddr(), port))
 	if err != nil {
 		log.Fatalf("err listen on %d: %v", port, err)
 	}
@@ -110,7 +117,7 @@ func (s *Server) RunHTTPServer(port int, done <-chan struct{}) {
 	r.PUT("/config", s.UpdateExporterConfig)
 
 	go func() {
-		err := r.Run(fmt.Sprintf("0.0.0.0:%d", port))
+		err := r.Run(fmt.Sprintf("%s:%d", controllerBindAddr(), port))
 		if err != nil {
 			log.Fatalf("error run http server: %v", err)
 		}

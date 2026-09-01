@@ -1,6 +1,6 @@
 module github.com/alibaba/kubeskoop/test/skoop
 
-go 1.25.0
+go 1.25.7
 
 require github.com/alibaba/kubeskoop/pkg/skoop v0.0.0
 
