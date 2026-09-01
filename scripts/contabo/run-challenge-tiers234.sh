@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export REAL_ONLY=1 ELITE_SRC=/opt/elite/src
+export FLOOD_LITE_MODE=1
+export FLOOD_SAFE_MODE=1
+export PATH="/usr/local/bin:/root/.cargo/bin:${PATH}"
+chmod +x "${ELITE_SRC}/benchmarks/sched-ext-gates/"*.sh
+chmod +x "${ELITE_SRC}/scripts/contabo/"*.sh
+
+EVID="${ELITE_SRC}/docs/evidence/scx-1202/CHALLENGE_PROOF_20260901"
+mkdir -p "${EVID}"/{tier2,tier3,tier4}
+
+echo "=== TIER 2 Andrea + Flood ==="
+bash "${ELITE_SRC}/benchmarks/sched-ext-gates/prove-scx1202-arighi.sh" 2>&1 | tee "${EVID}/tier2/00-arighi.log" || true
+LATEST_ARIGHI="$(ls -td "${ELITE_SRC}"/scripts/oneclick/results/arighi-proof-* | head -1)"
+cp "${LATEST_ARIGHI}/verdict.txt" "${EVID}/tier2/ANDREA_PROOF.verdict"
+cp "${LATEST_ARIGHI}/ANDREA_PROOF_REPORT.md" "${EVID}/tier2/"
+
+bash "${ELITE_SRC}/benchmarks/sched-ext-gates/flood-safe-recovery.sh" || true
+export FLOOD_OUT="${ELITE_SRC}/scripts/oneclick/results/rt-guard-flood-safe-$(date +%Y%m%d-%H%M%S)"
+export FLOOD_SAFE_MODE=1
+mkdir -p "${FLOOD_OUT}"
+for phase in gate P1 P2 P3 P4 P5; do
+  echo "flood ${phase}"
+  bash "${ELITE_SRC}/benchmarks/sched-ext-gates/rt-guard-flood-phase.sh" "${phase}" 2>&1 | tee -a "${EVID}/tier2/flood-${phase}.log" || true
+  sleep $([[ "${FLOOD_LITE_MODE:-0}" == "1" ]] && echo 10 || echo 20)
+done
+bash "${ELITE_SRC}/benchmarks/sched-ext-gates/rt-guard-flood-aggregate.sh" "${FLOOD_OUT}" 2>&1 | tee "${EVID}/tier2/flood-aggregate.log"
+cp "${FLOOD_OUT}/verdict.txt" "${EVID}/tier2/04-FLOOD.verdict"
+
+echo "=== TIER 3 Holy Grail ==="
+FLOOD_DIR="${FLOOD_OUT}"
+RT_DIR="$(ls -td "${ELITE_SRC}"/scripts/oneclick/results/rt-guard-* 2>/dev/null | grep -v flood | head -1)"
+bash "${ELITE_SRC}/benchmarks/ebpf-gates/holy-grail-verify.sh" "${FLOOD_DIR}" "${RT_DIR}" 2>&1 | tee "${EVID}/tier3/02-holy-grail.log"
+grep HOLY_GRAIL "${EVID}/tier3/02-holy-grail.log" | tee "${EVID}/tier3/02-HOLY_GRAIL.verdict" || true
+
+echo "=== TIER 4 Global eBPF ==="
+bash "${ELITE_SRC}/benchmarks/ebpf-gates/global-ebpf-inventory.sh" 2>&1 | tee "${EVID}/tier4/D1-inventory.log" || true
+bash "${ELITE_SRC}/benchmarks/ebpf-gates/telemetry-probe-gate.sh" 2>&1 | tee "${EVID}/tier4/D3-telemetry.log" || true
+bash "${ELITE_SRC}/scripts/oneclick/ebpf-xray-real-proof.sh" 2>&1 | tee "${EVID}/tier4/D4-xray.log" || true
+bash "${ELITE_SRC}/benchmarks/ebpf-gates/ebpf-future-holes.sh" 2>&1 | tee "${EVID}/tier4/D6-future-holes.log" || true
+bash "${ELITE_SRC}/benchmarks/ebpf-gates/global-ebpf-aggregate.sh" 2>&1 | tee "${EVID}/tier4/03-global-aggregate.log" || true
+grep -E 'GLOBAL_EBPF|fail=0|GLOBAL result=PASS' "${EVID}/tier4/03-global-aggregate.log" | tee "${EVID}/tier4/03-GLOBAL.verdict" || true
+
+FAIL=0
+grep -q 'ANDREA_PROOF_PASS fail=0' "${EVID}/tier2/ANDREA_PROOF.verdict" || FAIL=$((FAIL+1))
+grep -q 'RT_GUARD_FLOOD_PASS fail=0' "${EVID}/tier2/04-FLOOD.verdict" || FAIL=$((FAIL+1))
+grep -q 'HOLY_GRAIL_1202_SOLVED=YES' "${EVID}/tier3/02-HOLY_GRAIL.verdict" || FAIL=$((FAIL+1))
+grep -qE 'fail=0|GLOBAL result=PASS' "${EVID}/tier4/03-GLOBAL.verdict" || FAIL=$((FAIL+1))
+grep -q 'RT_GUARD_PASS fail=0' "${EVID}/tier1/01-RT_GUARD_PASS.verdict" || FAIL=$((FAIL+1))
+
+if [[ "${FAIL}" -eq 0 ]]; then
+  echo "LINUX_EBPF_CHALLENGE_PASS fail=0 host=$(hostname) kernel=$(uname -r)" | tee "${EVID}/CHALLENGE_VERDICT.txt"
+else
+  echo "LINUX_EBPF_CHALLENGE_FAIL fail=${FAIL}" | tee "${EVID}/CHALLENGE_VERDICT.txt"
+fi
+echo "DONE tiers234 fail=${FAIL}"

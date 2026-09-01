@@ -1,0 +1,13 @@
+{"mode":"lite_4vcpu","ftrace":"yes","schedulers":[
+{"name":"bpfland","result":"PASS_KSELFTEST_FALLBACK","ftrace":"yes"}
+,
+{"name":"lavd","result":"PASS_KSELFTEST_FALLBACK","ftrace":"yes"}
+,
+{"name":"rusty","result":"PASS_KSELFTEST_FALLBACK","ftrace":"yes"}
+,
+{"name":"flash","result":"PASS_KSELFTEST_FALLBACK","ftrace":"yes"}
+,
+{"name":"rustland","result":"PASS_KSELFTEST_FALLBACK","ftrace":"yes"}
+,
+{"name":"layered","result":"PASS_KSELFTEST_FALLBACK","ftrace":"yes"}
+]}

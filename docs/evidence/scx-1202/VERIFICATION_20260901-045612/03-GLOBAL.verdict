@@ -1,7 +1,7 @@
-HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=vmi3469243
-RT_GUARD_FLOOD_PASS fail=0 mode=safe_4vcpu host=vmi3469243 kernel=6.19.0-rc7-g9854922412d3-dirty
-HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=vmi3469243
-GLOBAL_EBPF_SUMMARY host=vmi3469243 kernel=6.19.0-rc7-g9854922412d3-dirty
-holy_grail=HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=vmi3469243
+HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
+RT_GUARD_FLOOD_PASS fail=0 mode=safe_4vcpu host=##### kernel=6.19.0-rc7-g9854922412d3-dirty
+HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
+GLOBAL_EBPF_SUMMARY host=##### kernel=6.19.0-rc7-g9854922412d3-dirty
+holy_grail=HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
 fail=0
 OUR_GOAL_LOG phase=GLOBAL result=PASS

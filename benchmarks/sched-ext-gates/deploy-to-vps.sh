@@ -17,6 +17,9 @@ scp ${SCX_SSH_OPTS} -r "${ROOT}/benchmarks/sched-ext-gates" "${HOST}:${DEST}/ben
 scp ${SCX_SSH_OPTS} -r "${ROOT}/benchmarks/ebpf-gates" "${HOST}:${DEST}/benchmarks/"
 # shellcheck disable=SC2086
 scp ${SCX_SSH_OPTS} "${ROOT}/scripts/contabo/sched-ext-vps-prep.sh" "${HOST}:${DEST}/scripts/contabo/"
+scp ${SCX_SSH_OPTS} "${ROOT}/scripts/contabo/run-linux-ebpf-challenge-proof.sh" "${HOST}:${DEST}/scripts/contabo/"
+scp ${SCX_SSH_OPTS} "${ROOT}/scripts/contabo/run-scx-1202-evidence.sh" "${HOST}:${DEST}/scripts/contabo/"
+scp ${SCX_SSH_OPTS} "${ROOT}/scripts/verify-scx-1202-evidence.sh" "${HOST}:${DEST}/scripts/"
 # shellcheck disable=SC2086
 scp ${SCX_SSH_OPTS} "${ROOT}/scripts/contabo/apply-rt-watchdog-patch.sh" "${HOST}:${DEST}/scripts/contabo/"
 # shellcheck disable=SC2086

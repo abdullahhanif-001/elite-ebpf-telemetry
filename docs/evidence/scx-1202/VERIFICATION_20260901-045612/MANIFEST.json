@@ -2,7 +2,7 @@
   "verification_stamp": "20260901-045612",
   "commit_sha": "694556c4641f739236993f1f00d50e593f8bf2b4",
   "kernel": "6.19.0-rc7-g9854922412d3-dirty",
-  "host_class": "Contabo VPS 4vCPU sched_ext",
+  "host_class": "sched_ext proof host 4vCPU sched_ext",
   "real_only": 1,
   "gates": [
     "rt-guard-pass",

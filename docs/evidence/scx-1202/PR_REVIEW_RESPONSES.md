@@ -26,7 +26,7 @@ Evidence: `RT_GUARD_PASS fail=0` — https://github.com/abdullahhanif-001/elite-
 
 ## If code changes requested
 
-Re-run on Contabo:
+Re-run on sched_ext proof host:
 
 ```bash
 export REAL_ONLY=1 ELITE_SRC=/opt/elite/src

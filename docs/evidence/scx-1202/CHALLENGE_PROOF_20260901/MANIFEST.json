@@ -1,0 +1,9 @@
+{
+  "challenge_stamp": "20260901",
+  "commit_sha": "unknown",
+  "kernel": "6.19.0-rc7-g9854922412d3-dirty",
+  "host_class": "sched_ext proof host 4vCPU 8GB lite flood",
+  "flood_lite_mode": 1,
+  "real_only": 1,
+  "tiers": ["T1-SCX-core", "T2-Andrea-flood-lite", "T3-Holy-Grail", "T4-Global-eBPF"]
+}

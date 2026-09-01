@@ -1,0 +1,4 @@
+RT_GUARD_FLOOD_PASS fail=0 mode=safe_4vcpu host=##### kernel=6.19.0-rc7-g9854922412d3-dirty
+GLOBAL_EBPF_SUMMARY host=##### kernel=6.19.0-rc7-g9854922412d3-dirty
+fail=0
+OUR_GOAL_LOG phase=GLOBAL result=PASS

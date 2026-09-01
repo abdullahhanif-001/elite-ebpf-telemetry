@@ -1,0 +1,6 @@
+[safe-gate] sched_ext=YES kernel=6.19.0-rc7-g9854922412d3-dirty
+[safe-gate] swap=YES
+[safe-gate] mem_avail=7033MB (>=4096MB)
+[safe-gate] load_1m=2.56 (<3.0)
+[safe-gate] no_build_jobs=OK
+FLOOD_SAFE_GATE_PASS host=##### avail_mb=7033 load=2.56

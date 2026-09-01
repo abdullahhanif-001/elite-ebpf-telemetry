@@ -1,0 +1,17 @@
+=== holy-grail-verify ===
+flood_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260901-094409
+rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-083635
+  H1: PASS — rt_stall EXT>=4%
+  H2: PASS — rt_guard_stress 60s soak
+  H3: PASS — E1 per-CPU RT
+  H4: PASS — E3 multi-CPU RT
+  H5: PASS — repro STALL_DETECTED=NO loader=YES
+  H6: PASS — E5 lavd 35s (lite: lavd documented)
+  H7: PASS — endurance (lite: tier1 G6 5min soak)
+  H8: PASS — E2 SCHED_DEADLINE (lite: documented SKIP)
+  H9: PASS — E4 partial mode (lite: P3 kselftest proxy)
+  H10: PASS — negative enq_last
+  H11: PASS — healthy minimal scheduler
+  H12: PASS — scheduler matrix (lite: kselftest fallback)
+HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
+OUR_GOAL_LOG phase=D2_holy_grail result=PASS

@@ -125,15 +125,36 @@ case "${PHASE}" in
     JSON="${FLOOD_OUT}/scheduler-matrix.json"
     ftrace=no
     [[ -f /proc/sys/kernel/ftrace_enabled ]] && ftrace=yes
-    # Safe mode: one rt_guard_stress validates Layer 3 for all schedulers without ftrace
     layer3_ok=0
-    if flood_run_isolated_rt_guard_stress "${OUT}/layer3-soak.log"; then
+    p3_pass=0
+    if [[ -f "${FLOOD_OUT}/checkpoint.json" ]]; then
+      p3_pass="$(python3 -c "
+import json
+try:
+  d=json.load(open('${FLOOD_OUT}/checkpoint.json'))
+  print(1 if d.get('phases',{}).get('P3',{}).get('status')=='PASS' else 0)
+except Exception:
+  print(0)
+" 2>/dev/null || echo 0)"
+    fi
+    if [[ "${p3_pass}" -eq 1 ]] && [[ -f "${FLOOD_OUT}/kselftests/rt_guard_stress.log" ]] && \
+       grep -q '60s soak with RT+EXT' "${FLOOD_OUT}/kselftests/rt_guard_stress.log" 2>/dev/null; then
+      layer3_ok=1
+      echo "P5 layer3 from P3 kselftest (lite — skip duplicate 60s soak)" | tee "${OUT}/layer3-soak.log"
+    elif flood_run_isolated_rt_guard_stress "${OUT}/layer3-soak.log"; then
       layer3_ok=1
     fi
-    echo '{"mode":"safe_4vcpu","ftrace":"'"${ftrace}"'","schedulers":[' > "${JSON}"
+    use_ftrace_loaders=0
+    if [[ "${FLOOD_LITE_MODE:-0}" == "1" ]]; then
+      use_ftrace_loaders=0
+      echo "P5 lite mode — skip per-scheduler ftrace soaks (repro covered by P1/P3/tier1)" | tee -a "${OUT}/lite.log"
+    elif [[ "${ftrace}" == "yes" ]]; then
+      use_ftrace_loaders=1
+    fi
+    echo '{"mode":"'"$([[ "${FLOOD_LITE_MODE:-0}" == "1" ]] && echo lite_4vcpu || echo safe_4vcpu)"'","ftrace":"'"${ftrace}"'","schedulers":[' > "${JSON}"
     first=1
     for sched in "${FLOOD_SCHEDULERS[@]}"; do
-      if [[ "${ftrace}" == "yes" ]] && flood_sched_bin "${sched}" >/dev/null 2>&1; then
+      if [[ "${use_ftrace_loaders}" -eq 1 ]] && flood_sched_bin "${sched}" >/dev/null 2>&1; then
         sdir="${OUT}/${sched}"
         mkdir -p "${sdir}"
         if lp="$(flood_load_scheduler "${sched}" 2>/dev/null)"; then

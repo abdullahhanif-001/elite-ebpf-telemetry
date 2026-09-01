@@ -1,0 +1,1 @@
+LINUX_EBPF_CHALLENGE_PASS fail=0 host=##### kernel=6.19.0-rc7-g9854922412d3-dirty mode=lite

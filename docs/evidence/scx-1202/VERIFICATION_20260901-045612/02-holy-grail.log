@@ -13,5 +13,5 @@ rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-065612
   H10: PASS — negative enq_last
   H11: PASS — healthy minimal scheduler
   H12: PASS — 6/6 PASS_LOADER (5/6+lavd SKIP ok)
-HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=vmi3469243
+HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
 OUR_GOAL_LOG phase=D2_holy_grail result=PASS
