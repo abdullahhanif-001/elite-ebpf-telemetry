@@ -26,6 +26,43 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 
 ---
 
+## sched_ext RT Guard — [scx#1202](https://github.com/sched-ext/scx/issues/1202) solved
+
+**Problem:** RT tasks monopolize CPU → EXT scheduler tasks stall → kernel watchdog ejects the BPF scheduler ([sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202)).
+
+**Solution (verified on real VPS, `REAL_ONLY=1`, no mocks):**
+
+| Layer | Fix | Artifact |
+|-------|-----|----------|
+| L1 | ext_server DL server | Andrea Righi `scx-dl-server` branch |
+| L2 | RT-aware watchdog | [`contrib/sched-ext/kernel/0001-sched_ext-rt-aware-watchdog.patch`](contrib/sched-ext/kernel/0001-sched_ext-rt-aware-watchdog.patch) |
+| L3 | BPF preemption interceptor | [`contrib/sched-ext/bpf/scx_rt_guard.bpf.h`](contrib/sched-ext/bpf/scx_rt_guard.bpf.h) + [`rt_guard_stress`](contrib/sched-ext/selftests/) selftest |
+
+**Proof (Contabo VPS, kernel `6.19.0-rc7` + ftrace + sched_ext):**
+
+| Gate | Verdict |
+|------|---------|
+| Holy Grail H1–H12 (#1202 matrix) | **12/12 PASS** — `HOLY_GRAIL_1202_SOLVED=YES` |
+| #1202 repro with bpfland | **`STALL_DETECTED=NO`** |
+| Global eBPF D1–D6 | **`GLOBAL_EBPF_PASS`** (`fail=0`) |
+| RT Guard flood P1–P5 | **`RT_GUARD_FLOOD_PASS`** |
+
+Full published report: **[docs/GLOBAL_EBPF_VERIFICATION_REPORT.md](docs/GLOBAL_EBPF_VERIFICATION_REPORT.md)**  
+sched_ext evidence pack: **[contrib/sched-ext/EVIDENCE_REPORT.md](contrib/sched-ext/EVIDENCE_REPORT.md)**  
+Upstream PR body (ready): **[contrib/sched-ext/GITHUB_PR_BODY.md](contrib/sched-ext/GITHUB_PR_BODY.md)** — `Fixes sched-ext/scx#1202`
+
+Reproduce on a sched_ext host:
+
+```bash
+export REAL_ONLY=1 ELITE_SRC=/opt/elite/src
+bash benchmarks/ebpf-gates/holy-grail-verify.sh
+bash benchmarks/ebpf-gates/global-ebpf-aggregate.sh
+```
+
+Upstream submission: [`scripts/contabo/submit-rt-guard-upstream.sh`](scripts/contabo/submit-rt-guard-upstream.sh) · tracking: [contrib/sched-ext/UPSTREAM_TRACKING.md](contrib/sched-ext/UPSTREAM_TRACKING.md)
+
+---
+
 ## What’s new
 
 ### Elite Physics Pack (OSS compose under systemd)
@@ -232,6 +269,8 @@ Speed/overhead proofs: `bash scripts/oneclick/competitive-speed-proof.sh` · `co
 
 ## Docs
 
+- [Global eBPF verification report (#1202)](docs/GLOBAL_EBPF_VERIFICATION_REPORT.md)
+- [sched_ext RT Guard upstream pack](contrib/sched-ext/README.md)
 - [Track C ECGF research](docs/research/MASTER_REPORT.md)
 - [ADR-005 Track C](docs/ADR-005-track-c-ecgf.md)
 - [World eBPF comparison](docs/WORLD_EBPF_COMPARISON.md)
