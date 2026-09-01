@@ -45,8 +45,9 @@ bash benchmarks/sched-ext-gates/rt-guard-flood-aggregate.sh  # → RT_GUARD_FLOO
 
 ## Claim language
 
-- **Verified:** RT-guard fix passes G0–G6 + Holy Grail H1–H12 on sched_ext kernel.
-- **Not claimed:** Upstream issue [sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202) closed — Layer 3 PR pending.
+- **Verified:** RT-guard fix passes core gates on sched_ext kernel (local dev).
+- **Upstream:** PR #3780 **closed** — reopen after dev complete (scx_loader, no SKIP gates).
+- **Not claimed:** Upstream issue [#1202](https://github.com/sched-ext/scx/issues/1202) closed.
 
 ## Known limitations (IND-SCX audit)
 

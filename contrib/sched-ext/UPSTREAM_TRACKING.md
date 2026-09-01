@@ -30,12 +30,12 @@ sched_ext evidence: [`contrib/sched-ext/EVIDENCE_REPORT.md`](EVIDENCE_REPORT.md)
 - GitHub PR body: `contrib/sched-ext/GITHUB_PR_BODY.md`
 - Submission pack generator: `scripts/contabo/submit-rt-guard-upstream.sh`
 
-## Next Actions
+## Next Actions (dev mode)
 
-1. Monitor [sched-ext/scx#3780](https://github.com/sched-ext/scx/pull/3780) — Layer 3 BPF header PR
-2. Send Layer 2 LKML patch — [`docs/evidence/scx-1202/LKML_SUBMISSION.md`](../../docs/evidence/scx-1202/LKML_SUBMISSION.md)
-3. Address PR review — [`docs/evidence/scx-1202/PR_REVIEW_RESPONSES.md`](../../docs/evidence/scx-1202/PR_REVIEW_RESPONSES.md)
-4. After merge: [`docs/evidence/scx-1202/FULLY_SOLVED_CHECKLIST.md`](../../docs/evidence/scx-1202/FULLY_SOLVED_CHECKLIST.md)
+1. Build `scx_loader` on Contabo — fix G6 SKIP in `rt-guard-pass.sh`
+2. Re-run `bash scripts/contabo/run-scx-1202-evidence.sh` — fresh VERIFICATION bundle
+3. Reopen PR on sched-ext/scx when gates are 100% green (no SKIP)
+4. Then LKML Layer 2 — [`docs/evidence/scx-1202/LKML_SUBMISSION.md`](../../docs/evidence/scx-1202/LKML_SUBMISSION.md)
 
 ## References
 
