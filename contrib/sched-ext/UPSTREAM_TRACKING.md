@@ -32,10 +32,10 @@ sched_ext evidence: [`contrib/sched-ext/EVIDENCE_REPORT.md`](EVIDENCE_REPORT.md)
 
 ## Next Actions
 
-1. Run `bash scripts/contabo/submit-rt-guard-upstream.sh` to assemble pack + print send commands
-2. Email Layer 2 patch to LKML (Tejun Heo, Andrea Righi, Peter Zijlstra)
-3. Open Layer 3 PR on [sched-ext/scx](https://github.com/sched-ext/scx) — fixes #1202
-4. Monitor Layer 1 (ext_server) merge into mainline — no re-submission needed
+1. Monitor [sched-ext/scx#3780](https://github.com/sched-ext/scx/pull/3780) — Layer 3 BPF header PR
+2. Send Layer 2 LKML patch — [`docs/evidence/scx-1202/LKML_SUBMISSION.md`](../../docs/evidence/scx-1202/LKML_SUBMISSION.md)
+3. Address PR review — [`docs/evidence/scx-1202/PR_REVIEW_RESPONSES.md`](../../docs/evidence/scx-1202/PR_REVIEW_RESPONSES.md)
+4. After merge: [`docs/evidence/scx-1202/FULLY_SOLVED_CHECKLIST.md`](../../docs/evidence/scx-1202/FULLY_SOLVED_CHECKLIST.md)
 
 ## References
 
