@@ -117,6 +117,7 @@ bash benchmarks/ebpf-gates/holy-grail-verify.sh
 
 ## Related Documents
 
+- **Committed evidence (auditor):** [`docs/evidence/scx-1202/README.md`](evidence/scx-1202/README.md) — `bash scripts/verify-scx-1202-evidence.sh`
 - sched_ext upstream pack: [`contrib/sched-ext/UPSTREAM_TRACKING.md`](../contrib/sched-ext/UPSTREAM_TRACKING.md)
 - sched_ext evidence summary: [`contrib/sched-ext/EVIDENCE_REPORT.md`](../contrib/sched-ext/EVIDENCE_REPORT.md)
 - Orphan BPF sources: [`bpf/DEPRECATED_ORPHANS.md`](../bpf/DEPRECATED_ORPHANS.md)

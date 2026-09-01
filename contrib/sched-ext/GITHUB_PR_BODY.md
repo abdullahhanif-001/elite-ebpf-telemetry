@@ -18,11 +18,15 @@ the pattern from scx_qmap (kernel >= 6.19, a3f5d48).
 - `tools/testing/selftests/sched_ext/rt_guard_stress.c`
 - `tools/testing/selftests/sched_ext/rt_guard_stress.bpf.c`
 
-## Test plan
+## Test plan (verified on Contabo sched_ext kernel)
 
-- [x] rt_stall kselftest PASS (EXT >= 4% under RT load)
-- [x] rt_guard_stress 60s soak — zero SCX_EXIT_ERROR_STALL
-- [x] Issue #1202 repro — no runnable task stall after fix
-- [x] PM2_GUARD_OK on Contabo VPS (5 co-resident apps)
+Evidence: [`docs/evidence/scx-1202/`](../../docs/evidence/scx-1202/) — run `bash scripts/verify-scx-1202-evidence.sh` from repo root.
+
+- [x] rt_stall kselftest PASS — `VERIFICATION_*/01-RT_GUARD_PASS.verdict` (`RT_GUARD_PASS fail=0`)
+- [x] rt_guard_stress 60s soak — same bundle (G3 in rt-guard-pass)
+- [x] Issue #1202 repro `STALL_DETECTED=NO` — `VERIFICATION_*/02-HOLY_GRAIL.verdict` (H5)
+- [x] PM2_GUARD_OK — see [GLOBAL_EBPF_VERIFICATION_REPORT.md](../../docs/GLOBAL_EBPF_VERIFICATION_REPORT.md) §Runtime Environment
+
+Reproduce: [`docs/evidence/scx-1202/README.md`](../../docs/evidence/scx-1202/README.md)
 
 Fixes sched-ext/scx#1202

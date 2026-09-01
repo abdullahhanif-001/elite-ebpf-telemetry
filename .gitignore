@@ -66,3 +66,8 @@ docs/MICROSOFT_REVIEW_PACK.md
 # Windows duplicate path artifacts
 benchmarks\\**
 
+# Committed SCX#1202 evidence (verdict bundles only; raw oneclick logs stay ignored)
+!docs/evidence/scx-1202/README.md
+!docs/evidence/scx-1202/IMPLEMENTATION_STATUS.md
+!docs/evidence/scx-1202/VERIFICATION_*/
+!docs/evidence/scx-1202/VERIFICATION_*/**

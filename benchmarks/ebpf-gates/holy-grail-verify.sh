@@ -16,11 +16,13 @@ if [[ -n "${2:-}" ]]; then
   RT_GUARD_DIR="${2}"
 else
   RT_GUARD_DIR=""
-  for cand in $(ls -td "${ROOT}"/scripts/oneclick/results/rt-guard-202* 2>/dev/null); do
+  shopt -s nullglob
+  for cand in "${ROOT}"/scripts/oneclick/results/rt-guard-202*; do
     [[ "${cand}" == *flood* ]] && continue
     RT_GUARD_DIR="${cand}"
     break
   done
+  shopt -u nullglob
 fi
 
 ebpf_ensure_our_goal

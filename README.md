@@ -26,9 +26,11 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 
 ---
 
-## sched_ext RT Guard — [scx#1202](https://github.com/sched-ext/scx/issues/1202) solved
+## sched_ext RT Guard — [scx#1202](https://github.com/sched-ext/scx/issues/1202) verified fix
 
 **Problem:** RT tasks monopolize CPU → EXT scheduler tasks stall → kernel watchdog ejects the BPF scheduler ([sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202)).
+
+**Status:** **Verified fix** on sched_ext kernel (Contabo VPS, `REAL_ONLY=1`). Upstream issue [#1202](https://github.com/sched-ext/scx/issues/1202) remains **open** — Layer 3 PR pending.
 
 **Solution (verified on real VPS, `REAL_ONLY=1`, no mocks):**
 
@@ -48,6 +50,7 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 | RT Guard flood P1–P5 | **`RT_GUARD_FLOOD_PASS`** |
 
 Full published report: **[docs/GLOBAL_EBPF_VERIFICATION_REPORT.md](docs/GLOBAL_EBPF_VERIFICATION_REPORT.md)**  
+Committed evidence (auditor verify): **[docs/evidence/scx-1202/README.md](docs/evidence/scx-1202/README.md)** — run `bash scripts/verify-scx-1202-evidence.sh`  
 sched_ext evidence pack: **[contrib/sched-ext/EVIDENCE_REPORT.md](contrib/sched-ext/EVIDENCE_REPORT.md)**  
 Upstream PR body (ready): **[contrib/sched-ext/GITHUB_PR_BODY.md](contrib/sched-ext/GITHUB_PR_BODY.md)** — `Fixes sched-ext/scx#1202`
 

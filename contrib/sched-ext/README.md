@@ -3,7 +3,9 @@
 Separate from Elite product code (ADR-005). Kernel + BPF scheduler contributions
 for [sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202).
 
-## Status: verified on VPS (2026-08-31)
+## Status: verified fix on VPS (2026-09-01)
+
+Upstream [#1202](https://github.com/sched-ext/scx/issues/1202) remains **open** until Layer 3 PR merges. Live proof on sched_ext kernel:
 
 | Gate | Result |
 |------|--------|
@@ -12,7 +14,8 @@ for [sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202).
 | RT Guard flood P1–P5 | **PASS** |
 | Global eBPF | **`GLOBAL_EBPF_PASS`** |
 
-Report: [docs/GLOBAL_EBPF_VERIFICATION_REPORT.md](../../docs/GLOBAL_EBPF_VERIFICATION_REPORT.md) · Evidence: [EVIDENCE_REPORT.md](EVIDENCE_REPORT.md)
+Report: [docs/GLOBAL_EBPF_VERIFICATION_REPORT.md](../../docs/GLOBAL_EBPF_VERIFICATION_REPORT.md)  
+Evidence: [docs/evidence/scx-1202/README.md](../../docs/evidence/scx-1202/README.md)
 
 ## Three Layers
 
