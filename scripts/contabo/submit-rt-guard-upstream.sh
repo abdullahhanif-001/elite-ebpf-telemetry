@@ -7,14 +7,18 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CONTRIB="${ROOT}/contrib/sched-ext"
 OUT="${ROOT}/scripts/oneclick/results/upstream-submission-$(date +%Y%m%d)"
 VERDICT="$(ls -td "${ROOT}"/scripts/oneclick/results/rt-guard-*/verdict.txt 2>/dev/null | head -1 || true)"
+EVID_VERDICT="$(ls -td "${ROOT}"/docs/evidence/scx-1202/VERIFICATION_*/01-RT_GUARD_PASS.verdict 2>/dev/null | head -1 || true)"
 
 mkdir -p "${OUT}"
 
-if [[ -z "${VERDICT}" ]] || ! grep -q 'RT_GUARD_PASS' "${VERDICT}"; then
-  echo "WARN: RT_GUARD_PASS verdict not found — run rt-guard-pass.sh on VPS first" >&2
-else
+if [[ -n "${VERDICT}" ]] && grep -q 'RT_GUARD_PASS' "${VERDICT}"; then
   cp "${VERDICT}" "${OUT}/vps-verdict.txt"
   echo "VPS evidence: ${VERDICT}"
+elif [[ -n "${EVID_VERDICT}" ]]; then
+  cp "${EVID_VERDICT}" "${OUT}/vps-verdict.txt"
+  echo "Committed evidence: ${EVID_VERDICT}"
+else
+  echo "WARN: RT_GUARD_PASS verdict not found — run rt-guard-pass.sh on VPS first" >&2
 fi
 
 # Layer 2: format-patch from contrib (or regenerate from VPS ext.c diff)

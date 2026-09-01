@@ -19,11 +19,14 @@
 - [x] Gate scripts — `benchmarks/sched-ext-gates/`, `benchmarks/ebpf-gates/`
 - [x] Static verifier — `scripts/verify-scx-1202-evidence.sh`
 
-## Pending (upstream, not required for verified-fix claim)
+## Pending (upstream, required for fully solved)
 
-- [ ] Email Layer 2 to LKML ([`scripts/contabo/submit-rt-guard-upstream.sh`](../../scripts/contabo/submit-rt-guard-upstream.sh))
-- [ ] Open Layer 3 PR on [sched-ext/scx](https://github.com/sched-ext/scx) — fixes #1202
-- [ ] Upstream issue [#1202](https://github.com/sched-ext/scx/issues/1202) closed after merge
+- [x] Layer 3 PR opened: https://github.com/sched-ext/scx/pull/3780
+- [x] Comment on #1202 with evidence links
+- [ ] Layer 2 LKML email sent — see [LKML_SUBMISSION.md](LKML_SUBMISSION.md)
+- [ ] PR #3780 merged on sched-ext/scx
+- [ ] Issue [#1202](https://github.com/sched-ext/scx/issues/1202) closed
+- [ ] Post-merge steps — see [FULLY_SOLVED_CHECKLIST.md](FULLY_SOLVED_CHECKLIST.md)
 
 ## Note on audit host mismatch
 
