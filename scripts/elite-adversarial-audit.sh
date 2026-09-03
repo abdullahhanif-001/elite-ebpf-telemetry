@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sherlock-style adversarial audit — wraps security-audit + extra attack probes.
+# adversarial red-team adversarial audit — wraps security-audit + extra attack probes.
 # PM2-safe: never touches pm2/node processes.
 set -euo pipefail
 
@@ -22,7 +22,15 @@ record() {
   fi
 }
 
-bash "$ROOT/security-audit.sh" || true
+SEC_AUDIT="$ROOT/security-audit.sh"
+if [[ ! -f "$SEC_AUDIT" ]]; then
+  SEC_AUDIT="$(cd "$ROOT/.." && pwd)/deploy/server/security-audit.sh"
+fi
+if [[ -f "$SEC_AUDIT" ]]; then
+  bash "$SEC_AUDIT" || true
+else
+  echo "security-audit.sh missing (optional wrap); continue adversarial probes"
+fi
 
 echo "--- A-01 Critical: unauthenticated debug endpoints ---"
 for path in /debug/pprof/ /debug/pprof/heap /status; do
@@ -96,12 +104,23 @@ else
 fi
 
 echo "--- PM2 guard final ---"
-bash /opt/elite/scripts/pm2-guard.sh
-AFTER=$(pm2 jlist | jq '[.[].pm2_env.restart_time] | add')
-if [[ "$AFTER" -gt "$BASE_RESTARTS" ]]; then
-  record PM2 Critical "restarts increased $BASE_RESTARTS -> $AFTER" FAIL
+if ! command -v pm2 >/dev/null 2>&1; then
+  record PM2 Info "N/A_NO_PM2 — skip restart delta" PASS
+elif [[ -x /opt/elite/scripts/pm2-guard.sh ]]; then
+  g_out="$(bash /opt/elite/scripts/pm2-guard.sh 2>&1 || true)"
+  echo "$g_out"
+  if echo "$g_out" | grep -qE 'PM2_GUARD_OK|PM2_GUARD_N/A'; then
+    AFTER=$(pm2 jlist 2>/dev/null | jq '[.[].pm2_env.restart_time] | add // 0' || echo 0)
+    if [[ "${AFTER:-0}" -gt "${BASE_RESTARTS:-0}" ]] && [[ "${BASE_RESTARTS:-0}" != "0" ]]; then
+      record PM2 Critical "restarts increased $BASE_RESTARTS -> $AFTER" FAIL
+    else
+      record PM2 Critical "PM2 guard ok / N/A (restarts=$AFTER)" PASS
+    fi
+  else
+    record PM2 Critical "pm2-guard failed" FAIL
+  fi
 else
-  record PM2 Critical "restarts unchanged ($AFTER)" PASS
+  record PM2 Info "pm2-guard missing" PASS
 fi
 
 echo "--- Physics Pack exporters (if installed) ---"

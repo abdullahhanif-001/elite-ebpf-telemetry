@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# elite-vps-uninstall-safe.sh — remove ONLY Elite eBPF from Contabo/VPS.
+# elite-vps-uninstall-safe.sh — remove ONLY Elite eBPF from server/VPS.
 # Absolute rules:
 #   - Never pm2 stop|restart|delete|kill|reload|start
 #   - Never touch peer agent paths/locks/sessions

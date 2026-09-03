@@ -9,7 +9,7 @@ OUT="${SCRIPT_DIR}/results/ecgf-bench-${STAMP}"
 mkdir -p "${OUT}"
 DELTA_MAX="${ECGF_DELTA_CPU_MAX:-0.05}"
 
-bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" | tee "${OUT}/pm2-before.txt" || true
+bash "${REPO_ROOT}/deploy/server/pm2-guard.sh" | tee "${OUT}/pm2-before.txt" || true
 
 sample_agent_cpu() {
   local label="$1" dest="$2"
@@ -88,14 +88,14 @@ if [[ -n "${B1_CPU}" && -n "${B2_CPU}" && "${B1_CPU}" != "na" && "${B2_CPU}" != 
   DELTA="$(python3 -c "print(round(abs(float('${B2_CPU}')-float('${B1_CPU}')), 6))")"
 fi
 
-VERDICT="NOT_PROVEN_SUPERIOR"
+VERDICT="ECGF_BENCH_INCONCLUSIVE"
 if [[ "${A1_OK}" -eq 1 && "${A2_OK}" -eq 1 && "${A3_OK}" -eq 1 && "${DELTA}" != "na" ]]; then
   if python3 -c "import sys; d=float(sys.argv[1]); m=float(sys.argv[2]); raise SystemExit(0 if d<=m else 1)" "${DELTA}" "${DELTA_MAX}"; then
-    VERDICT="ECGF_PROVEN_SUPERIOR"
+    VERDICT="ECGF_BENCH_PASS"
   fi
 fi
 
-bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" | tee "${OUT}/pm2-after.txt" || true
+bash "${REPO_ROOT}/deploy/server/pm2-guard.sh" | tee "${OUT}/pm2-after.txt" || true
 
 cat >"${SCRIPT_DIR}/ECGF_BENCH.md" <<EOF
 # ECGF Bench
@@ -115,4 +115,4 @@ Win rule: B2 A1–A3 security PASS and |B2−B1| CPU ≤ ${DELTA_MAX} cores.
 EOF
 cp -f "${SCRIPT_DIR}/ECGF_BENCH.md" "${OUT}/ECGF_BENCH.md"
 echo "Wrote ECGF_BENCH.md VERDICT=${VERDICT}"
-[[ "${VERDICT}" == "ECGF_PROVEN_SUPERIOR" ]]
+[[ "${VERDICT}" == "ECGF_BENCH_PASS" ]]

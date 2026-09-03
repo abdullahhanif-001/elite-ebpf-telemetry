@@ -1,0 +1,10 @@
+{
+  "verification_stamp": "20260902-063458",
+  "commit_sha": "8f1b094ada7daf0cff1a2d1bc45666378fd6d1b6",
+  "kernel": "6.19.0-rc7-scx-dl-g9854922412d3-dirty",
+  "host_class": "production server 4vCPU sched_ext",
+  "real_only": 1,
+  "status": "PARTIAL",
+  "fail_count": 2,
+  "gates": ["rt-guard-pass", "scx1202-matrix-verify", "global-ebpf-aggregate", "flood-safe-gate"]
+}

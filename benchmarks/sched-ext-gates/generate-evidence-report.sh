@@ -70,7 +70,7 @@ cat >> "${REPORT}" <<'EOF'
 ## Independent Verification
 
 ```bash
-ssh contabo-server
+ssh production-server
 export REAL_ONLY=1 ELITE_SRC=/opt/elite/src
 bash /opt/elite/src/benchmarks/sched-ext-gates/rt-guard-flood-phase.sh P1
 # ... P2-P5 then rt-guard-flood-aggregate.sh

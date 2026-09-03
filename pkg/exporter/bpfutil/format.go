@@ -98,7 +98,7 @@ func GetCommString(comm [20]int8) string {
 		buf[idx] = byte(comm[idx])
 	}
 
-	return strings.TrimSpace(string(buf))
+	return strings.TrimRight(strings.TrimSpace(string(buf)), "\x00")
 }
 
 func GetTCPState(_ uint8) string {

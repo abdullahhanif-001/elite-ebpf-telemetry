@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Elite already ships physics exporters (CO-RE + OSS Physics Pack), a userspace EWMA forecaster (`pkg/forecaster`), and Soft DCIC (`pkg/dcic` cgroup v2). Operators need a **single Contabo/VPS closed loop**: fuse network + LLC + PSI signals, project faults with deterministic math, then actuate soft (cgroup) or hard (resctrl) isolation — without claiming “world’s first eBPF” or shipping heavy APM stacks by default.
+Elite already ships physics exporters (CO-RE + OSS Physics Pack), a userspace EWMA forecaster (`pkg/forecaster`), and Soft DCIC (`pkg/dcic` cgroup v2). Operators need a **single server/VPS closed loop**: fuse network + LLC + PSI signals, project faults with deterministic math, then actuate soft (cgroup) or hard (resctrl) isolation — without claiming “world’s first eBPF” or shipping heavy APM stacks by default.
 
 ## Decision
 
@@ -19,7 +19,7 @@ Elite already ships physics exporters (CO-RE + OSS Physics Pack), a userspace EW
 ## Explicitly rejected
 
 - Fake “world’s first eBPF” marketing.
-- Default-on OBI/Parca/Tetragon/Hubble on Contabo.
+- Default-on OBI/Parca/Tetragon/Hubble on server.
 - NOSONAR / Quality Gate waivers.
 - Touching co-resident PM2 process sets.
 

@@ -1,5 +1,5 @@
 # Elite Physics Pack — Prometheus scrape glue (merge into prometheus.yml scrape_configs)
-# All targets default to localhost (Contabo / hard security bind).
+# All targets default to localhost (Server / hard security bind).
 
 scrape_configs:
   - job_name: elite-agent

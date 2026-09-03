@@ -32,7 +32,16 @@ if [[ ! -d "$SRC/pkg/forecaster" ]]; then
 fi
 
 run_go() {
-  docker run --rm -v "$SRC:/src" -w /src --entrypoint go "$DOCKER_IMG" "$@"
+  if command -v go >/dev/null 2>&1; then
+    (cd "$SRC" && go "$@")
+    return
+  fi
+  if command -v docker >/dev/null 2>&1; then
+    docker run --rm -v "$SRC:/src" -w /src --entrypoint go "$DOCKER_IMG" "$@"
+    return
+  fi
+  echo "FAIL: neither go nor docker available for forecaster tests" >&2
+  exit 1
 }
 
 echo "--- unit + stress + compete ---"

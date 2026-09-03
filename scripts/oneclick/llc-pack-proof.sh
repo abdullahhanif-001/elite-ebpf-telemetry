@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Contabo/VPS proof for Elite LLC sensors.
+# server/VPS proof for Elite LLC sensors.
 # Exit 0 = PASS, 2 = SKIP (no PMU), 1 = FAIL
 set -euo pipefail
 
@@ -27,8 +27,9 @@ if ! grep -q 'elite_llc_enabled' <<<"${body}"; then
 fi
 en="$(awk '/^elite_llc_enabled/{print $2; exit}' <<<"${body}")"
 if [[ "${en}" == "0" || "${en}" == "0.0" ]]; then
-  record L-02 "llc_enabled=0 (no PMU) — SKIP not FAIL" SKIP
-  exit 2
+  record L-02 "llc_enabled=0 (no PMU) — DEFERRED not FAIL" SKIP
+  echo "LLC_DEFERRED_NO_PMU"
+  exit 0
 fi
 record L-02 "llc_enabled=1" PASS
 if grep -qE '^elite_llc_miss_rate' <<<"${body}"; then

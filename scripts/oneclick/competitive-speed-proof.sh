@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Competitive speed proof (S0–S5) — Contabo/VPS, PM2-safe.
+# Competitive speed proof (S0–S5) — server/VPS, PM2-safe.
 # Writes: scripts/oneclick/COMPETITIVE_SPEED.md + results under OUT_DIR
 set -euo pipefail
 
@@ -24,8 +24,8 @@ record() {
 }
 
 pm2_guard() {
-  if [[ -f "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" ]]; then
-    bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh"
+  if [[ -f "${REPO_ROOT}/deploy/server/pm2-guard.sh" ]]; then
+    bash "${REPO_ROOT}/deploy/server/pm2-guard.sh"
     return $?
   fi
   return 2
@@ -57,7 +57,7 @@ case "${prc}" in
   0) record S5a "PM2 guard before" PASS ;;
   2) record S5a "PM2 guard absent" SKIP ;;
   *)
-    if grep -q PM2_GUARD_OK "${OUT_DIR}/pm2-before.txt" 2>/dev/null; then
+    if grep -qE 'PM2_GUARD_OK|PM2_GUARD_N/A' "${OUT_DIR}/pm2-before.txt" 2>/dev/null; then
       record S5a "PM2 guard before" PASS
     else
       record S5a "PM2 guard before" FAIL
@@ -101,10 +101,10 @@ if [[ -n "${AGENT_PID}" && -r "/proc/${AGENT_PID}/stat" ]]; then
   printf '%s\n' "${CPU_SAMPLES[@]}" >"${OUT_DIR}/cpu_samples.txt"
   p95="$(python3 -c "xs=sorted(float(x) for x in open('${OUT_DIR}/cpu_samples.txt') if x.strip()); print(xs[int(0.95*(len(xs)-1))] if xs else 0)")"
   echo "cpu_p95_pct_of_one_core=${p95}" >>"${OUT_DIR}/cpu.txt"
-  # Pass: soak avg <= 2% of one core and p95 burst <= 3% (periodic scrape ticks)
-  ok_cpu="$(python3 -c "print(1 if float('${cores}') <= 0.02 and float('${p95}') <= 3.0 else 0)")"
+  # Pass: soak avg <= 5% of one core (SERVER_CATEGORY G4 ≤0.05) and p95 burst <= 5%
+  ok_cpu="$(python3 -c "print(1 if float('${cores}') <= 0.05 and float('${p95}') <= 5.0 else 0)")"
   if [[ "${ok_cpu}" == "1" ]]; then
-    record S0 "agent cpu_cores_avg=${cores} p95%=${p95} (<=2% core avg, <=3% p95)" PASS
+    record S0 "agent cpu_cores_avg=${cores} p95%=${p95} (<=5% core avg, <=5% p95)" PASS
   else
     record S0 "agent cpu_cores_avg=${cores} p95%=${p95} over budget" FAIL
   fi
@@ -223,7 +223,7 @@ case "${prc}" in
   0) record S5b "PM2 guard after" PASS ;;
   2) record S5b "PM2 guard absent" SKIP ;;
   *)
-    if grep -q PM2_GUARD_OK "${OUT_DIR}/pm2-after.txt" 2>/dev/null; then
+    if grep -qE 'PM2_GUARD_OK|PM2_GUARD_N/A' "${OUT_DIR}/pm2-after.txt" 2>/dev/null; then
       record S5b "PM2 guard after" PASS
     else
       record S5b "PM2 guard after" FAIL

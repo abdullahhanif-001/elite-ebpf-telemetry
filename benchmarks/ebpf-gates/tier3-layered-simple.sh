@@ -5,6 +5,7 @@ SCHED=layered
 ROOT="${ELITE_SRC:-/opt/elite/src}"
 OUT="${FLOOD_OUT:-${ROOT}/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351}"
 SDIR="${OUT}/schedulers/${SCHED}"
+mkdir -p "${SDIR}"
 BIN=/opt/scx/target/release/scx_layered
 pkill -9 -f '/opt/scx/target/release/scx_' 2>/dev/null || true
 sleep 2
@@ -20,6 +21,7 @@ chrt -f 40 taskset -c 1 stress-ng --cpu 1 --timeout 20s &
 SP=$!
 sleep 25
 kill "${SP}" "${LP}" 2>/dev/null || true
+pkill -9 -f "/opt/scx/target/release/scx_${SCHED}" 2>/dev/null || true
 wait "${SP}" 2>/dev/null || true
 dmesg > "${SDIR}/dmesg.txt"
 if grep -qE 'runnable task stall|SCX_EXIT_ERROR_STALL|sched_ext.*disabled' "${SDIR}/dmesg.txt"; then

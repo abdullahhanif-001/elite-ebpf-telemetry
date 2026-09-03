@@ -22,9 +22,9 @@ switch ($Phase) {
     'code-audit'     { Invoke-Bash (Join-Path $EbpfGates 'code-audit-gate.sh') }
     'telemetry'      { Invoke-Bash (Join-Path $EbpfGates 'telemetry-probe-gate.sh') }
     'future-holes'   { Invoke-Bash (Join-Path $EbpfGates 'ebpf-future-holes.sh') }
-    'holy-grail'     { Invoke-Bash (Join-Path $EbpfGates 'holy-grail-verify.sh') }
+    'holy-grail'     { Invoke-Bash (Join-Path $EbpfGates 'scx1202-matrix-verify.sh') }
     'aggregate'      { Invoke-Bash (Join-Path $EbpfGates 'global-ebpf-aggregate.sh') }
-    'xray'           { ssh contabo-server "export REAL_ONLY=1 ELITE_SRC=/opt/elite/src; bash /opt/elite/src/scripts/oneclick/ebpf-xray-real-proof.sh" }
+    'xray'           { ssh production-server "export REAL_ONLY=1 ELITE_SRC=/opt/elite/src; bash /opt/elite/src/scripts/oneclick/ebpf-xray-real-proof.sh" }
     'tier1-deploy'   { & (Join-Path $ScxGates 'run-vps-flood-safe.ps1') -Phase deploy }
     'tier1-runall'   {
         & (Join-Path $ScxGates 'run-vps-flood-safe.ps1') -Phase deploy
@@ -38,17 +38,17 @@ switch ($Phase) {
         Start-Sleep -Seconds 60
         & (Join-Path $ScxGates 'run-vps-flood-safe.ps1') -Phase aggregate
     }
-    'tier2-ftrace'   { ssh contabo-server "bash /opt/elite/src/scripts/contabo/tier2-ftrace-kernel.sh" }
+    'tier2-ftrace'   { ssh production-server "bash /opt/elite/src/scripts/server/tier2-ftrace-kernel.sh" }
     'tier3-phase'    {
         param([string]$Name = 'P5b-bpfland')
-        ssh contabo-server "export REAL_ONLY=1 ELITE_SRC=/opt/elite/src FLOOD_SAFE_MODE=0; bash /opt/elite/src/benchmarks/sched-ext-gates/rt-guard-flood-phase.sh $Name"
+        ssh production-server "export REAL_ONLY=1 ELITE_SRC=/opt/elite/src FLOOD_SAFE_MODE=0; bash /opt/elite/src/benchmarks/sched-ext-gates/rt-guard-flood-phase.sh $Name"
     }
     'global-local'   {
         Invoke-Bash (Join-Path $EbpfGates 'global-ebpf-inventory.sh')
         Invoke-Bash (Join-Path $EbpfGates 'code-audit-gate.sh')
         Invoke-Bash (Join-Path $EbpfGates 'telemetry-probe-gate.sh')
         Invoke-Bash (Join-Path $EbpfGates 'ebpf-future-holes.sh')
-        Invoke-Bash (Join-Path $EbpfGates 'holy-grail-verify.sh')
+        Invoke-Bash (Join-Path $EbpfGates 'scx1202-matrix-verify.sh')
     }
     'global-all'     {
         & $PSCommandPath -Phase global-local

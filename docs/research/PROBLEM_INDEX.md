@@ -13,6 +13,6 @@
 | U09 | Arbitrary L3 cache without CAT | HARDWARE_LIMITED | REJECTED |
 | U10 | AI tool-consequence enforcement | PARTIALLY_SOLVED | REJECTED as invention (Sandlock/ActPlane) |
 | U11 | Physics↔security posture coupling | UNSOLVED (productized) | **SURVIVE (ECGF-lite)** |
-| U12 | Honest Contabo closed-loop proofs | PARTIALLY_SOLVED | Hygiene (F1) |
+| U12 | Honest Server closed-loop proofs | PARTIALLY_SOLVED | Hygiene (F1) |
 
 See `problems/` for full records.

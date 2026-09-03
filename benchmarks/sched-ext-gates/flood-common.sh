@@ -23,17 +23,6 @@ if [[ "${FLOOD_SAFE_MODE:-0}" == "1" ]]; then
   FLOOD_MAX_LOAD=3.0
 fi
 
-# Lite mode — small VPS (4vCPU/8GB): shorter flood, full repro unchanged
-if [[ "${FLOOD_LITE_MODE:-0}" == "1" ]]; then
-  FLOOD_SAFE_MODE=1
-  FLOOD_SOAK_SHORT_SEC=30
-  FLOOD_SOAK_LONG_SEC=120
-  FLOOD_COOLDOWN_SEC=15
-  FLOOD_STRESS_SEC=15
-  FLOOD_MIN_AVAIL_MB=2048
-  FLOOD_MAX_LOAD=4.5
-fi
-
 flood_safe_out_dir() {
   local root
   root="$(repo_root)"
@@ -210,12 +199,12 @@ flood_repro_capture() {
 }
 
 flood_pm2_before() {
-  bash "${ELITE_SRC}/scripts/contabo/pm2-guard-wrap.sh" before rt-guard-flood 2>/dev/null || \
+  bash "${ELITE_SRC}/scripts/server/pm2-guard-wrap.sh" before rt-guard-flood 2>/dev/null || \
     mkdir -p /opt/elite/baseline && pm2 jlist > /opt/elite/baseline/pm2-before.json 2>/dev/null || true
 }
 
 flood_pm2_after() {
-  bash "${ELITE_SRC}/scripts/contabo/pm2-guard-wrap.sh" after rt-guard-flood 2>/dev/null || true
+  bash "${ELITE_SRC}/scripts/server/pm2-guard-wrap.sh" after rt-guard-flood 2>/dev/null || true
 }
 
 flood_sched_bin() {

@@ -18,7 +18,7 @@ record() {
 }
 
 pm2_ok() {
-  bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" >"${OUT}/pm2.txt" 2>&1 && grep -q PM2_GUARD_OK "${OUT}/pm2.txt"
+  bash "${REPO_ROOT}/deploy/server/pm2-guard.sh" >"${OUT}/pm2.txt" 2>&1 && grep -q PM2_GUARD_OK "${OUT}/pm2.txt"
 }
 
 echo "=== ECGF REDTEAM ${STAMP} ==="

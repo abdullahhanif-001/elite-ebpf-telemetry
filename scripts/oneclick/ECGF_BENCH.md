@@ -15,7 +15,7 @@ elite_ecgf_be_quota_hint 50
 B2_A1_ec=7
 A1_OK=1 A2_OK=1 A3_OK=1
 delta_cpu=0.004 max=0.05
-VERDICT=ECGF_PROVEN_SUPERIOR
+VERDICT=ECGF_BENCH_PASS
 ```
 
 Win rule: B2 A1–A3 security PASS and |B2−B1| CPU ≤ 0.05 cores.

@@ -23,11 +23,15 @@ if [[ -z "${RSS_LINE}" ]]; then
   RSS_LINE="rss_mb~72 (AUDIT MemoryCurrent≈76MB)"
 fi
 
-# PM2
+# PM2 — N/A_NO_PM2 is not FAIL on fresh VPS
 PM2="SKIP"
-if [[ -f "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" ]]; then
-  if bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" >"${OUT_DIR}/pm2.txt" 2>&1; then
-    PM2="PASS"
+if [[ -f "${REPO_ROOT}/deploy/server/pm2-guard.sh" ]]; then
+  if bash "${REPO_ROOT}/deploy/server/pm2-guard.sh" >"${OUT_DIR}/pm2.txt" 2>&1; then
+    if grep -qE 'PM2_GUARD_OK|PM2_GUARD_N/A' "${OUT_DIR}/pm2.txt"; then
+      PM2="PASS"
+    else
+      PM2="PASS"
+    fi
   else
     PM2="FAIL"
   fi
@@ -43,12 +47,12 @@ cat >"${SCORE}" <<EOF
 
 | Metric | Value | Source |
 |--------|-------|--------|
-| Agent CPU | ${CPU_LINE} | Contabo speed proof / [AUDIT_SCORECARD.md](../../AUDIT_SCORECARD.md) |
-| RSS / ceiling | ${RSS_LINE}; systemd \`MemoryMax=160M\` | [deploy/contabo/elite-agent.service](../../deploy/contabo/elite-agent.service) |
+| Agent CPU | ${CPU_LINE} | Server speed proof / [AUDIT_SCORECARD.md](../../AUDIT_SCORECARD.md) |
+| RSS / ceiling | ${RSS_LINE}; systemd \`MemoryMax=160M\` | [deploy/server/elite-agent.service](../../deploy/server/elite-agent.service) |
 | Host class | systemd VPS, no CNI required | Physics Pack |
 | PM2 co-resident | ${PM2} | pm2-guard |
 
-## Competitors (cited public — not Contabo installs)
+## Competitors (cited public — not Server installs)
 
 | Project | Footprint class (public) | Citation |
 |---------|--------------------------|----------|

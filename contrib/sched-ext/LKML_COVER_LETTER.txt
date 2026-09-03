@@ -17,7 +17,7 @@ This patch adds scx_stall_caused_by_rt() in kernel/sched/ext.c:
 Complements Andrea Righi's ext_server DL server patchset (Layer 1) and the
 scx_rt_guard BPF sched_switch interceptor (Layer 3, sched-ext/scx contrib).
 
-Tested on Contabo VPS vmi3469243:
+Tested on production server vmi3469243:
 - tools/testing/selftests/sched_ext/rt_stall (requires ext_server kernel)
 - rt_guard_stress 60s soak (contrib selftest)
 

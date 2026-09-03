@@ -44,7 +44,7 @@ log() { echo "[elite-oneclick] $*"; }
 
 need_linux() {
   if [[ "$(uname -s)" != "Linux" ]]; then
-    echo "Linux VPS/Contabo target required (got $(uname -s))." >&2
+    echo "Linux VPS/Server target required (got $(uname -s))." >&2
     exit 1
   fi
 }
@@ -166,7 +166,7 @@ PY
       log "restarted elite-agent for forecast"
     fi
   else
-    log "WARN: ${cfg} missing — write deploy/contabo/config.yaml manually"
+    log "WARN: ${cfg} missing — write deploy/server/config.yaml manually"
   fi
 }
 
@@ -225,7 +225,7 @@ install_compose_stub() {
     cat > "${SCRIPT_DIR}/compose/${name}.md" <<EOF
 # Optional compose: ${name}
 
-Not installed by Contabo default. Pin upstream separately; keep CPUQuota low.
+Not installed by Server default. Pin upstream separately; keep CPUQuota low.
 See ADR-003 / ADR-004. Enable with: elite-oneclick.sh enable ${name}
 EOF
   fi

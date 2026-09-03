@@ -14,7 +14,7 @@ bash scripts/oneclick/elite-oneclick.sh test --suite heavy
 
 Profiles: `minimal`, `physics`, `predict`, `llc`, `dcic-soft`, `closed-loop`, `compose-*` (optional heavy). Knobs: [`profiles.env`](profiles.env). ADR: [`docs/ADR-004-closed-loop-predict-actuate.md`](../../docs/ADR-004-closed-loop-predict-actuate.md). Heavy gates write [`HEAVY_TEST_SCORECARD.md`](HEAVY_TEST_SCORECARD.md).
 
-## Contabo / VPS (physics pack only)
+## Server / VPS (physics pack only)
 
 ```bash
 sudo bash scripts/oneclick/elite-physics-pack.sh install

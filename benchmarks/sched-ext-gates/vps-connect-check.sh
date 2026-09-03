@@ -28,7 +28,7 @@ REMOTE
 echo "${out}"
 echo "${out}" | grep -q "hostname=${EXPECTED}" || { echo "FAIL wrong host (expected ${EXPECTED})"; exit 1; }
 echo "${out}" | grep -q "sched_ext=YES" || {
-  echo "FAIL sched_ext not enabled — run: ssh ${HOST} bash ${ELITE_SRC}/scripts/contabo/sched-ext-vps-prep.sh"
+  echo "FAIL sched_ext not enabled — run: ssh ${HOST} bash ${ELITE_SRC}/scripts/server/sched-ext-vps-prep.sh"
   exit 1
 }
 echo "VPS_CONNECT_PASS host=${EXPECTED}"

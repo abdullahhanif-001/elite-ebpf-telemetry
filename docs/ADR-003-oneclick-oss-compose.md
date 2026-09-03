@@ -20,7 +20,7 @@ Building novel kernel BPF (packet fate ledgers, in-kernel MM→Net causal graphs
    - Inspektor Gadget `ig` (optional tcpdrop metrics `:2224`)
    - `bpfcc-tools` for CLI softirq/tcpdrop helpers
 4. K8s path documents upstream one-liners (`skoopbundle.yaml`, Retina Helm, `kubectl gadget deploy`) — no Retina fork into Elite.
-5. Uniqueness claim = **packaged Contabo/VPS + K8s compose + Grafana scorecard under Elite branding**, with mandatory attribution (`scripts/oneclick/ATTRIBUTION.md`).
+5. Uniqueness claim = **packaged server/VPS + K8s compose + Grafana scorecard under Elite branding**, with mandatory attribution (`scripts/oneclick/ATTRIBUTION.md`).
 
 ## Explicitly rejected
 
@@ -29,7 +29,7 @@ Building novel kernel BPF (packet fate ledgers, in-kernel MM→Net causal graphs
 
 ## Consequences
 
-- Faster Contabo proof cycles; license/attribution obligations for every upstream.
+- Faster Server proof cycles; license/attribution obligations for every upstream.
 - Product roadmap = pin versions, scrape glue, scorecard, soak — not verifier wrestling for novel programs.
 - Optional netstacklat YAML is vendored by commit SHA but **not** auto-started (requires upstream build).
 

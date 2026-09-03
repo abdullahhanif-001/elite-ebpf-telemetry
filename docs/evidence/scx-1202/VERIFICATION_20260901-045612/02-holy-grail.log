@@ -1,4 +1,4 @@
-=== holy-grail-verify ===
+=== scx1202-matrix-verify ===
 flood_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351
 rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-065612
   H1: PASS — rt_stall EXT>=4%
@@ -13,5 +13,5 @@ rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-065612
   H10: PASS — negative enq_last
   H11: PASS — healthy minimal scheduler
   H12: PASS — 6/6 PASS_LOADER (5/6+lavd SKIP ok)
-HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
+SCX1202_MATRIX_PASS=YES fail=0 checks=12/12 host=vmi3469243
 OUR_GOAL_LOG phase=D2_holy_grail result=PASS

@@ -1,6 +1,6 @@
 # Math Model (ECGF-lite)
 
-**UNPROVEN** until Contabo benches.
+**UNPROVEN** until Server benches.
 
 Let posture loop period be \(T=1s\). Cost per tick: scrape/parse decision \(C_r\) + metric publish \(C_m\). Amortized CPU fraction \(\approx (C_r+C_m)/T\).
 

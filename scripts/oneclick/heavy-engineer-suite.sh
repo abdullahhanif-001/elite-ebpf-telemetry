@@ -46,7 +46,7 @@ run_go() {
 }
 
 pm2_guard() {
-  local guard="${REPO_ROOT}/deploy/contabo/pm2-guard.sh"
+  local guard="${REPO_ROOT}/deploy/server/pm2-guard.sh"
   if [[ -x "${guard}" || -f "${guard}" ]]; then
     bash "${guard}"
     return $?
@@ -95,7 +95,6 @@ if command -v shellcheck >/dev/null 2>&1; then
     "${SCRIPT_DIR}/heavy-engineer-suite.sh" \
     "${SCRIPT_DIR}/elite-oneclick.sh" \
     "${SCRIPT_DIR}/after-working.sh" \
-    "${SCRIPT_DIR}/mock-inject-proof.sh" \
     >"${OUT_DIR}/shellcheck.txt" 2>&1
   sc=$?
   set -e
@@ -163,20 +162,19 @@ else
   record H3 "bench failed (see h3-bench.txt)" FAIL
 fi
 
-# --- H4 fuse/causal + MOCK_ ---
-log "H4 MOCK_ decision bus"
-if [[ -f "${SCRIPT_DIR}/mock-inject-proof.sh" ]]; then
-  set +e
-  bash "${SCRIPT_DIR}/mock-inject-proof.sh" >"${OUT_DIR}/h4-mock.txt" 2>&1
-  h4=$?
-  set -e
-  if [[ "${h4}" -eq 0 ]]; then
-    record H4 "MOCK_ decision bus + causal goldens (pkg tests)" PASS
-  else
-    record H4 "mock-inject-proof failed" FAIL
-  fi
+# --- H4 fuse/causal goldens (pkg/forecaster unit tests) ---
+log "H4 causal decision-bus goldens"
+set +e
+run_go test ./pkg/forecaster/ -run 'TestFuse|TestEncode|TestPolicy' -count=1 \
+  >"${OUT_DIR}/h4-causal.txt" 2>&1
+h4=$?
+set -e
+if [[ "${h4}" -eq 0 ]]; then
+  record H4 "causal goldens (pkg/forecaster unit tests)" PASS
+elif [[ "${h4}" -eq 2 ]]; then
+  record H4 "go/docker unavailable" SKIP
 else
-  record H4 "mock-inject-proof.sh missing" FAIL
+  record H4 "causal golden tests failed (see h4-causal.txt)" FAIL
 fi
 
 # --- H5 after-working ---
@@ -407,7 +405,7 @@ $(cat "${OUT_DIR}/results.txt" 2>/dev/null || echo "(no results)")
 ## Notes
 
 - \`HEAVY_PASS_SOFT\` / Soft-only is success when the host lacks resctrl/CAT (ADR-004).
-- \`HEAVY_PASS_PENDING_SONAR\` means local/Contabo gates passed; push Sonar fixes and re-poll QG until \`alert_status=OK\`.
+- \`HEAVY_PASS_PENDING_SONAR\` means local/Server gates passed; push Sonar fixes and re-poll QG until \`alert_status=OK\`.
 - PM2 apps must remain untouched; H7 requires \`PM2_GUARD_OK\`.
 - Go module path stays \`github.com/alibaba/kubeskoop\` (fork convention); public brand is \`${GH_REPO}\`.
 

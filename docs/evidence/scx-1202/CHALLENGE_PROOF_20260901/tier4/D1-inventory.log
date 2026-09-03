@@ -1,3 +1,0 @@
-<stdin>:87: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
-INVENTORY_OK count=72 out=/opt/elite/src/scripts/oneclick/results/our-goal/inventory.json
-OUR_GOAL_LOG phase=D1_inventory result=PASS

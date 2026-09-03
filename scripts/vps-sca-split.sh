@@ -18,7 +18,7 @@ SKOOP_EXCLUDE='exclude google.golang.org/genproto v0.0.0-20210402141018-6c239bbf
 if ! grep -q 'exclude google.golang.org/genproto' "$ROOT/pkg/skoop/go.mod"; then
   printf '\n%s\n' "$SKOOP_EXCLUDE" >> "$ROOT/pkg/skoop/go.mod"
 fi
-for d in pkg/skoop pkg/controller cmd/skoop cmd/collector cmd/controller test/skoop; do
+for d in pkg/skoop pkg/controller cmd/skoop cmd/collector cmd/controller; do
   echo "-- tidy $d"
   docker run --rm -v "$ROOT:/src" -w "/src/$d" "$BUILDER" \
     env GOTOOLCHAIN=local go mod tidy || \

@@ -19,7 +19,7 @@ export ELITE_BUILD_ROOT="${ELITE_BUILD_ROOT:-/opt/elite-build}"
 export ELITE_SRC="${ELITE_SRC:-/opt/elite/src}"
 export XDP_HEALTH_NO_UNLOAD=1
 
-SAFE_PREP="${REPO_ROOT}/scripts/contabo/safe-proof-prep.sh"
+SAFE_PREP="${REPO_ROOT}/scripts/server/safe-proof-prep.sh"
 if [[ -f "${SAFE_PREP}" ]]; then
   bash "${SAFE_PREP}" || true
 fi

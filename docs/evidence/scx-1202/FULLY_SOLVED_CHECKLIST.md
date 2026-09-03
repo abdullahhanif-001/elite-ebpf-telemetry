@@ -1,4 +1,4 @@
-# SCX#1202 — Post-Merge Checklist (upstream closure)
+# SCX#1202 — Post-Merge Checklist (fully solved)
 
 Run these steps **after** [sched-ext/scx#3780](https://github.com/sched-ext/scx/pull/3780) merges.
 
@@ -16,10 +16,10 @@ GitHub should auto-close via `Fixes #1202`. If not:
 gh issue close 1202 --repo sched-ext/scx --comment "Fixed by sched-ext/scx#3780"
 ```
 
-## 3. Fresh evidence run on sched_ext proof host
+## 3. Fresh evidence run on server
 
 ```bash
-ssh ##### 'bash /opt/elite/src/scripts/contabo/run-scx-1202-evidence.sh'
+ssh production-server 'bash /opt/elite/src/scripts/server/run-scx-1202-evidence.sh'
 ```
 
 Copy new `VERIFICATION_*` bundle to repo; update `MANIFEST.json` with upstream merge commit SHA.
@@ -42,4 +42,4 @@ Copy new `VERIFICATION_*` bundle to repo; update `MANIFEST.json` with upstream m
 - Layer 3 PR **OPEN** — awaiting maintainer merge
 - Layer 2 LKML — ready, email pending
 - Issue #1202 — **OPEN**
-- Claim: **verified fix** (not upstream-closed until steps above complete)
+- Claim: **verified fix** (not fully solved until steps above complete)

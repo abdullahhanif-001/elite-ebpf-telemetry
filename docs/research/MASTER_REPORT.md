@@ -2,11 +2,11 @@
 
 ## Executive Summary
 
-Elite Track C delivers **ECGF-lite**: physics-triggered security posture over **existing** Soft DCIC + consequence envelopes (systemd/Landlock/seccomp compose). Novel BPF, Tetragon clones, and Sandlock clones are **REJECTED**. Contabo B2 vs B1 measured: **`ECGF_PROVEN_SUPERIOR`**.
+Elite Track C delivers **ECGF-lite**: physics-triggered security posture over **existing** Soft DCIC + consequence envelopes (systemd/Landlock/seccomp compose). Novel BPF, Tetragon clones, and Sandlock clones are **REJECTED**. Server B2 vs B1 measured: **`ECGF_BENCH_PASS`**.
 
 ## Current eBPF State / Competitive Landscape
 
-See [WORLD_EBPF_COMPARISON.md](../WORLD_EBPF_COMPARISON.md), [PRIOR_ART_MATRIX.md](PRIOR_ART_MATRIX.md), [SOURCES.md](SOURCES.md).
+See [COMPETITOR_BASELINE_MATRIX.md](../COMPETITOR_BASELINE_MATRIX.md), [PRIOR_ART_MATRIX.md](PRIOR_ART_MATRIX.md), [SOURCES.md](SOURCES.md).
 
 ## Unsolved Problem Map
 
@@ -38,19 +38,19 @@ See [ARCHITECTURE_ECGF.md](ARCHITECTURE_ECGF.md), [ADR-005](../ADR-005-track-c-e
 - `ecgf-envelope.sh`, `ecgf-redteam.sh`, `ecgf-bench.sh`
 - Profile `ecgf` / `elite-ecgf-pack.sh`
 
-## Contabo Evidence (2026-08-24)
+## Server Evidence (2026-08-24)
 
 | Gate | Result |
 |------|--------|
 | Red-team A1–A3 | **PASS** (`results/ecgf-redteam-latest.txt`) |
 | Red-team verdict | `ECGF_REDTEAM_PASS` |
 | Bench B0/B1/B2 | **Measured** — ΔCPU ≤ 0.05; A1–A3 OK |
-| B2 vs B1 superiority | **`ECGF_PROVEN_SUPERIOR`** — see `scripts/oneclick/ECGF_BENCH.md` |
+| B2 vs B1 superiority | **`ECGF_BENCH_PASS`** — see `scripts/oneclick/ECGF_BENCH.md` |
 | Live `elite_predict_*` | **`H11_PASS_LIVE`** (`results/p1-live-20260824-111335/`) |
 | Category bakeoff | **`CATEGORY_BAKEOFF_PASS`** |
 | PM2 | `PM2_GUARD_OK` |
 
-MVP posture+envelope: **ECGF_MVP_PASS**. Superiority: **ECGF_PROVEN_SUPERIOR**.
+MVP posture+envelope: **ECGF_MVP_PASS**. Superiority: **ECGF_BENCH_PASS**.
 
 ## Final Verdict
 
@@ -59,7 +59,7 @@ ELITE_ECGF_TRACK_C
 novelty=SURVIVE_NARROW_INTEGRATION
 bpf_invention=REJECTED
 mvp=ECGF_MVP_PASS
-VERDICT=ECGF_PROVEN_SUPERIOR
+VERDICT=ECGF_BENCH_PASS
 ```
 
-Honesty: MOCK decision bus ≠ live predict PASS (H11 LIVE required). Category #1 is Contabo physics-speed VPS bakeoff only — see [CLAIM_CHARTER.md](../CLAIM_CHARTER.md).
+Honesty: MOCK decision bus ≠ live predict PASS (H11 LIVE required). Server category is Server physics-speed VPS bakeoff only — see [CLAIM_CHARTER.md](../CLAIM_CHARTER.md).

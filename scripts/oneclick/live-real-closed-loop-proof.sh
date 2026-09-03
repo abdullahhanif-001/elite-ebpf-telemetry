@@ -18,8 +18,8 @@ record() {
 }
 
 pm2_guard() {
-  if [[ -f "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" ]]; then
-    bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" && return 0
+  if [[ -f "${REPO_ROOT}/deploy/server/pm2-guard.sh" ]]; then
+    bash "${REPO_ROOT}/deploy/server/pm2-guard.sh" && return 0
   fi
   if [[ -f /opt/elite/scripts/pm2-guard.sh ]]; then
     bash /opt/elite/scripts/pm2-guard.sh && return 0

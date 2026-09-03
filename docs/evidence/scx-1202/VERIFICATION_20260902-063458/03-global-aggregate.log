@@ -1,0 +1,57 @@
+D1_inventory=MISSING
+D2_flood=PASS /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805
+=== scx1202-matrix-verify ===
+flood_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805
+rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-175213
+  H1: PASS — rt_stall EXT>=4%
+  H2: PASS — rt_guard_stress 60s soak
+  H3: PASS — E1 per-CPU RT
+  H4: PASS — E3 multi-CPU RT
+  H5: PASS — repro STALL_DETECTED=NO loader=PARTIAL
+  H6: FAIL — E5 lavd 35s
+  H7: FAIL — 30min endurance
+  H8: FAIL — E2 SCHED_DEADLINE
+  H9: FAIL — E4 partial mode
+  H10: PASS — negative enq_last
+  H11: FAIL — healthy minimal scheduler
+  H12: PARTIAL — kselftest fallback only (Tier3 blocked on ftrace)
+  H12: FAIL — 6/6 PASS_LOADER (5/6+lavd SKIP ok)
+SCX1202_MATRIX_PASS=NO pass=6/12 fail=6 host=ubuntu-s-4vcpu-8gb-nyc1
+OUR_GOAL_LOG phase=D2_holy_grail result=PARTIAL
+D3_telemetry=MISSING (run telemetry-probe-gate.sh)
+D4_xray=MISSING (run ebpf-xray on VPS)
+D5_go=FAIL
+D6_future_holes=MISSING
+phase P1=PASS
+phase P2=PASS
+phase P3=PASS
+phase P4=PASS
+phase P5=PASS
+EVIDENCE_REPORT_OK /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805/EVIDENCE_REPORT.md
+GITHUB_COMMENT_OK /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805/GITHUB_1202_COMMENT.md
+RT_GUARD_FLOOD_PASS fail=0 mode=safe_4vcpu host=ubuntu-s-4vcpu-8gb-nyc1 kernel=6.19.0-rc7-scx-dl-g9854922412d3-dirty
+=== scx1202-matrix-verify ===
+flood_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805
+rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-175213
+  H1: PASS — rt_stall EXT>=4%
+  H2: PASS — rt_guard_stress 60s soak
+  H3: PASS — E1 per-CPU RT
+  H4: PASS — E3 multi-CPU RT
+  H5: PASS — repro STALL_DETECTED=NO loader=PARTIAL
+  H6: FAIL — E5 lavd 35s
+  H7: FAIL — 30min endurance
+  H8: FAIL — E2 SCHED_DEADLINE
+  H9: FAIL — E4 partial mode
+  H10: PASS — negative enq_last
+  H11: FAIL — healthy minimal scheduler
+  H12: PARTIAL — kselftest fallback only (Tier3 blocked on ftrace)
+  H12: FAIL — 6/6 PASS_LOADER (5/6+lavd SKIP ok)
+SCX1202_MATRIX_PASS=NO pass=6/12 fail=6 host=ubuntu-s-4vcpu-8gb-nyc1
+OUR_GOAL_LOG phase=D2_holy_grail result=PARTIAL
+AGGREGATE_OK out=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805
+EVIDENCE_REPORT_OK /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805/EVIDENCE_REPORT.md
+GITHUB_COMMENT_OK /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805/GITHUB_1202_COMMENT.md
+GLOBAL_EBPF_SUMMARY host=ubuntu-s-4vcpu-8gb-nyc1 kernel=6.19.0-rc7-scx-dl-g9854922412d3-dirty
+holy_grail=SCX1202_MATRIX_PASS=NO pass=6/12 fail=6 host=ubuntu-s-4vcpu-8gb-nyc1
+fail=5
+OUR_GOAL_LOG phase=GLOBAL result=FAIL

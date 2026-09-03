@@ -3,10 +3,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SCRIPT="$ROOT/deploy/contabo/run-loadtest.sh"
+SCRIPT="$ROOT/deploy/server/run-loadtest.sh"
 
 if [[ ! -f "$SCRIPT" ]]; then
-  echo "FAIL: $SCRIPT not found. Copy deploy/contabo/ to the host first." >&2
+  echo "FAIL: $SCRIPT not found. Copy deploy/server/ to the host first." >&2
   exit 1
 fi
 

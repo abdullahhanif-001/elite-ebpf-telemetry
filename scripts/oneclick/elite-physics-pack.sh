@@ -189,7 +189,7 @@ uninstall_pack() {
 do_install() {
   need_root
   if [[ "$(uname -s)" != "Linux" ]]; then
-    echo "This installer targets Linux VPS/Contabo hosts." >&2
+    echo "This installer targets Linux VPS/production servers." >&2
     exit 1
   fi
   install_dirs

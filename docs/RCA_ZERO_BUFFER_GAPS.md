@@ -1,4 +1,4 @@
-# RCA — Zero-Buffer Holy Grail Gaps (Track D → v1.0)
+# RCA — Zero-Buffer SCX1202 gate matrix Gaps (Track D → v1.0)
 
 **Date:** 2026-08-30  
 **Status:** Baseline for v1.0 root solve
@@ -32,7 +32,7 @@ Artifacts land in `scripts/oneclick/results/*-latest.txt`.
 
 ## Honest limits
 
-- Single Contabo VPS ≠ 10M conn/s; multi-node + documented ceiling
+- Single production server ≠ 10M conn/s; multi-node + documented ceiling
 - Not Maglev / Azure LB replacement (see [`PLAN_SELF_AUDIT.md`](PLAN_SELF_AUDIT.md))
 
 ## Kill criteria

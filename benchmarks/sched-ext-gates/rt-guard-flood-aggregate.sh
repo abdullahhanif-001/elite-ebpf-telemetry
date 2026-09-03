@@ -35,7 +35,7 @@ HOST="$(hostname 2>/dev/null || echo unknown)"
 if [[ "${FAIL}" -eq 0 ]]; then
   echo "RT_GUARD_FLOOD_PASS fail=0 mode=safe_4vcpu host=${HOST} kernel=${KERNEL}" | tee "${FLOOD_DIR}/verdict.txt"
   cp "${FLOOD_DIR}/EVIDENCE_REPORT.md" "${ROOT}/contrib/sched-ext/EVIDENCE_REPORT.md" 2>/dev/null || true
-  bash "${ROOT}/benchmarks/ebpf-gates/holy-grail-verify.sh" "${FLOOD_DIR}" 2>/dev/null || true
+  bash "${ROOT}/benchmarks/ebpf-gates/scx1202-matrix-verify.sh" "${FLOOD_DIR}" 2>/dev/null || true
   echo "AGGREGATE_OK out=${FLOOD_DIR}"
 else
   echo "RT_GUARD_FLOOD_FAIL fail=${FAIL} mode=safe_4vcpu host=${HOST}" | tee "${FLOOD_DIR}/verdict.txt"

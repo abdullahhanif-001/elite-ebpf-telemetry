@@ -8,6 +8,6 @@
 
 **Kill-gate outcome:** Pure AI sandboxes and Tetragon enforcement are **REJECTED** as inventions. Integration of Elite **EXISTING** predict→actuate with envelopes is the only surviving Track C scope.
 
-**Honesty prerequisite (FACT):** Contabo H6 SKIPs and H11 MOCK-only must be fixed before any invention claim. WORLD_BEST predictive 15/15 on bus-only is **not** evidence.
+**Honesty prerequisite (FACT):** Server H6 SKIPs and H11 MOCK-only must be fixed before any invention claim. SERVER_PHYSICS_VPS predictive 15/15 on bus-only is **not** evidence.
 
 **Demotion rule:** If MVP equals “static Sandlock + Soft DCIC,” label **PRODUCT FEATURE**, strip invention language → `REJECTED_AS_CLONE` or product-only.

@@ -27,7 +27,7 @@ SCX_SSH_OPTS=(
 )
 _id_file="${HOME}/.ssh/id_rsa"
 if [[ ! -f "${_id_file}" ]]; then
-  _id_file="${HOME}/.ssh/id_rsa_contabo"
+  _id_file="${HOME}/.ssh/id_rsa_server"
 fi
 if [[ -f "${_id_file}" ]]; then
   SCX_SSH_OPTS+=(-i "${_id_file}")

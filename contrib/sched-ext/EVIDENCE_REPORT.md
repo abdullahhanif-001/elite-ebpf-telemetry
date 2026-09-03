@@ -1,6 +1,6 @@
 # sched_ext RT Monopolization — Evidence Report
 
-**Status:** Verified on Contabo VPS (4 vCPU, 8 GB RAM), 2026-08-31  
+**Status:** Verified on production server (4 vCPU, 8 GB RAM), 2026-08-31  
 **Issue:** [sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202) — RT monopolization / runnable task stall  
 **Full report:** [`docs/GLOBAL_EBPF_VERIFICATION_REPORT.md`](../../docs/GLOBAL_EBPF_VERIFICATION_REPORT.md)
 
@@ -11,7 +11,7 @@
 | Gate | Result |
 |------|--------|
 | RT Guard flood (P1–P5) | PASS |
-| Holy Grail H1–H12 | PASS (12/12) |
+| SCX1202 gate matrix H1–H12 | PASS (12/12) |
 | kselftest `rt_stall` | EXT ≥4% under RT load (symptom reproduced) |
 | kselftest `rt_guard_stress` | 60s soak — no stall exit |
 | #1202 repro with bpfland | `STALL_DETECTED=NO` |
@@ -37,7 +37,7 @@
 | `contrib/sched-ext/bpf/scx_rt_guard.bpf.h` | Layer 3 BPF header |
 | `contrib/sched-ext/selftests/rt_guard_stress.{c,bpf.c}` | kselftest harness |
 | `benchmarks/sched-ext-gates/` | Flood-safe gate scripts (P1–P7) |
-| `benchmarks/ebpf-gates/holy-grail-verify.sh` | H1–H12 matrix verifier |
+| `benchmarks/ebpf-gates/scx1202-matrix-verify.sh` | H1–H12 matrix verifier |
 
 Raw VPS logs are kept locally under `scripts/oneclick/results/` (gitignored). Use the verification scripts above to regenerate evidence on a sched_ext host.
 
@@ -45,4 +45,4 @@ Raw VPS logs are kept locally under `scripts/oneclick/results/` (gitignored). Us
 
 ## Upstream Next Steps
 
-See [`UPSTREAM_TRACKING.md`](UPSTREAM_TRACKING.md) for maintainer contacts and submission commands (`scripts/contabo/submit-rt-guard-upstream.sh`).
+See [`UPSTREAM_TRACKING.md`](UPSTREAM_TRACKING.md) for maintainer contacts and submission commands (`scripts/server/submit-rt-guard-upstream.sh`).

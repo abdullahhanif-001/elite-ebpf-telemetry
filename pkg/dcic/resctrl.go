@@ -9,7 +9,7 @@ import (
 )
 
 // ResctrlActuator applies L3 CAT schemata under /sys/fs/resctrl when Track B capable.
-// Soft cgroup actuator remains the Contabo default; this is used only when capability allows.
+// Soft cgroup actuator remains the Server default; this is used only when capability allows.
 type ResctrlActuator struct {
 	Root     string // /sys/fs/resctrl
 	CtrlGroup string // elite_be

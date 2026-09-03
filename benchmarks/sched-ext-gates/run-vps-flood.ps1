@@ -11,20 +11,20 @@ $Root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 Set-Location $Root
 
 function Invoke-Vps([string]$Cmd) {
-    ssh contabo-server $Cmd
+    ssh production-server $Cmd
 }
 
 switch ($Phase) {
     'deploy' {
-        ssh contabo-server "mkdir -p /opt/elite/src/benchmarks/sched-ext-gates /opt/elite/src/scripts/contabo /opt/elite/src/contrib"
-        scp -r benchmarks/sched-ext-gates contabo-server:/opt/elite/src/benchmarks/
-        scp scripts/contabo/sched-ext-vps-prep.sh contabo-server:/opt/elite/src/scripts/contabo/
-        scp -r contrib/sched-ext contabo-server:/opt/elite/src/contrib/
-        Invoke-Vps "chmod +x /opt/elite/src/benchmarks/sched-ext-gates/*.sh /opt/elite/src/scripts/contabo/*.sh"
+        ssh production-server "mkdir -p /opt/elite/src/benchmarks/sched-ext-gates /opt/elite/src/scripts/server /opt/elite/src/contrib"
+        scp -r benchmarks/sched-ext-gates production-server:/opt/elite/src/benchmarks/
+        scp scripts/server/sched-ext-vps-prep.sh production-server:/opt/elite/src/scripts/server/
+        scp -r contrib/sched-ext production-server:/opt/elite/src/contrib/
+        Invoke-Vps "chmod +x /opt/elite/src/benchmarks/sched-ext-gates/*.sh /opt/elite/src/scripts/server/*.sh"
         Write-Host "DEPLOY_OK"
     }
     'build' {
-        Invoke-Vps "export ELITE_SRC=/opt/elite/src; python3 /opt/elite/src/scripts/contabo/patch-scx-ftrace-bypass.py 2>/dev/null || true; bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh scx-build 2>&1 | tail -30"
+        Invoke-Vps "export ELITE_SRC=/opt/elite/src; python3 /opt/elite/src/scripts/server/patch-scx-ftrace-bypass.py 2>/dev/null || true; bash /opt/elite/src/scripts/server/sched-ext-vps-prep.sh scx-build 2>&1 | tail -30"
         Invoke-Vps "ls -la /opt/scx/target/release/scx_bpfland /opt/scx/target/release/scx_lavd 2>/dev/null"
         Write-Host "BUILD_OK"
     }

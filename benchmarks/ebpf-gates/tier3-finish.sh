@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tier3-finish.sh — run remaining Holy Grail checks (simple one-shot on VPS).
+# tier3-finish.sh — run remaining SCX1202 gate matrix checks (simple one-shot on VPS).
 set -euo pipefail
 ROOT="${ELITE_SRC:-/opt/elite/src}"
 G="${ROOT}/benchmarks/ebpf-gates"
@@ -12,6 +12,6 @@ bash "${G}/tier3-layered-simple.sh" || true
 bash "${G}/tier3-run-all.sh"
 bash "${G}/tier3-build-matrix.sh"
 bash "${G}/tier3-endurance-simple.sh" bpfland 1800
-bash "${G}/holy-grail-verify.sh" "${FLOOD_OUT}"
+bash "${G}/scx1202-matrix-verify.sh" "${FLOOD_OUT}"
 bash "${G}/global-ebpf-aggregate.sh"
 echo "TIER3_FINISH_DONE"

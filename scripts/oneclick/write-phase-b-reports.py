@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Phase B staff-engineer markdown reports from live VPS artifacts."""
+"""Generate Phase B operational markdown reports from live server artifacts."""
 from __future__ import annotations
 
 import os
@@ -111,17 +111,17 @@ ebpf_xray = f"""# eBPF X-Ray — Live Production Proof (X1–X8)
 **Artifact:** `{xray_path}`  
 **Verdict:** `{xray_verdict}`
 
-## What this proves (absolute)
+## Scope
 
-On a **live production VPS** (Contabo, shared PM2 neighbors), Elite is the only named stack that simultaneously:
+On a **live production server** (shared PM2 neighbors), Elite provides:
 
-1. Runs **12+ CO-RE trace probes** on :9102 with elite_softirq, elite_socketlatency, elite_connecttrace, elite_shrinklat, and **30 elite_predict_* series**.
-2. Compiles and loads a **custom XDP mitigator** (xdp_mitigator.c) with a **pinned elite_policy BPF map**.
-3. Keeps **forecaster policy state** in parity between disk (predict-policy.bin) and the pinned map (X5).
-4. Passes **W4 in-process map sync** at sub-100µs (bundled in X6).
-5. Wraps every attach/load with **PM2_GUARD_OK** — zero neighbor restarts.
+1. **12+ CO-RE trace probes** on :9102 — elite_softirq, elite_socketlatency, elite_connecttrace, elite_shrinklat, **30 elite_predict_* series**.
+2. **Custom XDP mitigator** (xdp_mitigator.c) with **pinned elite_policy BPF map**.
+3. **Forecaster policy parity** between disk (predict-policy.bin) and pinned map (X5).
+4. **W4 in-process map sync** at sub-100µs (X6).
+5. **PM2_GUARD_OK** on every attach/load — zero neighbor restarts.
 
-No Pixie pod, no Cilium CNI, no Tetragon enforcement daemon, no standalone ebpf_exporter sidecar is required for this **single-systemd closed loop**.
+Single-systemd closed loop. No Pixie pod, Cilium CNI, Tetragon daemon, or ebpf_exporter sidecar required.
 
 ## Gate results
 
@@ -136,9 +136,9 @@ No Pixie pod, no Cilium CNI, no Tetragon enforcement daemon, no standalone ebpf_
 | X7 | XDP attach + policy pin | **PASS** | no XDP mitigator | XDP in CNI | no | no | optional | no |
 | X8 | PM2 guard after xray | **PASS** | not a product goal | not PM2-safe | heavy agent | sidecar class | secops | secops |
 
-## Staff-engineer read
+## Operational read
 
-If you are evaluating **physics + predict + actuate on bare metal/VPS**, this x-ray is the artifact other vendors do not ship: a **reproducible bash proof** that BPF programs are loaded, maps are pinned, metrics are live, and co-resident PM2 fleets stay untouched.
+Reproducible bash proof: BPF loaded, maps pinned, metrics live, PM2 fleet untouched.
 
 ```text
 REAL_EBPF_XRAY_PASS
@@ -154,11 +154,11 @@ w4_report = f"""# W4 — Policy Map Inject Latency Gate
 **Measured:** p99 ≈ **{w4_p99} µs** (`{w4_ns} ns/op` bench)  
 **Verdict:** `{w4_verdict}`
 
-## Absolute statement
+## Measured result
 
-Elite synchronizes forecaster policy into a **pinned BPF hash map** via SyncPolicyToBPFMap (cilium/ebpf) in **~{w4_p99} µs** per update on production silicon — **{headroom}× headroom under a 100 µs SLO** before XDP even reads the map.
+Forecaster policy sync into **pinned BPF hash map** via SyncPolicyToBPFMap — **~{w4_p99} µs** per update ({headroom}× headroom under 100 µs SLO).
 
-## World comparison (policy → kernel fast path)
+## Peer baseline (policy → kernel path)
 
 | Stack | Policy→kernel path | Typical update latency class | Closed-loop on VPS systemd |
 |-------|-------------------|------------------------------|----------------------------|
@@ -171,7 +171,7 @@ Elite synchronizes forecaster policy into a **pinned BPF hash map** via SyncPoli
 | Falco | rule reload | seconds class | security alerts |
 | Inspektor Gadget | gadget attach | operator-driven | optional K8s |
 
-**Conclusion:** For **sub-millisecond policy injection into BPF** on a single VPS without a mesh or CNI, Elite is the only stack in this matrix with a **numbered microsecond proof** tied to production code (pkg/forecaster/policy_bpf_sync.go).
+**Conclusion:** Sub-millisecond policy injection into BPF on single production server without mesh or CNI — measured in pkg/forecaster/policy_bpf_sync.go.
 
 ```text
 W4_PASS
@@ -180,29 +180,30 @@ bench_ns_per_op={w4_ns}
 ```
 """
 
-gates_report = f"""# Elite #1 Gates — 8/8 Production Checklist
+gates_report = f"""# Elite Production Gates — 8/8 Checklist
 
 **Generated:** {GEN_ISO}  
 **Host:** {HOST}  
+**Author:** Abdullah Hanif  
 **Summary:** pass={gates_pass} fail={gates_fail}  
 **Artifact:** `{gates_path}`
 
-## Gates (what staff engineers audit before switch)
+## Gates (operator audit before switch)
 
-| Gate | Requirement | World peer default |
-|------|-------------|-------------------|
+| Gate | Requirement | Peer baseline |
+|------|-------------|---------------|
 | G1 | elite_predict_* live on :9102 | Beyla/Hubble: no kinematic predict series |
 | G1b | Full elite_* physics families | node_exporter: host stats only |
 | G2 | Soft DCIC actuate metrics :9103 | Pixie: observe-only |
 | G3 | Category bakeoff artifact tree | no peer ships bakeoff script |
-| G4 | PM2_GUARD_OK (neighbor safety) | **unique to Elite** shared-VPS charter |
+| G4 | PM2_GUARD_OK (neighbor safety) | documented for Elite shared-VPS charter |
 | G5 | H11 LIVE evidence tree | closed-loop proof rare in eBPF OSS |
 | UX1 | elite-updater binary | most agents: manual rollouts |
 | UX2 | elite-updater.timer active | signed atomic updates uncommon |
 
-## Absolute claim (scoped)
+## Scoped verdict
 
-When **pass=8 fail=0**, Elite is **switch-ready on Contabo** for physics-speed Soft closed-loop — with live predict, Soft DCIC actuate, updater UX, and **documented PM2 co-resident safety**. No competitor in WORLD_EBPF_COMPARISON.md publishes an equivalent **8-gate bash checklist** for bare-metal VPS.
+When **pass=8 fail=0**, Elite is **switch-ready on production server** for physics-speed Soft closed-loop — live predict, Soft DCIC actuate, updater UX, documented PM2 co-resident safety.
 
 ```text
 GATES_8_8_PASS
@@ -211,59 +212,53 @@ fail={gates_fail}
 ```
 """
 
-flagship = f"""# Phase B VPS Proof Report — Staff Engineer Evidence Pack
+flagship = f"""# Phase B VPS Proof Report — Operational Evidence Pack
 
 **Repository:** [abdullahhanif-001/elite-ebpf-telemetry](https://github.com/abdullahhanif-001/elite-ebpf-telemetry)  
+**Author:** Abdullah Hanif  
 **Generated:** {GEN_ISO}  
 **Host:** {HOST}  
 **Evidence root:** `{RESULTS_DIR}`
 
-## Executive verdict (read this first)
+## Executive verdict
 
-Elite Phase B on Contabo is **not a demo** — it is a **PM2-safe, Sonar A-grade, reproducible proof suite** that no other eBPF product in our world matrix ships as a single bash orchestration:
-
-| Proof | Verdict | Why it matters |
-|-------|---------|----------------|
-| Real closed-loop | REAL_CLOSED_LOOP_PASS | Predict file + live metrics — not mock inject |
+| Proof | Verdict | Notes |
+|-------|---------|-------|
+| Real closed-loop | REAL_CLOSED_LOOP_PASS | Predict file + live metrics |
 | H11 live predict | H11_PASS_LIVE | elite_predict_* scraped under load |
 | eBPF X-Ray X1–X8 | `{xray_verdict}` | BPF inventory, compile, map parity, XDP, PM2 |
-| W4 map inject | `{w4_verdict}` (~{w4_p99} µs) | Forecaster→pinned map faster than any peer SLO we cite |
+| W4 map inject | `{w4_verdict}` (~{w4_p99} µs) | Forecaster→pinned map sync |
 | Speed S0–S5 | `{speed_verdict}` | ≤2% core avg, 0-alloc hot paths |
 | Category bakeoff | CATEGORY_BAKEOFF_PASS | Elite vs node_exporter class peers |
 | Final stress (7 tests) | COMPLETE | TCP flood, SIGTERM, corrupt config, 60s soak |
-| Adversarial audit | FAILURES=0 (physics skipped safe) | No open pprof on :9102 |
+| Adversarial audit | FAILURES=0 | No open pprof on :9102 |
 | Gates 8/8 | pass={gates_pass} fail={gates_fail} | Production switch checklist |
-| PM2 charter | PM2_GUARD_OK | Six neighbor apps — **zero restart delta** |
-| SonarCloud | Security/Reliability/Maintainability **A** | Supply chain gate on main |
+| PM2 charter | PM2_GUARD_OK | Six neighbor apps — zero restart delta |
+| SonarCloud | A-grade | Supply chain gate on main |
 | Elite CI + check | green on main | BPF generate + golangci + Shellcheck |
 
-## World top-tool comparison (same VPS constraints)
+## Competitor baseline (production server, same VPS constraints)
 
-Scores are **WIN / PEER / DECLINE** on Elite's axis: *physics-speed Soft closed-loop on systemd VPS with PM2 neighbors*.
+| Tool | Org | Physics | Predict | BPF→XDP | Soft actuate | PM2-safe | Map sync |
+|------|-----|:-------:|:-------:|:-------:|:------------:|:--------:|:--------:|
+| **Elite** | Abdullah Hanif | PASS | PASS | PASS | PASS | PASS | PASS (~{w4_p99} µs) |
+| Cilium Hubble | Isovalent | BASELINE | OUT_OF_SCOPE | BASELINE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE |
+| Tetragon | Isovalent | OUT_OF_SCOPE | OUT_OF_SCOPE | BASELINE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE |
+| Pixie | CNCF | BASELINE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE |
+| Grafana Beyla | Grafana | BASELINE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE |
+| Cloudflare ebpf_exporter | Cloudflare | BASELINE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE |
+| Falco | CNCF | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE |
+| node_exporter | Prometheus | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | OUT_OF_SCOPE | BASELINE | OUT_OF_SCOPE |
 
-| Tool | Org | Physics probes | Kinematic predict | BPF policy→XDP | Soft actuate | PM2-safe proof | Sub-100µs map sync proof |
-|------|-----|:--------------:|:-----------------:|:--------------:|:------------:|:--------------:|:------------------------:|
-| **Elite** | Abdullah Hanif | **WIN** | **WIN** (0-alloc) | **WIN** | **WIN** | **WIN** (unique) | **WIN** (~{w4_p99} µs) |
-| Cilium Hubble | Isovalent | PEER (flows) | DECLINE | PEER (CNI) | DECLINE | DECLINE | DECLINE |
-| Tetragon | Isovalent | DECLINE | DECLINE | PEER (enforce) | DECLINE | DECLINE | DECLINE |
-| Pixie | CNCF | PEER | DECLINE | DECLINE | DECLINE | DECLINE (heavy) | DECLINE |
-| Grafana Beyla | Grafana | PEER (app) | DECLINE | DECLINE | DECLINE | DECLINE | DECLINE |
-| Cloudflare ebpf_exporter | Cloudflare | PEER (:9435) | DECLINE | DECLINE | DECLINE | DECLINE | DECLINE |
-| Falco | CNCF | DECLINE | DECLINE | DECLINE | DECLINE | DECLINE | DECLINE |
-| Inspektor Gadget | IG | PEER | DECLINE | DECLINE | DECLINE | DECLINE | DECLINE |
-| Microsoft Retina | Microsoft | PEER | DECLINE | DECLINE | DECLINE | DECLINE | DECLINE |
-| Istio sidecar | Istio | DECLINE | DECLINE | DECLINE | DECLINE | DECLINE | DECLINE |
-| node_exporter | Prometheus | DECLINE | DECLINE | DECLINE | DECLINE | PEER (light) | DECLINE |
+**Scoped claim:** Live numbered proofs for predict + actuate + XDP policy map + PM2 co-residence on one production server.
 
-**Absolute scoped claim:** On this rubric Elite is the **only** stack with **live numbered proofs** for predict + actuate + XDP policy map + PM2 co-residence on one VPS.
+**Honesty:** Elite does not claim global eBPF leadership, Tetragon-grade blocking, or DeepFlow APM. See CLAIM_CHARTER.md.
 
-**Honesty:** Elite does **not** claim global eBPF #1, Tetragon-grade attack blocking, or DeepFlow APM. See CLAIM_CHARTER.md.
-
-## Reproduce on Contabo
+## Reproduce on server
 
 ```bash
 export REAL_ONLY=1 SKIP_PHYSICS_PROOF=1
-bash scripts/contabo/safe-proof-prep.sh
+bash scripts/server/safe-proof-prep.sh
 bash scripts/oneclick/elite-run-complete.sh
 bash scripts/oneclick/write-phase-b-reports.sh
 ```
@@ -274,12 +269,12 @@ bash scripts/oneclick/write-phase-b-reports.sh
 - W4_XDP_GATE_REPORT.md
 - GATES_8_8_REPORT.md
 - COMPETITIVE_SPEED.md
-- WORLD_BEST_SCORECARD.md
-- docs/WORLD_EBPF_COMPARISON.md
+- OPS_PROVIDER_SCORE.md
+- docs/COMPETITOR_BASELINE_MATRIX.md
 
 ```text
 PHASE_B_VPS_PROOF_PACK
-VERDICT=PHASE_B_STAFF_ENGINEER_PASS
+VERDICT=PHASE_B_OPS_PASS
 ```
 """
 

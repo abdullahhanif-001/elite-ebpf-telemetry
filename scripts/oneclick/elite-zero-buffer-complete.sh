@@ -33,7 +33,7 @@ run_step "g10-priority" "bash \"${SCRIPT_DIR}/g10-priority-pass-proof.sh\""
 run_step "g14-multicore" "bash \"${REPO_ROOT}/benchmarks/zero-buffer/g14-multicore.sh\""
 run_step "g15-federate" "bash \"${SCRIPT_DIR}/g15-federate-propagation-proof.sh\""
 
-WRAP="${REPO_ROOT}/scripts/contabo/pm2-guard-wrap.sh"
+WRAP="${REPO_ROOT}/scripts/server/pm2-guard-wrap.sh"
 if [[ -f "${WRAP}" ]]; then
   run_step "elite-run-complete" "bash \"${WRAP}\" -- bash \"${SCRIPT_DIR}/elite-run-complete.sh\""
 else
@@ -41,7 +41,7 @@ else
 fi
 
 run_step "traffic-engine" "bash \"${SCRIPT_DIR}/traffic-engine-proof.sh\""
-run_step "w5-graduated" "bash \"${REPO_ROOT}/benchmarks/contabo-gates/w5-xdp-graduated-shed.sh\""
+run_step "w5-graduated" "bash \"${REPO_ROOT}/benchmarks/server-gates/w5-xdp-graduated-shed.sh\""
 run_step "thundering-herd" "bash \"${SCRIPT_DIR}/thundering-herd-proof.sh\""
 
 if [[ -f "${SCRIPT_DIR}/gates-checklist.sh" ]]; then

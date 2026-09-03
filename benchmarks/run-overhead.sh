@@ -64,7 +64,7 @@ case "$MODE" in
     fi
     ;;
   systemd)
-    exec bash "$ROOT/deploy/contabo/run-overhead-systemd.sh"
+    exec bash "$ROOT/deploy/server/run-overhead-systemd.sh"
     ;;
   *)
     echo "FAIL: unknown mode $MODE (use kubernetes or systemd)" >&2

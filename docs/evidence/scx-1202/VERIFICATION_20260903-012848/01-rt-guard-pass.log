@@ -1,0 +1,622 @@
+[G0] vps-connect-check
+VPS_CONNECT_PASS host=ubuntu-s-4vcpu-8gb-nyc1 (local)
+[G0] PASS local
+[G1] pm2-guard before
+PM2_WRAP before rt-guard
+PM2_GUARD_OK[before-rt-guard] apps=1
+[G1] PASS (or baseline created)
+[G2] rt_stall kselftest
+===== START =====
+TEST: create_dsq
+DESCRIPTION: Create and destroy a dsq in a loop
+OUTPUT:
+ok 1 create_dsq # 
+=====  END  =====
+===== START =====
+TEST: enq_last_no_enq_fails
+DESCRIPTION: Verify we eject a scheduler if we specify the SCX_OPS_ENQ_LAST flag without defining ops.enqueue()
+OUTPUT:
+ok 2 enq_last_no_enq_fails # 
+=====  END  =====
+===== START =====
+TEST: ddsp_bogus_dsq_fail
+DESCRIPTION: Verify we gracefully fail, and fall back to using a built-in DSQ, if we do a direct dispatch to an invalid DSQ in ops.select_cpu()
+OUTPUT:
+ok 3 ddsp_bogus_dsq_fail # 
+=====  END  =====
+===== START =====
+TEST: ddsp_vtimelocal_fail
+DESCRIPTION: Verify we gracefully fail, and fall back to using a built-in DSQ, if we do a direct vtime dispatch to a built-in DSQ from DSQ in ops.select_cpu()
+OUTPUT:
+ok 4 ddsp_vtimelocal_fail # 
+=====  END  =====
+===== START =====
+TEST: dsp_local_on
+DESCRIPTION: Verify we can directly dispatch tasks to a local DSQs from ops.dispatch()
+OUTPUT:
+ok 5 dsp_local_on # 
+=====  END  =====
+===== START =====
+TEST: enq_select_cpu
+DESCRIPTION: Verify scx_bpf_select_cpu_dfl() from multiple contexts
+OUTPUT:
+test_select_cpu_from_user: CPU 0
+ok 6 enq_select_cpu # 
+=====  END  =====
+===== START =====
+TEST: exit
+DESCRIPTION: Verify we can cleanly exit a scheduler in multiple places
+OUTPUT:
+ok 7 exit # 
+=====  END  =====
+===== START =====
+TEST: hotplug
+DESCRIPTION: Verify hotplug behavior
+OUTPUT:
+EXIT: unregistered from BPF (hotplug event detected (1 going online))
+EXIT: unregistered from BPF (hotplug event detected (1 going offline))
+EXIT: unregistered from the main kernel (cpu 1 going online, exiting scheduler)
+EXIT: unregistered from the main kernel (cpu 1 going offline, exiting scheduler)
+EXIT: unregistered from the main kernel (expected hotplug seq 71 did not match actual 72)
+ok 8 hotplug # 
+=====  END  =====
+===== START =====
+TEST: init_enable_count
+DESCRIPTION: Verify we correctly count the occurrences of init, enable, etc callbacks.
+OUTPUT:
+ok 9 init_enable_count # 
+=====  END  =====
+===== START =====
+TEST: maximal
+DESCRIPTION: Verify we can load a scheduler with every callback defined
+OUTPUT:
+ok 10 maximal # 
+=====  END  =====
+===== START =====
+TEST: maybe_null
+DESCRIPTION: Verify if PTR_MAYBE_NULL works for .dispatch
+OUTPUT:
+libbpf: prog 'maybe_null_fail_dispatch': BPF program load failed: -EACCES
+libbpf: prog 'maybe_null_fail_dispatch': -- BEGIN PROG LOAD LOG --
+Global function maybe_null_fail_dispatch() doesn't return scalar. Only those are supported.
+0: R1=ctx() R10=fp0
+; void BPF_STRUCT_OPS(maybe_null_fail_dispatch, s32 cpu, struct task_struct *p) @ maybe_null_fail_dsp.bpf.c:15
+0: (79) r1 = *(u64 *)(r1 +8)          ; R1=trusted_ptr_or_null_task_struct(id=1)
+; vtime_test = p->scx.dsq_vtime; @ maybe_null_fail_dsp.bpf.c:17
+1: (79) r1 = *(u64 *)(r1 +840)
+R1 invalid mem access 'trusted_ptr_or_null_'
+processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+libbpf: prog 'maybe_null_fail_dispatch': failed to load: -EACCES
+libbpf: failed to load object 'maybe_null_fail_dsp'
+libbpf: failed to load BPF skeleton 'maybe_null_fail_dsp': -EACCES
+libbpf: prog 'maybe_null_fail_yield': BPF program load failed: -EACCES
+libbpf: prog 'maybe_null_fail_yield': -- BEGIN PROG LOAD LOG --
+0: R1=ctx() R10=fp0
+; bool BPF_STRUCT_OPS(maybe_null_fail_yield, struct task_struct *from, @ maybe_null_fail_yld.bpf.c:15
+0: (b7) r2 = 2104                     ; R2=2104
+1: (79) r1 = *(u64 *)(r1 +8)          ; R1=trusted_ptr_or_null_task_struct(id=1)
+2: (bf) r3 = r1                       ; R1=trusted_ptr_or_null_task_struct(id=1) R3=trusted_ptr_or_null_task_struct(id=1)
+3: (0f) r3 += r2
+R3 pointer arithmetic on trusted_ptr_or_null_ prohibited, null-check it first
+processed 4 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+libbpf: prog 'maybe_null_fail_yield': failed to load: -EACCES
+libbpf: failed to load object 'maybe_null_fail_yld'
+libbpf: failed to load BPF skeleton 'maybe_null_fail_yld': -EACCES
+ok 11 maybe_null # 
+=====  END  =====
+===== START =====
+TEST: minimal
+DESCRIPTION: Verify we can load a fully minimal scheduler
+OUTPUT:
+ok 12 minimal # 
+=====  END  =====
+===== START =====
+TEST: numa
+DESCRIPTION: Verify NUMA-aware functionalities
+OUTPUT:
+ok 13 numa # 
+=====  END  =====
+===== START =====
+TEST: allowed_cpus
+DESCRIPTION: Verify scx_bpf_select_cpu_and()
+OUTPUT:
+test_select_cpu_from_user: CPU 3
+ok 14 allowed_cpus # 
+=====  END  =====
+===== START =====
+TEST: peek_dsq
+DESCRIPTION: Test DSQ create/destroy operations and future peek functionality
+OUTPUT:
+Enabling scheduler to test DSQ insert operations...
+Starting 4 background workload threads...
+Waiting for enqueue events.
+Background workload threads stopped.
+Enqueue/dispatch count over 3 seconds: 218 / 22032
+Debug: ksym_exists=1
+DSQ insert test done on cpu: 0
+✓ DSQ insert succeeded !
+  DSQ peek result 1 (before insert): 0
+✓ DSQ peek verification success: peek returned NULL!
+  DSQ peek result 2 (after insert): -119042792017152
+  DSQ peek result 2, expected: -119042792017152
+✓ DSQ peek verification success: peek returned the inserted task!
+  Inserted test task -> pid: 115609
+  DSQ peek result 2 -> pid: 115609
+Observed DSQ pool DSQ peek pids:
+  Sample 2: pid 73202
+  Sample 7: pid 115607
+  Sample 8: pid 115608
+  Sample 9: pid 115609
+  Sample 10: pid 115610
+  Sample 11: pid 97710
+  Sample 12: pid 608
+  Sample 13: pid 707
+  Sample 15: pid 15
+  Sample 18: pid 5318
+  Sample 22: pid 22
+  Sample 23: pid 98823
+  Sample 26: pid 626
+  Sample 29: pid 629
+  Sample 32: pid 932
+  Sample 33: pid 43832
+  Sample 43: pid 95443
+  Sample 56: pid 61556
+  Sample 57: pid 757
+  Sample 58: pid 758
+  Sample 73: pid 773
+  Sample 74: pid 774
+  Sample 75: pid 675
+  Sample 76: pid 676
+  Sample 77: pid 677
+  Sample 81: pid 681
+Observed ~26 pids in the DSQ pool DSQ(s)
+Total non-null peek observations: 676 out of 174353
+✓ DSQ pool test success: observed successful peeks in native mode
+ok 15 peek_dsq # 
+=====  END  =====
+===== START =====
+TEST: prog_run
+DESCRIPTION: Verify we can call into a scheduler with BPF_PROG_RUN, and invoke kfuncs
+OUTPUT:
+ok 16 prog_run # 
+=====  END  =====
+===== START =====
+TEST: reload_loop
+DESCRIPTION: Stress test loading and unloading schedulers repeatedly in a tight loop
+OUTPUT:
+ok 17 reload_loop # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dfl
+DESCRIPTION: Verify the default ops.select_cpu() dispatches tasks when idles cores are found, and skips ops.enqueue()
+OUTPUT:
+ok 18 select_cpu_dfl # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dfl_nodispatch
+DESCRIPTION: Verify behavior of scx_bpf_select_cpu_dfl() in ops.select_cpu()
+OUTPUT:
+ok 19 select_cpu_dfl_nodispatch # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dispatch
+DESCRIPTION: Test direct dispatching to built-in DSQs from ops.select_cpu()
+OUTPUT:
+ok 20 select_cpu_dispatch # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dispatch_bad_dsq
+DESCRIPTION: Verify graceful failure if we direct-dispatch to a bogus DSQ in ops.select_cpu()
+OUTPUT:
+ok 21 select_cpu_dispatch_bad_dsq # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dispatch_dbl_dsp
+DESCRIPTION: Verify graceful failure if we dispatch twice to a DSQ in ops.select_cpu()
+OUTPUT:
+ok 22 select_cpu_dispatch_dbl_dsp # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_vtime
+DESCRIPTION: Test doing direct vtime-dispatching from ops.select_cpu(), to a non-built-in DSQ
+OUTPUT:
+ok 23 select_cpu_vtime # 
+=====  END  =====
+===== START =====
+TEST: rt_stall
+DESCRIPTION: Verify that RT tasks cannot stall SCHED_EXT tasks
+OUTPUT:
+TAP version 13
+1..1
+# Runtime of FAIR task (PID 119954) is 0.250000 seconds
+# Runtime of RT task (PID 119955) is 4.740000 seconds
+# FAIR task got 5.01% of total runtime
+ok 1 PASS: FAIR task got more than 4.00% of runtime
+TAP version 13
+1..1
+# Runtime of EXT task (PID 119957) is 0.240000 seconds
+# Runtime of RT task (PID 119958) is 4.740000 seconds
+# EXT task got 4.82% of total runtime
+ok 2 PASS: EXT task got more than 4.00% of runtime
+TAP version 13
+1..1
+# Runtime of FAIR task (PID 119960) is 0.240000 seconds
+# Runtime of RT task (PID 119961) is 4.750000 seconds
+# FAIR task got 4.81% of total runtime
+ok 3 PASS: FAIR task got more than 4.00% of runtime
+TAP version 13
+1..1
+# Runtime of EXT task (PID 119965) is 0.240000 seconds
+# Runtime of RT task (PID 119966) is 4.740000 seconds
+# EXT task got 4.82% of total runtime
+ok 4 PASS: EXT task got more than 4.00% of runtime
+ok 24 rt_stall # 
+=====  END  =====
+===== START =====
+TEST: rt_guard_stress
+DESCRIPTION: 60s RT+EXT soak — zero watchdog stall (rt_guard + ext_server)
+OUTPUT:
+TAP version 13
+1..1
+ok 1 60s soak with RT+EXT on CPU 1 — no watchdog exit
+ok 25 rt_guard_stress # 
+=====  END  =====
+===== START =====
+TEST: example
+DESCRIPTION: Validate the basic function of the test suite itself
+OUTPUT:
+ok 26 example # 
+=====  END  =====
+===== START =====
+TEST: total_bw
+DESCRIPTION: Verify total_bw consistency across BPF program states
+OUTPUT:
+BPF prog initially not loaded, reading total_bw values
+Read 4 total_bw values (testing 4 CPUs)
+Values are consistent: 419424
+BPF program loaded, reading total_bw values
+Read 4 total_bw values (testing 4 CPUs)
+Values are consistent: 419424
+BPF program unloaded, reading total_bw values
+Read 4 total_bw values (testing 4 CPUs)
+Values are consistent: 419424
+All total_bw values are consistent across all scenarios
+ok 27 total_bw # 
+=====  END  =====
+
+
+=============================
+
+RESULTS:
+
+PASSED:  27
+SKIPPED: 0
+FAILED:  0
+[G2] PASS
+[G3] rt_guard_stress
+===== START =====
+TEST: create_dsq
+DESCRIPTION: Create and destroy a dsq in a loop
+OUTPUT:
+ok 1 create_dsq # 
+=====  END  =====
+===== START =====
+TEST: enq_last_no_enq_fails
+DESCRIPTION: Verify we eject a scheduler if we specify the SCX_OPS_ENQ_LAST flag without defining ops.enqueue()
+OUTPUT:
+ok 2 enq_last_no_enq_fails # 
+=====  END  =====
+===== START =====
+TEST: ddsp_bogus_dsq_fail
+DESCRIPTION: Verify we gracefully fail, and fall back to using a built-in DSQ, if we do a direct dispatch to an invalid DSQ in ops.select_cpu()
+OUTPUT:
+ok 3 ddsp_bogus_dsq_fail # 
+=====  END  =====
+===== START =====
+TEST: ddsp_vtimelocal_fail
+DESCRIPTION: Verify we gracefully fail, and fall back to using a built-in DSQ, if we do a direct vtime dispatch to a built-in DSQ from DSQ in ops.select_cpu()
+OUTPUT:
+ok 4 ddsp_vtimelocal_fail # 
+=====  END  =====
+===== START =====
+TEST: dsp_local_on
+DESCRIPTION: Verify we can directly dispatch tasks to a local DSQs from ops.dispatch()
+OUTPUT:
+ok 5 dsp_local_on # 
+=====  END  =====
+===== START =====
+TEST: enq_select_cpu
+DESCRIPTION: Verify scx_bpf_select_cpu_dfl() from multiple contexts
+OUTPUT:
+test_select_cpu_from_user: CPU 1
+ok 6 enq_select_cpu # 
+=====  END  =====
+===== START =====
+TEST: exit
+DESCRIPTION: Verify we can cleanly exit a scheduler in multiple places
+OUTPUT:
+ok 7 exit # 
+=====  END  =====
+===== START =====
+TEST: hotplug
+DESCRIPTION: Verify hotplug behavior
+OUTPUT:
+EXIT: unregistered from BPF (hotplug event detected (1 going online))
+EXIT: unregistered from BPF (hotplug event detected (1 going offline))
+EXIT: unregistered from the main kernel (cpu 1 going online, exiting scheduler)
+EXIT: unregistered from the main kernel (cpu 1 going offline, exiting scheduler)
+EXIT: unregistered from the main kernel (expected hotplug seq 81 did not match actual 82)
+ok 8 hotplug # 
+=====  END  =====
+===== START =====
+TEST: init_enable_count
+DESCRIPTION: Verify we correctly count the occurrences of init, enable, etc callbacks.
+OUTPUT:
+ok 9 init_enable_count # 
+=====  END  =====
+===== START =====
+TEST: maximal
+DESCRIPTION: Verify we can load a scheduler with every callback defined
+OUTPUT:
+ok 10 maximal # 
+=====  END  =====
+===== START =====
+TEST: maybe_null
+DESCRIPTION: Verify if PTR_MAYBE_NULL works for .dispatch
+OUTPUT:
+libbpf: prog 'maybe_null_fail_dispatch': BPF program load failed: -EACCES
+libbpf: prog 'maybe_null_fail_dispatch': -- BEGIN PROG LOAD LOG --
+Global function maybe_null_fail_dispatch() doesn't return scalar. Only those are supported.
+0: R1=ctx() R10=fp0
+; void BPF_STRUCT_OPS(maybe_null_fail_dispatch, s32 cpu, struct task_struct *p) @ maybe_null_fail_dsp.bpf.c:15
+0: (79) r1 = *(u64 *)(r1 +8)          ; R1=trusted_ptr_or_null_task_struct(id=1)
+; vtime_test = p->scx.dsq_vtime; @ maybe_null_fail_dsp.bpf.c:17
+1: (79) r1 = *(u64 *)(r1 +840)
+R1 invalid mem access 'trusted_ptr_or_null_'
+processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+libbpf: prog 'maybe_null_fail_dispatch': failed to load: -EACCES
+libbpf: failed to load object 'maybe_null_fail_dsp'
+libbpf: failed to load BPF skeleton 'maybe_null_fail_dsp': -EACCES
+libbpf: prog 'maybe_null_fail_yield': BPF program load failed: -EACCES
+libbpf: prog 'maybe_null_fail_yield': -- BEGIN PROG LOAD LOG --
+0: R1=ctx() R10=fp0
+; bool BPF_STRUCT_OPS(maybe_null_fail_yield, struct task_struct *from, @ maybe_null_fail_yld.bpf.c:15
+0: (b7) r2 = 2104                     ; R2=2104
+1: (79) r1 = *(u64 *)(r1 +8)          ; R1=trusted_ptr_or_null_task_struct(id=1)
+2: (bf) r3 = r1                       ; R1=trusted_ptr_or_null_task_struct(id=1) R3=trusted_ptr_or_null_task_struct(id=1)
+3: (0f) r3 += r2
+R3 pointer arithmetic on trusted_ptr_or_null_ prohibited, null-check it first
+processed 4 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+libbpf: prog 'maybe_null_fail_yield': failed to load: -EACCES
+libbpf: failed to load object 'maybe_null_fail_yld'
+libbpf: failed to load BPF skeleton 'maybe_null_fail_yld': -EACCES
+ok 11 maybe_null # 
+=====  END  =====
+===== START =====
+TEST: minimal
+DESCRIPTION: Verify we can load a fully minimal scheduler
+OUTPUT:
+ok 12 minimal # 
+=====  END  =====
+===== START =====
+TEST: numa
+DESCRIPTION: Verify NUMA-aware functionalities
+OUTPUT:
+ok 13 numa # 
+=====  END  =====
+===== START =====
+TEST: allowed_cpus
+DESCRIPTION: Verify scx_bpf_select_cpu_and()
+OUTPUT:
+test_select_cpu_from_user: CPU 2
+ok 14 allowed_cpus # 
+=====  END  =====
+===== START =====
+TEST: peek_dsq
+DESCRIPTION: Test DSQ create/destroy operations and future peek functionality
+OUTPUT:
+Enabling scheduler to test DSQ insert operations...
+Starting 4 background workload threads...
+Waiting for enqueue events.
+Background workload threads stopped.
+Enqueue/dispatch count over 3 seconds: 124 / 21245
+Debug: ksym_exists=1
+DSQ insert test done on cpu: 2
+✓ DSQ insert succeeded !
+  DSQ peek result 1 (before insert): 0
+✓ DSQ peek verification success: peek returned NULL!
+  DSQ peek result 2 (after insert): -119043027418112
+  DSQ peek result 2, expected: -119043027418112
+✓ DSQ peek verification success: peek returned the inserted task!
+  Inserted test task -> pid: 122125
+  DSQ peek result 2 -> pid: 122125
+Observed DSQ pool DSQ peek pids:
+  Sample 2: pid 73202
+  Sample 5: pid 705
+  Sample 7: pid 707
+  Sample 10: pid 97710
+  Sample 13: pid 113513
+  Sample 15: pid 15
+  Sample 23: pid 98823
+  Sample 24: pid 122124
+  Sample 25: pid 122125
+  Sample 26: pid 626
+  Sample 27: pid 122126
+  Sample 28: pid 122123
+  Sample 29: pid 629
+  Sample 32: pid 932
+  Sample 33: pid 32
+  Sample 47: pid 95147
+  Sample 49: pid 1149
+  Sample 50: pid 97850
+  Sample 56: pid 61556
+  Sample 58: pid 758
+  Sample 73: pid 773
+Observed ~21 pids in the DSQ pool DSQ(s)
+Total non-null peek observations: 495 out of 167586
+✓ DSQ pool test success: observed successful peeks in native mode
+ok 15 peek_dsq # 
+=====  END  =====
+===== START =====
+TEST: prog_run
+DESCRIPTION: Verify we can call into a scheduler with BPF_PROG_RUN, and invoke kfuncs
+OUTPUT:
+ok 16 prog_run # 
+=====  END  =====
+===== START =====
+TEST: reload_loop
+DESCRIPTION: Stress test loading and unloading schedulers repeatedly in a tight loop
+OUTPUT:
+ok 17 reload_loop # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dfl
+DESCRIPTION: Verify the default ops.select_cpu() dispatches tasks when idles cores are found, and skips ops.enqueue()
+OUTPUT:
+ok 18 select_cpu_dfl # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dfl_nodispatch
+DESCRIPTION: Verify behavior of scx_bpf_select_cpu_dfl() in ops.select_cpu()
+OUTPUT:
+ok 19 select_cpu_dfl_nodispatch # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dispatch
+DESCRIPTION: Test direct dispatching to built-in DSQs from ops.select_cpu()
+OUTPUT:
+ok 20 select_cpu_dispatch # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dispatch_bad_dsq
+DESCRIPTION: Verify graceful failure if we direct-dispatch to a bogus DSQ in ops.select_cpu()
+OUTPUT:
+ok 21 select_cpu_dispatch_bad_dsq # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_dispatch_dbl_dsp
+DESCRIPTION: Verify graceful failure if we dispatch twice to a DSQ in ops.select_cpu()
+OUTPUT:
+ok 22 select_cpu_dispatch_dbl_dsp # 
+=====  END  =====
+===== START =====
+TEST: select_cpu_vtime
+DESCRIPTION: Test doing direct vtime-dispatching from ops.select_cpu(), to a non-built-in DSQ
+OUTPUT:
+ok 23 select_cpu_vtime # 
+=====  END  =====
+===== START =====
+TEST: rt_stall
+DESCRIPTION: Verify that RT tasks cannot stall SCHED_EXT tasks
+OUTPUT:
+TAP version 13
+1..1
+# Runtime of FAIR task (PID 126049) is 0.240000 seconds
+# Runtime of RT task (PID 126050) is 4.750000 seconds
+# FAIR task got 4.81% of total runtime
+ok 1 PASS: FAIR task got more than 4.00% of runtime
+TAP version 13
+1..1
+# Runtime of EXT task (PID 126053) is 0.240000 seconds
+# Runtime of RT task (PID 126054) is 4.750000 seconds
+# EXT task got 4.81% of total runtime
+ok 2 PASS: EXT task got more than 4.00% of runtime
+TAP version 13
+1..1
+# Runtime of FAIR task (PID 126056) is 0.240000 seconds
+# Runtime of RT task (PID 126057) is 4.750000 seconds
+# FAIR task got 4.81% of total runtime
+ok 3 PASS: FAIR task got more than 4.00% of runtime
+TAP version 13
+1..1
+# Runtime of EXT task (PID 126060) is 0.240000 seconds
+# Runtime of RT task (PID 126061) is 4.750000 seconds
+# EXT task got 4.81% of total runtime
+ok 4 PASS: EXT task got more than 4.00% of runtime
+ok 24 rt_stall # 
+=====  END  =====
+===== START =====
+TEST: rt_guard_stress
+DESCRIPTION: 60s RT+EXT soak — zero watchdog stall (rt_guard + ext_server)
+OUTPUT:
+TAP version 13
+1..1
+ok 1 60s soak with RT+EXT on CPU 1 — no watchdog exit
+ok 25 rt_guard_stress # 
+=====  END  =====
+===== START =====
+TEST: example
+DESCRIPTION: Validate the basic function of the test suite itself
+OUTPUT:
+ok 26 example # 
+=====  END  =====
+===== START =====
+TEST: total_bw
+DESCRIPTION: Verify total_bw consistency across BPF program states
+OUTPUT:
+BPF prog initially not loaded, reading total_bw values
+Read 4 total_bw values (testing 4 CPUs)
+Values are consistent: 419424
+BPF program loaded, reading total_bw values
+Read 4 total_bw values (testing 4 CPUs)
+Values are consistent: 419424
+BPF program unloaded, reading total_bw values
+Read 4 total_bw values (testing 4 CPUs)
+Values are consistent: 419424
+All total_bw values are consistent across all scenarios
+ok 27 total_bw # 
+=====  END  =====
+
+
+=============================
+
+RESULTS:
+
+PASSED:  27
+SKIPPED: 0
+FAILED:  0
+[G3] PASS
+[G4] rt-monopolization-repro
+01:33:14 [INFO] NUMA nodes: 1
+01:33:14 [INFO] Disabling NUMA optimizations
+01:33:14 [INFO] scx_bpfland 1.1.3 x86_64-unknown-linux-gnu SMT off
+01:33:14 [INFO] scheduler options: /opt/scx/target/release/scx_bpfland
+01:33:14 [INFO] scheduler flags: 0x36
+01:33:14 [INFO] primary CPU domain = 0xf
+01:33:14 [INFO] cpufreq performance level: max
+LOADER=bpfland pid=126113
+RT_STRESS pid=126124
+stress-ng: info:  [126124] setting to a 15 secs run per stressor
+stress-ng: info:  [126124] dispatching hogs: 1 cpu
+stress-ng: info:  [126124] skipped: 0
+stress-ng: info:  [126124] passed: 1: cpu (1)
+stress-ng: info:  [126124] failed: 0
+stress-ng: info:  [126124] metrics untrustworthy: 0
+stress-ng: info:  [126124] successful run completed in 15.00 secs
+STALL_DETECTED=NO
+EXIT: unregistered from user space
+01:33:37 [INFO] Unregister scx_bpfland scheduler
+RT_REPRO_CAPTURED out=/opt/elite/src/scripts/oneclick/results/rt-guard-baseline-20260903-013314
+[G4] PASS no stall
+[G5] sched_ext status
+sched_ext debugfs N/A
+[G5] INFO captured
+[G6] bpfland 5min soak
+01:33:37 [INFO] NUMA nodes: 1
+01:33:37 [INFO] Disabling NUMA optimizations
+01:33:37 [INFO] scx_bpfland 1.1.3 x86_64-unknown-linux-gnu SMT off
+01:33:37 [INFO] scheduler options: /opt/scx/target/release/scx_bpfland
+01:33:37 [INFO] scheduler flags: 0x36
+01:33:37 [INFO] primary CPU domain = 0xf
+01:33:37 [INFO] cpufreq performance level: max
+SOAK_PASS
+EXIT: unregistered from user space
+01:38:37 [INFO] Unregister scx_bpfland scheduler
+[G6] PASS
+PM2_WRAP after rt-guard
+PM2_GUARD_OK[after-rt-guard] apps=1
+RT_GUARD_PASS fail=0 host=ubuntu-s-4vcpu-8gb-nyc1 kernel=6.19.0-rc7-scx-dl-g9854922412d3-dirty

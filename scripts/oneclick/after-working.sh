@@ -20,8 +20,8 @@ record() {
 }
 
 pm2_guard() {
-  if [[ -x "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" ]]; then
-    bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" || return 1
+  if [[ -x "${REPO_ROOT}/deploy/server/pm2-guard.sh" ]]; then
+    bash "${REPO_ROOT}/deploy/server/pm2-guard.sh" || return 1
   fi
   return 0
 }
@@ -80,18 +80,19 @@ else
   record T2 "bench skipped (no go)" SKIP
 fi
 
-# T3 MOCK_ — unit tests tagged; Contabo inject optional
-if [[ -f "${SCRIPT_DIR}/mock-inject-proof.sh" ]]; then
-  if bash "${SCRIPT_DIR}/mock-inject-proof.sh"; then
-    record T3 "MOCK_ inject proof" PASS
-  else
-    record T3 "MOCK_ inject proof" FAIL
-  fi
-else
-  record T3 "MOCK_ via unit tests only" SKIP
-fi
+# T3 causal goldens — covered by pkg/forecaster unit tests (no inject script)
+set +e
+(cd "${REPO_ROOT}" && go test ./pkg/forecaster/ -run 'TestFuse|TestEncode|TestPolicy' -count=1) \
+  >"${OUT_DIR}/t3-causal.txt" 2>&1
+t3=$?
+set -e
+case "${t3}" in
+  0) record T3 "causal goldens (pkg/forecaster)" PASS ;;
+  2) record T3 "go/docker unavailable" SKIP ;;
+  *) record T3 "causal golden tests failed" FAIL ;;
+esac
 
-# T4 Contabo proofs if present
+# T4 Server proofs if present
 if [[ -f "${SCRIPT_DIR}/physics-pack-proof.sh" ]]; then
   set +e
   bash "${SCRIPT_DIR}/physics-pack-proof.sh" >"${OUT_DIR}/physics-proof.log" 2>&1

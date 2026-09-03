@@ -1,6 +1,6 @@
 # compose-obi
 
-Optional OpenTelemetry eBPF Instrumentation (heavy). Off Contabo default.
+Optional OpenTelemetry eBPF Instrumentation (heavy). Off Server default.
 
 Pin and run upstream OBI/Beyla separately; scrape OTLP/Prometheus into localhost Prometheus.
 Keep `network.enabled: false` if Cilium eBPF dataplane is present.

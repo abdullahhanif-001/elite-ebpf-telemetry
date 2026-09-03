@@ -1,15 +1,15 @@
 # Competitive Proof (Executive)
 
-**Brand line:** Best measured Contabo physics-speed Soft closed-loop VPS eBPF stack among named bakeoff peers — proven, not pitched. Not global eBPF #1. See [CLAIM_CHARTER.md](CLAIM_CHARTER.md).
+**Brand line:** Best measured Server physics-speed Soft closed-loop VPS eBPF stack among named bakeoff peers — proven, not pitched. Not global eBPF #1. See [CLAIM_CHARTER.md](CLAIM_CHARTER.md).
 
 | Field | Value |
 |-------|--------|
 | Project | Elite eBPF Telemetry |
 | Maintainer | Abdullah Hanif (`abdullahhanif-001`) |
 | Khasiyat | Physics eBPF + 0-alloc kinematic predict + Soft density on one VPS |
-| Full matrix | [WORLD_EBPF_COMPARISON.md](WORLD_EBPF_COMPARISON.md) |
-| Rubric | [WORLD_BEST_PROVIDER_SCORE.md](WORLD_BEST_PROVIDER_SCORE.md) |
-| Category #1 | [CATEGORY_NUMBER_ONE_SCORECARD.md](CATEGORY_NUMBER_ONE_SCORECARD.md) |
+| Full matrix | [COMPETITOR_BASELINE_MATRIX.md](COMPETITOR_BASELINE_MATRIX.md) |
+| Rubric | [OPS_PROVIDER_SCORE.md](OPS_PROVIDER_SCORE.md) |
+| Server category | [SERVER_CATEGORY_SCORECARD.md](SERVER_CATEGORY_SCORECARD.md) |
 | Speed | [../scripts/oneclick/COMPETITIVE_SPEED.md](../scripts/oneclick/COMPETITIVE_SPEED.md) |
 | Overhead | [../scripts/oneclick/COMPETITIVE_OVERHEAD.md](../scripts/oneclick/COMPETITIVE_OVERHEAD.md) |
 | Phase B VPS pack | [../scripts/oneclick/PHASE_B_VPS_PROOF_REPORT.md](../scripts/oneclick/PHASE_B_VPS_PROOF_REPORT.md) |
@@ -27,12 +27,12 @@
 | Retina | K8s network observability | **PEER** on cluster drops; **WIN** bare-metal systemd |
 | Istio sidecar | L7 mesh | **WIN** speed (remove sidecar tax) |
 | Hubble | Cilium flows | **WIN** no-CNI VPS path |
-| Soft density closed-loop | — | **WIN** (Elite-only Contabo default) |
+| Soft density closed-loop | — | **WIN** (Elite-only Server default) |
 
-## Contabo evidence (required for category claim)
+## Server evidence (required for category claim)
 
 - Speed / overhead bakeoff → `CATEGORY_BAKEOFF_PASS`
 - Live predict H11 → **`H11_PASS_LIVE`** (`elite_predict_*` scrape)
-- Soft DCIC → `:9103` up; ECGF → `ECGF_PROVEN_SUPERIOR`
+- Soft DCIC → `:9103` up; ECGF → `ECGF_BENCH_PASS`
 - PM2 untouched → `PM2_GUARD_OK`
-- Score ≥ 90 + LIVE → `VERDICT=WORLD_BEST_PHYSICS_SPEED_VPS`
+- Score ≥ 90 + LIVE → `VERDICT=SERVER_PHYSICS_VPS_PASS`

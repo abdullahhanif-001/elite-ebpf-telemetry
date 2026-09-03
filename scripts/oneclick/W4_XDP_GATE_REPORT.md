@@ -1,16 +1,16 @@
 # W4 — Policy Map Inject Latency Gate
 
-**Generated:** 2026-08-28T20:23:08+05:00  
+**Generated:** 2026-09-02T07:46:27+05:00  
 **Host:** pc-55  
 **Threshold:** p99 ≤ 100 µs (gate)  
 **Measured:** p99 ≈ **? µs** (`? ns/op` bench)  
 **Verdict:** `PENDING`
 
-## Absolute statement
+## Measured result
 
-Elite synchronizes forecaster policy into a **pinned BPF hash map** via SyncPolicyToBPFMap (cilium/ebpf) in **~? µs** per update on production silicon — **?× headroom under a 100 µs SLO** before XDP even reads the map.
+Forecaster policy sync into **pinned BPF hash map** via SyncPolicyToBPFMap — **~? µs** per update (?× headroom under 100 µs SLO).
 
-## World comparison (policy → kernel fast path)
+## Peer baseline (policy → kernel path)
 
 | Stack | Policy→kernel path | Typical update latency class | Closed-loop on VPS systemd |
 |-------|-------------------|------------------------------|----------------------------|
@@ -23,7 +23,7 @@ Elite synchronizes forecaster policy into a **pinned BPF hash map** via SyncPoli
 | Falco | rule reload | seconds class | security alerts |
 | Inspektor Gadget | gadget attach | operator-driven | optional K8s |
 
-**Conclusion:** For **sub-millisecond policy injection into BPF** on a single VPS without a mesh or CNI, Elite is the only stack in this matrix with a **numbered microsecond proof** tied to production code (pkg/forecaster/policy_bpf_sync.go).
+**Conclusion:** Sub-millisecond policy injection into BPF on single production server without mesh or CNI — measured in pkg/forecaster/policy_bpf_sync.go.
 
 ```text
 W4_PASS

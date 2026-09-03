@@ -35,7 +35,7 @@ Defaults: α=`0.3`, window=`8`, hardDrop=`0.1s`, accThreshold=`0.001 s^-2`, inte
 
 ## Hot-path constraints (why this is not a weekend script)
 
-- **0 allocs/op** targets on `ParseBody` / `Observe` (verified with `go test -benchmem` under Docker on Contabo).
+- **0 allocs/op** targets on `ParseBody` / `Observe` (verified with `go test -benchmem` under Docker on server).
 - Scraper: 256 KiB reusable body + read buffers; `DisableCompression`; no per-tick `map` for series.
 - Runner: `[2]Snapshot` flip via `atomic.Uint32` index — avoids allocating a new pointer each tick.
 - Semi mode uses the agent’s existing Reload path to shed **event** probes only; metrics probes stay registered.
@@ -75,7 +75,7 @@ forecast:
 ```bash
 go test ./pkg/forecaster/ -count=1
 go test ./pkg/forecaster/ -bench=. -benchmem -count=1
-bash scripts/oneclick/forecaster-agrade.sh   # Contabo, PM2-safe
+bash scripts/oneclick/forecaster-agrade.sh   # Server, PM2-safe
 curl -s 127.0.0.1:9102/metrics | grep elite_predict_
 ```
 
