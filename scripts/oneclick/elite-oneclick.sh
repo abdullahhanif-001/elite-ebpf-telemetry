@@ -145,11 +145,25 @@ block = """forecast:
   readPSI: true
   decisionPath: "/var/lib/elite/predict-decision.json"
   targets:
-    - url: "http://127.0.0.1:9435/metrics"
-      series: ["softirq_wait_seconds"]
     - url: "http://127.0.0.1:9102/metrics"
-      series: ["elite_socketlatency"]
+      series: ["elite_socketlatency", "elite_softirq"]
 """
+# Prefer native :9102 only. Optional :9435 when physics pack is healthy (avoid hang/deadlock).
+if pathlib.Path("/opt/elite/physics-pack/bin/ebpf_exporter").exists():
+    import urllib.request
+    ok9435 = False
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:9435/metrics", timeout=2) as r:
+            ok9435 = r.status == 200
+    except Exception:
+        ok9435 = False
+    if ok9435:
+        block = block.replace(
+            '  targets:\n    - url: "http://127.0.0.1:9102/metrics"',
+            '  targets:\n    - url: "http://127.0.0.1:9435/metrics"\n      series: ["softirq_wait_seconds"]\n    - url: "http://127.0.0.1:9102/metrics"',
+            1,
+        )
+
 if re.search(r"(?m)^forecast:\\s*$", text):
     text = re.sub(r"(?ms)^forecast:.*?(?=^(?:[a-zA-Z]|\\Z))", block, text, count=1)
 else:
