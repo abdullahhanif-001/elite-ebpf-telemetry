@@ -9,7 +9,7 @@
 | PR | ~~#3780~~ **CLOSED** (withdrawn for dev — reopen when ready) |
 | Status | **Development in progress** — not ready for maintainer review |
 | Fixes | [#1202](https://github.com/sched-ext/scx/issues/1202) |
-| Issue comment | https://github.com/sched-ext/scx/issues/1202#issuecomment-5489342030 |
+| Issue comment | [issuecomment-5489342030](https://github.com/sched-ext/scx/issues/1202#issuecomment-5489342030) |
 
 ## Layer 2 — LKML (watchdog patch)
 

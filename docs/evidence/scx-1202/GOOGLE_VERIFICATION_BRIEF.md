@@ -53,8 +53,8 @@ bash scripts/verify-scx-1202-evidence.sh
 
 | Item | Link | Status |
 |------|------|--------|
-| Layer 3 PR | https://github.com/sched-ext/scx/pull/3780 | OPEN |
-| Issue #1202 comment | https://github.com/sched-ext/scx/issues/1202#issuecomment-5489342030 | Posted |
+| Layer 3 PR | [sched-ext/scx#3780](https://github.com/sched-ext/scx/pull/3780) | OPEN |
+| Issue #1202 comment | [comment](https://github.com/sched-ext/scx/issues/1202#issuecomment-5489342030) | Posted |
 | Layer 2 LKML | [LKML_SUBMISSION.md](LKML_SUBMISSION.md) | Ready to send |
 
 **Fully solved** = PR merged + #1202 closed. Not claimed until then.

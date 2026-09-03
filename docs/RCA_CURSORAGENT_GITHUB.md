@@ -17,9 +17,9 @@ The Cursor app install lives at **github.com/apps/cursor/installations** or repo
 
 ## Fix (cache clear at source)
 
-1. https://github.com/apps/cursor/installations → Configure → remove this repo  
-2. https://github.com/abdullahhanif-001/elite-ebpf-telemetry/settings/installations → uninstall Cursor  
-3. https://cursor.com/dashboard → Integrations → Disconnect GitHub  
+1. [Cursor app installations](https://github.com/apps/cursor/installations) → Configure → remove this repo  
+2. [Repo installations](https://github.com/abdullahhanif-001/elite-ebpf-telemetry/settings/installations) → uninstall Cursor  
+3. [Cursor dashboard](https://cursor.com/dashboard) → Integrations → Disconnect GitHub  
 4. Browser console (logged into cursor.com): `fetch('/api/dashboard/disconnect-github', {method: 'POST', credentials: 'include'})`  
 5. Re-verify: `bash scripts/remove-cursor-github-app.sh`
 
