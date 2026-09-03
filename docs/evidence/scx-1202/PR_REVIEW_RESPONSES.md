@@ -6,7 +6,7 @@ For [sched-ext/scx#3780](https://github.com/sched-ext/scx/pull/3780). Paste into
 
 **Response:** The interceptor only calls `scx_bpf_reenqueue_local()` when `next` is SCHED_FIFO/RR/DEADLINE. We validated with `rt_guard_stress` 60s soak (no `SCX_EXIT_ERROR_STALL`). Happy to add a perf benchmark if reviewers want scale data.
 
-Evidence: `RT_GUARD_PASS fail=0` — https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/docs/evidence/scx-1202/VERIFICATION_20260901-045612/01-RT_GUARD_PASS.verdict
+Evidence: `RT_GUARD_PASS fail=0` — [verdict](https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/docs/evidence/scx-1202/VERIFICATION_20260901-045612/01-RT_GUARD_PASS.verdict)
 
 ## LIMIT-SCX-002 — partial-switch mode gap (Layer 2)
 

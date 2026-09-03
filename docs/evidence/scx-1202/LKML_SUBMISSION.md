@@ -20,7 +20,7 @@
 
 ## Public evidence (link in email body — do not attach raw VPS logs)
 
-```
+```text
 Evidence: https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/docs/evidence/scx-1202/VERIFICATION_20260901-045612/01-RT_GUARD_PASS.verdict
 Verifier: https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/scripts/verify-scx-1202-evidence.sh
 Layer 3 PR: https://github.com/sched-ext/scx/pull/3780
@@ -43,7 +43,7 @@ Or send manually from your email client with patch attached and cover letter as 
 
 ## Email body addition (paste after cover letter)
 
-```
+```text
 Verified on production server (kernel 6.19.0-rc7, CONFIG_SCHED_CLASS_EXT=y):
   RT_GUARD_PASS fail=0
   rt_stall + rt_guard_stress kselftests PASS
