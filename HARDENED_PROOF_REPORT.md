@@ -155,7 +155,7 @@ failed start probe kernellatency      ✗ (removed from config — symbol mismat
 | `bpf/softirq.c` | `vec_nr >= 32` shift guard |
 | `pkg/exporter/probe/perfbatch/reader.go` | Timeout-bounded perf reads, 256-event buffer, drop accounting |
 | `pkg/exporter/cmd/server.go` | Loopback enforcement, HTTP timeouts, pprof removed |
-| `deploy/contabo/config.yaml` | `kernellatency` removed (6.8 incompatible) |
+| `deploy/server/config.yaml` | `kernellatency` removed (6.8 incompatible) |
 
 ---
 
@@ -213,7 +213,7 @@ PM2_RESTARTS=131 UNCHANGED
 | Stress harness | `/opt/elite/scripts/final-stress-test.sh` |
 | PM2 guard | `/opt/elite/scripts/pm2-guard.sh` |
 | Prior security audit | `SECURITY_AUDIT_AND_METRICS.md` |
-| Systemd hardened unit | `deploy/contabo/elite-agent.service` |
+| Systemd hardened unit | `deploy/server/elite-agent.service` |
 
 ---
 

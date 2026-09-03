@@ -9,7 +9,7 @@ OUR="${ROOT}/scripts/oneclick/results/our-goal"
 REPORT="${OUR}/END_TO_END_REPORT-LATEST.md"
 STAMP="$(date -u +%Y%m%d-%H%M%S)"
 TMP="/tmp/our-goal-fix-${STAMP}.log"
-CONTABO="${ROOT}/scripts/contabo"
+SERVER_SCRIPTS="${ROOT}/scripts/server"
 
 exec > >(tee -a "${TMP}") 2>&1
 echo "=== our-goal-fix-failures ${STAMP} ==="
@@ -36,8 +36,8 @@ fi
 
 set +e
 # 3) XDP policy pin on lo only (eth0 untouched) — PM2 guard active, rider excluded
-if [[ -x "${CONTABO}/safe-proof-prep.sh" ]]; then
-  bash "${CONTABO}/safe-proof-prep.sh" || echo "WARN safe-proof-prep partial"
+if [[ -x "${SERVER_SCRIPTS}/safe-proof-prep.sh" ]]; then
+  bash "${SERVER_SCRIPTS}/safe-proof-prep.sh" || echo "WARN safe-proof-prep partial"
 fi
 POLICY_PIN="/sys/fs/bpf/elite/policy"
 if [[ ! -e "${POLICY_PIN}" ]] && command -v bpftool >/dev/null 2>&1; then
@@ -47,7 +47,7 @@ if [[ ! -e "${POLICY_PIN}" ]] && command -v bpftool >/dev/null 2>&1; then
     bpftool map pin id "${id}" "${POLICY_PIN}" 2>/dev/null && echo "OK pinned policy id=${id}"
   fi
 fi
-bash "${CONTABO}/xdp-attach.sh" status 2>&1 || true
+bash "${SERVER_SCRIPTS}/xdp-attach.sh" status 2>&1 || true
 if xdp-loader status 2>/dev/null | grep -q xdp_mitigator; then
   mkdir -p /opt/elite-build/logs
   echo "XDP_ATTACH_OK" > /opt/elite-build/logs/xdp-attach-latest.verdict

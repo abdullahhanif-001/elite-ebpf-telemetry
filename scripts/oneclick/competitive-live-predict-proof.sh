@@ -22,8 +22,8 @@ record() {
 }
 
 pm2_guard() {
-  if [[ -f "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" ]]; then
-    bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" && return 0
+  if [[ -f "${REPO_ROOT}/deploy/server/pm2-guard.sh" ]]; then
+    bash "${REPO_ROOT}/deploy/server/pm2-guard.sh" && return 0
   fi
   return 2
 }
@@ -66,9 +66,16 @@ set -e
 
 if [[ "${d_before}" -ne 0 && "${p_before}" -ne 0 ]]; then
   record L1 "neither Soft DCIC nor agent metrics up" SKIP
-  # Still run pure MOCK_ decision-bus shape (unit-level) so suite has a signal
-  bash "${SCRIPT_DIR}/mock-inject-proof.sh" | tee "${OUT_DIR}/mock.txt"
-  record L2 "MOCK_ decision bus shape only" PASS
+  set +e
+  (cd "${REPO_ROOT}" && go test ./pkg/forecaster/ -run 'TestFuse|TestEncode|TestPolicy' -count=1) \
+    >"${OUT_DIR}/unit-causal.txt" 2>&1
+  unit_rc=$?
+  set -e
+  if [[ "${unit_rc}" -eq 0 ]]; then
+    record L2 "causal goldens (unit tests only)" PASS
+  else
+    record L2 "causal unit tests failed" FAIL
+  fi
   echo "H11_SKIP_NO_RUNTIME" >"${OUT_DIR}/verdict.txt"
   exit 2
 fi
@@ -158,8 +165,10 @@ fi
 # Honesty: MOCK bus alone is never live PASS (ADR-005 / Track C).
 if [[ "${LIVE_PREDICT}" -eq 1 ]]; then
   echo "H11_PASS_LIVE" >"${OUT_DIR}/verdict.txt"
-  mkdir -p "${SCRIPT_DIR}/results"
+  mkdir -p "${SCRIPT_DIR}/results/p1-live-${STAMP}"
   cp -a "${OUT_DIR}/results.txt" "${SCRIPT_DIR}/results/live-predict-${STAMP}.txt" 2>/dev/null || true
+  cp -a "${OUT_DIR}/verdict.txt" "${SCRIPT_DIR}/results/p1-live-${STAMP}/verdict.txt"
+  cp -a "${OUT_DIR}/results.txt" "${SCRIPT_DIR}/results/p1-live-${STAMP}/results.txt" 2>/dev/null || true
   echo "=== H11 LIVE OK ==="
   exit 0
 fi

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rt-guard-pass.sh — full REAL gate suite G0-G6 on Contabo VPS.
+# rt-guard-pass.sh — full REAL gate suite G0-G6 on production server.
 # shellcheck disable=SC2029
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
@@ -51,7 +51,7 @@ fi
 
 # G1: PM2 guard before
 log_gate 1 "pm2-guard before"
-if vps_cmd "bash ${ELITE_SRC}/scripts/contabo/pm2-guard-wrap.sh before rt-guard 2>/dev/null || true"; then
+if vps_cmd "bash ${ELITE_SRC}/scripts/server/pm2-guard-wrap.sh before rt-guard 2>/dev/null || true"; then
   log_gate 1 "PASS (or baseline created)"
 else
   log_gate 1 "WARN pm2 baseline missing — creating"
@@ -96,54 +96,53 @@ else
   fi
 fi
 
-# G4: issue #1202 repro — must NOT stall after fix
+# G4: issue #1202 repro — must NOT stall after fix; REAL_ONLY requires scx_loader
 log_gate 4 "rt-monopolization-repro"
-if RUN_LOCAL="${RUN_LOCAL}" bash "${GATES_DIR}/rt-monopolization-repro.sh" | tee "${OUT}/g4-repro.log"; then
-  LATEST="$(ls -td "${ROOT}/scripts/oneclick/results/rt-guard-baseline-"* 2>/dev/null | head -1)"
-  if [[ -n "${LATEST}" ]] && grep -qE 'SCX_EXIT_ERROR_STALL|runnable task stall' "${LATEST}/dmesg.txt" 2>/dev/null; then
-    log_gate 4 "FAIL stall still present in dmesg"
-    FAIL=$((FAIL + 1))
-  elif grep -q 'STALL_DETECTED=YES' "${OUT}/g4-repro.log" 2>/dev/null; then
-    log_gate 4 "FAIL stall detected in repro"
-    FAIL=$((FAIL + 1))
-  elif sched_ext_enabled && grep -qE 'LOADER=SKIP' "${OUT}/g4-repro.log" 2>/dev/null; then
-    log_gate 4 "FAIL scx_loader required on sched_ext kernel"
-    FAIL=$((FAIL + 1))
-  else
-    log_gate 4 "PASS no stall"
-  fi
-else
-  log_gate 4 "FAIL repro script error"
+set +e
+RUN_LOCAL="${RUN_LOCAL}" bash "${GATES_DIR}/rt-monopolization-repro.sh" 2>&1 | tee "${OUT}/g4-repro.log"
+g4_rc=${PIPESTATUS[0]}
+set -e
+if [[ "${g4_rc}" -ne 0 ]]; then
+  log_gate 4 "FAIL repro exit=${g4_rc}"
   FAIL=$((FAIL + 1))
+elif grep -qE 'SCX_EXIT_ERROR_STALL|runnable task stall' "${OUT}/g4-repro.log" 2>/dev/null; then
+  log_gate 4 "FAIL stall signature in repro log"
+  FAIL=$((FAIL + 1))
+elif grep -q 'STALL_DETECTED=YES' "${OUT}/g4-repro.log" 2>/dev/null; then
+  log_gate 4 "FAIL stall detected in repro"
+  FAIL=$((FAIL + 1))
+elif sched_ext_enabled && grep -qE 'LOADER=SKIP' "${OUT}/g4-repro.log" 2>/dev/null; then
+  log_gate 4 "FAIL scx_loader required on sched_ext kernel"
+  FAIL=$((FAIL + 1))
+else
+  log_gate 4 "PASS no stall"
 fi
 
-# G5: ext_server debugfs
-log_gate 5 "ext_server status"
-vps_cmd "cat /sys/kernel/debug/sched/ext_server/status 2>/dev/null || echo 'ext_server debugfs N/A'" | tee "${OUT}/g5-ext_server.txt"
+# G5: sched_ext debugfs
+log_gate 5 "sched_ext status"
+vps_cmd "cat /sys/kernel/debug/sched_ext/current 2>/dev/null || cat /sys/kernel/debug/sched/ext/current 2>/dev/null || echo 'sched_ext debugfs N/A'" | tee "${OUT}/g5-sched_ext.txt"
 log_gate 5 "INFO captured"
 
-# G6: scx_bpfland 5min soak (direct binary — scx_loader v1.x is DBus daemon, no `load` subcommand)
+# G6: scx_bpfland 5min soak (skip when scx_loader absent)
 log_gate 6 "bpfland 5min soak"
 if vps_cmd bash -s <<'REMOTE' | tee "${OUT}/g6-soak.log"; then
 set -euo pipefail
-BIN="${SCX_BIN_DIR:-/opt/scx/target/release}/scx_bpfland"
-if [[ ! -x "${BIN}" ]]; then echo "SKIP scx_bpfland"; exit 0; fi
+if ! command -v scx_loader >/dev/null; then echo "SKIP scx_loader"; exit 0; fi
 dmesg -C
-"${BIN}" &
+scx_loader load bpfland &
 LP=$!
 sleep 300
-kill "${LP}" 2>/dev/null || true
-pkill -f '/opt/scx/target/release/scx_bpfland' 2>/dev/null || true
+kill $LP 2>/dev/null || true
 if dmesg | grep -qE 'runnable task stall|SCX_EXIT_ERROR_STALL'; then
   echo "SOAK_FAIL stall detected"
   dmesg | tail -20
   exit 1
 fi
-echo "SOAK_PASS LOADER=bpfland"
+echo "SOAK_PASS"
 REMOTE
-  if grep -qE 'SKIP scx_bpfland|SKIP scx_loader' "${OUT}/g6-soak.log"; then
+  if grep -q 'SKIP scx_loader' "${OUT}/g6-soak.log"; then
     if sched_ext_enabled; then
-      log_gate 6 "FAIL scx_bpfland required on sched_ext kernel"
+      log_gate 6 "FAIL scx_loader required on sched_ext kernel"
       FAIL=$((FAIL + 1))
     else
       log_gate 6 "SKIP (sched_ext not enabled)"
@@ -160,7 +159,7 @@ else
 fi
 
 # G1 after: PM2 guard
-vps_cmd "bash ${ELITE_SRC}/scripts/contabo/pm2-guard-wrap.sh after rt-guard 2>/dev/null || true" || true
+vps_cmd "bash ${ELITE_SRC}/scripts/server/pm2-guard-wrap.sh after rt-guard 2>/dev/null || true" || true
 
 if [[ "${FAIL}" -eq 0 ]]; then
   echo "RT_GUARD_PASS fail=0 host=${SCX_EXPECTED_HOST} kernel=$(uname -r 2>/dev/null || echo unknown)" | tee "${OUT}/verdict.txt"

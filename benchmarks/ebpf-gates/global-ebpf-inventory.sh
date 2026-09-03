@@ -74,7 +74,7 @@ for patch in (root / "contrib/sched-ext/kernel").glob("*.patch"):
     })
 
 gates = list((root / "benchmarks/sched-ext-gates").glob("*.sh"))
-gates += list((root / "benchmarks/contabo-gates").glob("*.sh"))
+gates += list((root / "benchmarks/server-gates").glob("*.sh"))
 gates += list((root / "benchmarks/ebpf-gates").glob("*.sh"))
 for g in sorted(set(gates)):
     items.append({

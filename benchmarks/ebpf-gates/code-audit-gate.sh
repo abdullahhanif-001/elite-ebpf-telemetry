@@ -49,7 +49,7 @@ if [[ "$(hostname 2>/dev/null)" == "${SCX_EXPECTED_HOST}" ]]; then
   done
 else
   log "LOCAL_MODE — run on VPS for live kernel checks"
-  ssh -o ConnectTimeout=15 "${SCX_VPS_HOST:-contabo-server}" \
+  ssh -o ConnectTimeout=15 "${SCX_VPS_HOST:-production-server}" \
     "grep -q scx_stall_caused_by_rt ${SCX_KERNEL_BUILD}/kernel/sched/ext.c && echo LAYER2_VPS=YES || echo LAYER2_VPS=NO" \
     | tee -a "${OUT}" || true
 fi

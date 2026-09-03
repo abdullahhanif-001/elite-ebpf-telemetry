@@ -1,4 +1,4 @@
-# Elite Physics Pack — Contabo scorecard template
+# Elite Physics Pack — Server scorecard template
 
 Fill after `sudo bash scripts/oneclick/elite-physics-pack.sh install` and a traffic soak.
 

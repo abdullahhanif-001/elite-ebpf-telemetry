@@ -19,7 +19,7 @@ install_go_build() {
     echo "go or docker required to build elite-ecgf" >&2
     exit 1
   fi
-  install -m 0644 "${REPO_ROOT}/deploy/contabo/elite-ecgf.service" /etc/systemd/system/elite-ecgf.service
+  install -m 0644 "${REPO_ROOT}/deploy/server/elite-ecgf.service" /etc/systemd/system/elite-ecgf.service
   systemctl daemon-reload
   systemctl enable --now elite-ecgf.service
   echo "elite-ecgf installed"

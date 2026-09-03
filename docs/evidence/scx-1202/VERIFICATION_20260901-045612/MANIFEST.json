@@ -2,18 +2,21 @@
   "verification_stamp": "20260901-045612",
   "commit_sha": "694556c4641f739236993f1f00d50e593f8bf2b4",
   "kernel": "6.19.0-rc7-g9854922412d3-dirty",
-  "host_class": "sched_ext proof host 4vCPU sched_ext",
+  "host_class": "production server 4vCPU sched_ext",
   "real_only": 1,
+  "status": "PARTIAL",
+  "fail_count": 3,
+  "notes": "Historical capture — G4/G6 scx_loader SKIP, flood-safe FAIL grafted stale PASS. Not accepted as FULL proof. Re-run: bash scripts/server/run-scx-1202-evidence.sh",
   "gates": [
     "rt-guard-pass",
-    "holy-grail-verify",
+    "scx1202-matrix-verify",
     "global-ebpf-aggregate",
-    "rt-guard-flood-aggregate"
+    "flood-safe-gate"
   ],
   "verdicts": {
-    "RT_GUARD_PASS": "fail=0",
-    "HOLY_GRAIL": "12/12",
+    "RT_GUARD_PASS": "fail=0 (log shows G4 LOADER=SKIP, G6 SKIP — inconsistent)",
+    "SCX1202_MATRIX": "12/12 (matrix reads local artifact dirs)",
     "GLOBAL_EBPF": "fail=0",
-    "RT_GUARD_FLOOD": "fail=0"
+    "RT_GUARD_FLOOD": "fail=0 (04-flood-safe.log shows FLOOD_SAFE_GATE_FAIL)"
   }
 }

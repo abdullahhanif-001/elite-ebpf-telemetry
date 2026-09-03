@@ -7,7 +7,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/our-goal-log.sh"
 ROOT="$(ebpf_repo_root)"
 STAMP="$(date +%Y%m%d-%H%M%S)"
 OUT="${OUR_GOAL_DIR}/audit/line-audit-${STAMP}.txt"
-VPS_HOST="${SCX_VPS_HOST:-contabo-server}"
+VPS_HOST="${SCX_VPS_HOST:-production-server}"
 VPS_ROOT="${ELITE_SRC:-/opt/elite/src}"
 FAIL=0
 

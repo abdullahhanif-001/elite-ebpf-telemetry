@@ -1,0 +1,7 @@
+=== HOST FINGERPRINT ===
+ubuntu-s-4vcpu-8gb-nyc1
+Linux ubuntu-s-4vcpu-8gb-nyc1 6.19.0-rc7-scx-dl-g9854922412d3-dirty #3 SMP PREEMPT_DYNAMIC Wed Sep  2 10:33:00 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+CONFIG_SCHED_CLASS_EXT=y
+CONFIG_FUNCTION_TRACER=y
+scx_loader=/usr/local/bin/scx_loader
+sched_ext=unknown

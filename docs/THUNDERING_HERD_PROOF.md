@@ -46,4 +46,4 @@ bash scripts/oneclick/thundering-herd-proof.sh
 
 ## Cilium comparison (documented, not marketing)
 
-Measure policy→map latency via W4 gate (`benchmarks/contabo-gates/w4-xdp-inject-latency.sh`) on same host. Thundering outcome compared qualitatively in staff reports — Elite targets **predictive admission** not CNI dataplane replacement.
+Measure policy→map latency via W4 gate (`benchmarks/server-gates/w4-xdp-inject-latency.sh`) on same host. Thundering outcome compared qualitatively in staff reports — Elite targets **predictive admission** not CNI dataplane replacement.

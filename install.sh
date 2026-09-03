@@ -141,7 +141,7 @@ install_agent_binary() {
   dest="${ELITE_ROOT}/bin/elite-agent"
   mkdir -p "${ELITE_ROOT}/bin" "${ELITE_ROOT}/bin/previous"
 
-  # Prefer local build / env override (dev and Contabo source trees)
+  # Prefer local build / env override (dev and Server source trees)
   if [[ -n "${ELITE_AGENT_BIN:-}" && -x "${ELITE_AGENT_BIN}" ]]; then
     log "using ELITE_AGENT_BIN=${ELITE_AGENT_BIN}"
     $DRY_RUN || cp -f "${ELITE_AGENT_BIN}" "${dest}"
@@ -234,14 +234,14 @@ apply_metal() {
   mkdir -p /var/lib/elite /etc/elite
 
   # Deploy configs and units from checkout when present
-  if [[ -d "${ROOT}/deploy/contabo" ]]; then
-    cp -f "${ROOT}/deploy/contabo/config.yaml" "${ELITE_ROOT}/config/config.yaml"
-    cp -f "${ROOT}/deploy/contabo/elite-agent.service" /etc/systemd/system/elite-agent.service
-    cp -f "${ROOT}/deploy/contabo/pm2-guard.sh" "${ELITE_ROOT}/scripts/pm2-guard.sh"
+  if [[ -d "${ROOT}/deploy/server" ]]; then
+    cp -f "${ROOT}/deploy/server/config.yaml" "${ELITE_ROOT}/config/config.yaml"
+    cp -f "${ROOT}/deploy/server/elite-agent.service" /etc/systemd/system/elite-agent.service
+    cp -f "${ROOT}/deploy/server/pm2-guard.sh" "${ELITE_ROOT}/scripts/pm2-guard.sh"
     chmod 0755 "${ELITE_ROOT}/scripts/pm2-guard.sh"
-    if [[ -f "${ROOT}/deploy/contabo/elite-updater.service" ]]; then
-      cp -f "${ROOT}/deploy/contabo/elite-updater.service" /etc/systemd/system/elite-updater.service
-      cp -f "${ROOT}/deploy/contabo/elite-updater.timer" /etc/systemd/system/elite-updater.timer
+    if [[ -f "${ROOT}/deploy/server/elite-updater.service" ]]; then
+      cp -f "${ROOT}/deploy/server/elite-updater.service" /etc/systemd/system/elite-updater.service
+      cp -f "${ROOT}/deploy/server/elite-updater.timer" /etc/systemd/system/elite-updater.timer
     fi
   fi
   if [[ -f "${ROOT}/config/update.yaml" ]]; then
@@ -298,7 +298,7 @@ apply_metal() {
   echo "  curl http://127.0.0.1:9102/metrics"
   echo "  bash ${ELITE_ROOT}/scripts/pm2-guard.sh   # if PM2 apps present"
   echo "  systemctl status elite-agent elite-updater.timer"
-  echo "See deploy/contabo/ROLLBACK.md for rollback."
+  echo "See deploy/server/ROLLBACK.md for rollback."
 }
 
 if [[ -z "$MODE" ]]; then

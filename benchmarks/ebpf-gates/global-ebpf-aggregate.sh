@@ -25,7 +25,7 @@ else
   FAIL=$((FAIL + 1))
 fi
 
-bash "${GATES_EBPF}/holy-grail-verify.sh" "${FLOOD_DIR}" 2>/dev/null || true
+bash "${GATES_EBPF}/scx1202-matrix-verify.sh" "${FLOOD_DIR}" 2>/dev/null || true
 HG="$(cat "${OUR_GOAL_DIR}/HOLY_GRAIL_VERDICT.txt" 2>/dev/null || echo UNKNOWN)"
 HG="$(cat "${OUR_GOAL_DIR}/HOLY_GRAIL_VERDICT.txt" 2>/dev/null || echo UNKNOWN)"
 

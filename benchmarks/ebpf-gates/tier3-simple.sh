@@ -23,6 +23,7 @@ chrt -f 40 taskset -c 1 stress-ng --cpu 1 --cpu-method matrixprod --timeout 20s 
 SP=$!
 sleep 25
 kill "${SP}" "${LP}" 2>/dev/null || true
+pkill -9 -f "/opt/scx/target/release/scx_${SCHED}" 2>/dev/null || true
 wait "${SP}" 2>/dev/null || true
 dmesg > "${SDIR}/dmesg.txt"
 if grep -qE 'runnable task stall|SCX_EXIT_ERROR_STALL|sched_ext.*disabled' "${SDIR}/dmesg.txt"; then

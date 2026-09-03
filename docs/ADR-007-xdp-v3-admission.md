@@ -5,7 +5,7 @@
 
 ## Context
 
-Track D v2 used global `shed_ppm` + 1s userspace loop. Holy grail requires per-packet admission, priority tiers, sub-100ms control, and federation push.
+Track D v2 used global `shed_ppm` + 1s userspace loop. SCX1202 gate matrix requires per-packet admission, priority tiers, sub-100ms control, and federation push.
 
 ## Decision
 

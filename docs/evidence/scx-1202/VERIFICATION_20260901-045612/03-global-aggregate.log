@@ -1,6 +1,6 @@
 D1_inventory=OK
 D2_flood=PASS /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351
-=== holy-grail-verify ===
+=== scx1202-matrix-verify ===
 flood_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351
 rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-065612
   H1: PASS — rt_stall EXT>=4%
@@ -15,7 +15,7 @@ rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-065612
   H10: PASS — negative enq_last
   H11: PASS — healthy minimal scheduler
   H12: PASS — 6/6 PASS_LOADER (5/6+lavd SKIP ok)
-HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
+SCX1202_MATRIX_PASS=YES fail=0 checks=12/12 host=vmi3469243
 OUR_GOAL_LOG phase=D2_holy_grail result=PASS
 D3_telemetry=PASS
 D4_xray=PASS
@@ -28,8 +28,8 @@ phase P4=PASS
 phase P5=PASS
 EVIDENCE_REPORT_OK /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351/EVIDENCE_REPORT.md
 GITHUB_COMMENT_OK /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351/GITHUB_1202_COMMENT.md
-RT_GUARD_FLOOD_PASS fail=0 mode=safe_4vcpu host=##### kernel=6.19.0-rc7-g9854922412d3-dirty
-=== holy-grail-verify ===
+RT_GUARD_FLOOD_PASS fail=0 mode=safe_4vcpu host=vmi3469243 kernel=6.19.0-rc7-g9854922412d3-dirty
+=== scx1202-matrix-verify ===
 flood_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351
 rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-065612
   H1: PASS — rt_stall EXT>=4%
@@ -44,12 +44,12 @@ rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-065612
   H10: PASS — negative enq_last
   H11: PASS — healthy minimal scheduler
   H12: PASS — 6/6 PASS_LOADER (5/6+lavd SKIP ok)
-HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
+SCX1202_MATRIX_PASS=YES fail=0 checks=12/12 host=vmi3469243
 OUR_GOAL_LOG phase=D2_holy_grail result=PASS
 AGGREGATE_OK out=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351
 EVIDENCE_REPORT_OK /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351/EVIDENCE_REPORT.md
 GITHUB_COMMENT_OK /opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260831-062351/GITHUB_1202_COMMENT.md
-GLOBAL_EBPF_SUMMARY host=##### kernel=6.19.0-rc7-g9854922412d3-dirty
-holy_grail=HOLY_GRAIL_1202_SOLVED=YES fail=0 checks=12/12 host=#####
+GLOBAL_EBPF_SUMMARY host=vmi3469243 kernel=6.19.0-rc7-g9854922412d3-dirty
+holy_grail=SCX1202_MATRIX_PASS=YES fail=0 checks=12/12 host=vmi3469243
 fail=0
 OUR_GOAL_LOG phase=GLOBAL result=PASS

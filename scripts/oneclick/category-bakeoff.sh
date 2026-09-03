@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Category #1 bakeoff — same Contabo host, named peers (CLAIM_CHARTER).
+# Server category bakeoff — same production server, named peers (CLAIM_CHARTER).
 # Never touch PM2 apps.
 set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -11,7 +11,7 @@ REPEATS="${BAKEOFF_REPEATS:-3}"
 SAMPLE_SEC="${BAKEOFF_SAMPLE_SEC:-3}"
 
 pm2_ok() {
-  bash "${REPO_ROOT}/deploy/contabo/pm2-guard.sh" >"${OUT}/pm2.txt" 2>&1 && grep -q PM2_GUARD_OK "${OUT}/pm2.txt"
+  bash "${REPO_ROOT}/deploy/server/pm2-guard.sh" >"${OUT}/pm2.txt" 2>&1 && grep -q PM2_GUARD_OK "${OUT}/pm2.txt"
 }
 
 sample_proc() {
@@ -100,9 +100,9 @@ LIVE_YES=no
 [[ "${SOFT}" -eq 1 ]] && SOFT_YES=yes
 [[ "${LIVE}" -eq 1 ]] && LIVE_YES=yes
 
-DOC="${REPO_ROOT}/docs/CATEGORY_NUMBER_ONE_SCORECARD.md"
+DOC="${REPO_ROOT}/docs/SERVER_CATEGORY_SCORECARD.md"
 {
-  echo "# Category Number One Scorecard"
+  echo "# Server Category Scorecard"
   echo ""
   echo "**Generated:** $(date -Is 2>/dev/null || date)"
   echo "**Host out:** \`${OUT}\`"
@@ -110,7 +110,7 @@ DOC="${REPO_ROOT}/docs/CATEGORY_NUMBER_ONE_SCORECARD.md"
   echo "See [CLAIM_CHARTER.md](CLAIM_CHARTER.md)."
   echo ""
   echo '```text'
-  echo "ELITE_CATEGORY_NUMBER_ONE"
+  echo "ELITE_SERVER_CATEGORY_PASS"
   echo "elite_cpu_median=${ELITE_CPU_MED}"
   echo "elite_rss_mb_median=${ELITE_RSS_MED}"
   echo "node_cpu_median=${NODE_CPU_MED}"
@@ -131,7 +131,7 @@ DOC="${REPO_ROOT}/docs/CATEGORY_NUMBER_ONE_SCORECARD.md"
   echo ""
   echo "**Win rule applied:** Elite must expose elite_predict_* + Soft DCIC metrics and keep median agent CPU <= 0.05 cores; node_exporter compared when present (capability: Soft actuate + live predict)."
 } >"${DOC}"
-cp -f "${DOC}" "${OUT}/CATEGORY_NUMBER_ONE_SCORECARD.md"
+cp -f "${DOC}" "${OUT}/SERVER_CATEGORY_SCORECARD.md"
 echo "VERDICT=${VERDICT}" | tee "${OUT}/verdict.txt"
 if [[ "${WIN}" -eq 1 ]]; then
   exit 0

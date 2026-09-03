@@ -21,7 +21,7 @@ Partial mode (SCX_OPS_SWITCH_PARTIAL) is excluded — FAIR tasks may hog
 CPU without RT involvement.
 
 References: https://github.com/sched-ext/scx/issues/1202
-Tested: rt_stall + rt_guard_stress kselftests on Contabo VPS (vmi3469243)
+Tested: rt_stall + rt_guard_stress kselftests on production server (vmi3469243)
 
 ---
  kernel/sched/ext.c | 45 +++++++++++++++++++++++++++++++++++++++++++++

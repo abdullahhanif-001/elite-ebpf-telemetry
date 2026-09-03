@@ -39,8 +39,8 @@ $ pm2 jlist | jq '[.[].pm2_env.restart_time] | add'   # post-audit
 |----|----------|---------------|-----------|----------------------|-------------|
 | V-01 | **Critical** | NULL `sock` deref on RST path | `bpf/tcpreset.c:72` | Attacker triggers TCP RST without socket; BPF reads through NULL → corrupt telemetry / forensics blind spot | Guard `sk` before all reads; set `state=0` on NOSOCK |
 | V-02 | **Critical** | Unauthenticated pprof on metrics port | `pkg/exporter/cmd/server.go:30` | Local attacker dumps heap/goroutine profiles from `:9102` | Removed `net/http/pprof` import; dedicated `ServeMux` (no DefaultServeMux) |
-| V-03 | **Critical** | Root + ambient CAP_SYS_PTRACE | `deploy/contabo/elite-agent.service` | Daemon compromise → read any process memory | Dropped `CAP_SYS_PTRACE`; `NoNewPrivileges=true`; minimal cap set |
-| V-04 | **High** | `kprobe/kfree_skb` on kernel 6.8+ | `bpf/kernellatency.c:214` | Probe attach fails / map exhaustion on drop paths | Removed from Contabo config; fail-soft probe start in Go; CO-RE tracepoint migration planned |
+| V-03 | **Critical** | Root + ambient CAP_SYS_PTRACE | `deploy/server/elite-agent.service` | Daemon compromise → read any process memory | Dropped `CAP_SYS_PTRACE`; `NoNewPrivileges=true`; minimal cap set |
+| V-04 | **High** | `kprobe/kfree_skb` on kernel 6.8+ | `bpf/kernellatency.c:214` | Probe attach fails / map exhaustion on drop paths | Removed from Server config; fail-soft probe start in Go; CO-RE tracepoint migration planned |
 | V-05 | **High** | Stale `kfree_skb` tracepoint layout | `bpf/packetloss.c:11-18` | Kernel 6.11+ misreads protocol field → evasion | CO-RE `trace_event_raw_kfree_skb` with legacy fallback |
 | V-06 | **High** | Unbounded skb header reads | `bpf/headers/inspector.h:166-207` | Crafted skb → kernel memory adjacent to head leaked into tuples | `skb_len`, `ihl`, L3/L4 bounds checks before probe_read |
 | V-07 | **High** | NULL `skb->dev` deref | `bpf/headers/inspector.h:215-222` | Orphaned skb on drop path → EFAULT / garbage ifindex | NULL-check `dev` before ifindex/mtu reads |
@@ -100,7 +100,7 @@ PASS: elite_agent_cpu_cores=0.0033 (<0.10)
 | `/internal` | 200 | **404** (debugMode only) |
 | Loopback bind enforcement | config-only | **runtime reject** of `0.0.0.0` |
 
-**Systemd hardening deployed** (live on Contabo):
+**Systemd hardening deployed** (live on server):
 
 ```text
 $ systemctl show elite-agent -p CPUQuota,MemoryMax,NoNewPrivileges,MemoryCurrent
@@ -148,14 +148,14 @@ PASS: elite_agent_cpu_cores=0.0079 (<0.10)
 
 | Kernel | Probe | Result |
 |--------|-------|--------|
-| 6.8.0-136 (Contabo) | socketlatency | **PASS** — events flowing |
+| 6.8.0-136 (server) | socketlatency | **PASS** — events flowing |
 | 6.8.0-136 | softirq | **PASS** |
 | 6.8.0-136 | packetloss | **PASS** |
 | 6.8.0-136 | tcpsummary | **PASS** |
 | 6.8.0-136 | kernellatency | **FAIL** — `kfree_skb: token __x64_kfree_skb: not found` |
 | 6.8.0-136 | connecttrace | **N/A** — not in v1.0.0 binary |
 
-**Action:** `kernellatency` removed from `/opt/elite/config/config.yaml` on Contabo.
+**Action:** `kernellatency` removed from `/opt/elite/config/config.yaml` on server.
 
 ### 4.3 Metric verification
 
@@ -206,9 +206,9 @@ $ crontab -l | grep pm2-guard
 |----------|------|
 | BPF fixes | `bpf/tcpreset.c`, `bpf/packetloss.c`, `bpf/softirq.c`, `bpf/headers/inspector.h` |
 | Go daemon hardening | `pkg/exporter/cmd/server.go`, `pkg/exporter/security/*`, `pkg/exporter/probe/legacy.go`, `pkg/export/otel.go` |
-| Systemd unit | `deploy/contabo/elite-agent.service` |
-| Slim probe config | `deploy/contabo/config.yaml` (no kernellatency) |
-| Audit harness | `deploy/contabo/security-audit.sh` |
+| Systemd unit | `deploy/server/elite-agent.service` |
+| Slim probe config | `deploy/server/config.yaml` (no kernellatency) |
+| Audit harness | `deploy/server/security-audit.sh` |
 | Rollback | `/opt/elite/ROLLBACK.md` |
 
 ---

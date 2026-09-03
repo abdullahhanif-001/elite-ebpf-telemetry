@@ -1,5 +1,5 @@
 [G0] vps-connect-check
-VPS_CONNECT_PASS host=##### (local)
+VPS_CONNECT_PASS host=vmi3469243 (local)
 [G0] PASS local
 [G1] pm2-guard before
 PM2_WRAP before rt-guard
@@ -659,4 +659,4 @@ PM2_GUARD_OK[after-rt-guard] apps=6
 PM2_GUARD_SKIP_RESTART rider-tracker-api base=349 cur=0
 PM2_GUARD_OK
 PM2_WRAP_OK after rt-guard
-RT_GUARD_PASS fail=0 host=##### kernel=6.19.0-rc7-g9854922412d3-dirty
+RT_GUARD_PASS fail=0 host=vmi3469243 kernel=6.19.0-rc7-g9854922412d3-dirty

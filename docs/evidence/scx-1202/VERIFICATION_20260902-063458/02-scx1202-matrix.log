@@ -1,0 +1,18 @@
+=== scx1202-matrix-verify ===
+flood_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-flood-safe-20260902-061805
+rt_guard_dir=/opt/elite/src/scripts/oneclick/results/rt-guard-20260901-175213
+  H1: PASS — rt_stall EXT>=4%
+  H2: PASS — rt_guard_stress 60s soak
+  H3: PASS — E1 per-CPU RT
+  H4: PASS — E3 multi-CPU RT
+  H5: PASS — repro STALL_DETECTED=NO loader=PARTIAL
+  H6: FAIL — E5 lavd 35s
+  H7: FAIL — 30min endurance
+  H8: FAIL — E2 SCHED_DEADLINE
+  H9: FAIL — E4 partial mode
+  H10: PASS — negative enq_last
+  H11: FAIL — healthy minimal scheduler
+  H12: PARTIAL — kselftest fallback only (Tier3 blocked on ftrace)
+  H12: FAIL — 6/6 PASS_LOADER (5/6+lavd SKIP ok)
+SCX1202_MATRIX_PASS=NO pass=6/12 fail=6 host=ubuntu-s-4vcpu-8gb-nyc1
+OUR_GOAL_LOG phase=D2_holy_grail result=PARTIAL

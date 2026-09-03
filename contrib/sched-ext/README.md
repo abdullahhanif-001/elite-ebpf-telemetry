@@ -9,7 +9,7 @@ Upstream [#1202](https://github.com/sched-ext/scx/issues/1202) remains **open** 
 
 | Gate | Result |
 |------|--------|
-| Holy Grail H1–H12 | **12/12 PASS** — `HOLY_GRAIL_1202_SOLVED=YES` |
+| SCX1202 gate matrix H1–H12 | **12/12 PASS** — `SCX1202_MATRIX_PASS=YES` |
 | #1202 repro | **`STALL_DETECTED=NO`** with bpfland loaded |
 | RT Guard flood P1–P5 | **PASS** |
 | Global eBPF | **`GLOBAL_EBPF_PASS`** |
@@ -33,11 +33,11 @@ Evidence: [docs/evidence/scx-1202/README.md](../../docs/evidence/scx-1202/README
 bash benchmarks/sched-ext-gates/deploy-to-vps.sh
 
 # One-time VPS prep (swap, kernel build, scx clone)
-ssh contabo-server 'bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh swap'
-ssh contabo-server 'bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh deps'
-ssh contabo-server 'bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh kernel-clone'
-ssh contabo-server 'bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh kernel-config'
-ssh contabo-server 'nohup bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh kernel-build > /tmp/scx-kernel-build.log 2>&1 &'
+ssh production-server 'bash /opt/elite/src/scripts/server/sched-ext-vps-prep.sh swap'
+ssh production-server 'bash /opt/elite/src/scripts/server/sched-ext-vps-prep.sh deps'
+ssh production-server 'bash /opt/elite/src/scripts/server/sched-ext-vps-prep.sh kernel-clone'
+ssh production-server 'bash /opt/elite/src/scripts/server/sched-ext-vps-prep.sh kernel-config'
+ssh production-server 'nohup bash /opt/elite/src/scripts/server/sched-ext-vps-prep.sh kernel-build > /tmp/scx-kernel-build.log 2>&1 &'
 
 # After reboot into scx-dl kernel:
 bash benchmarks/sched-ext-gates/rt-guard-pass.sh

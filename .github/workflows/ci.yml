@@ -25,11 +25,11 @@ jobs:
           bash -n install.sh
           bash -n benchmarks/run-overhead.sh
           bash -n benchmarks/run-loadtest.sh
-          bash -n deploy/contabo/run-overhead-systemd.sh
-          bash -n deploy/contabo/run-loadtest.sh
-          bash -n deploy/contabo/pm2-guard.sh
-          bash -n deploy/contabo/security-audit.sh
-          bash -n deploy/contabo/final-stress-test.sh
+          bash -n deploy/server/run-overhead-systemd.sh
+          bash -n deploy/server/run-loadtest.sh
+          bash -n deploy/server/pm2-guard.sh
+          bash -n deploy/server/security-audit.sh
+          bash -n deploy/server/final-stress-test.sh
           bash -n scripts/audit-commit.sh
           bash -n scripts/elite-adversarial-audit.sh
           bash -n scripts/oneclick/claim-charter-grep.sh
@@ -44,7 +44,7 @@ jobs:
           bash -n scripts/oneclick/elite-zero-buffer-complete.sh
           bash -n scripts/oneclick/traffic-engine-proof.sh
           bash -n scripts/oneclick/thundering-herd-proof.sh
-          bash -n benchmarks/contabo-gates/w5-xdp-graduated-shed.sh
+          bash -n benchmarks/server-gates/w5-xdp-graduated-shed.sh
           bash -n benchmarks/thundering-herd/run.sh
           bash -n benchmarks/zero-buffer/matrix.sh
           bash -n benchmarks/zero-buffer/g14-multicore.sh

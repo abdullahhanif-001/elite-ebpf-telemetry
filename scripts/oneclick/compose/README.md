@@ -1,4 +1,4 @@
-# Optional compose profiles (never Contabo default)
+# Optional compose profiles (never Server default)
 
 Heavy upstream stacks are **opt-in** via `elite-oneclick.sh enable <name>` or `--profile compose-*`.
 
@@ -11,4 +11,4 @@ Heavy upstream stacks are **opt-in** via `elite-oneclick.sh enable <name>` or `-
 | kepler | Kepler power metrics | [kepler.md](kepler.md) |
 | sec | Tetragon observe-only | [sec.md](sec.md) |
 
-CPUQuota must keep agent+pack under Contabo SLO. If after-working CPU check fails, leave feature disabled.
+CPUQuota must keep agent+pack under Server SLO. If after-working CPU check fails, leave feature disabled.

@@ -10,7 +10,7 @@ fail_count=0
 VERDICT=SPEED_PASS
 ```
 
-## Absolute read (staff engineer)
+## Operational read
 
 Elite agent sustains **≤2% of one CPU core average** and **≤3% p95 burst** during a 60s soak while serving **30 `elite_predict_*` series** and full physics probes — on the **same VPS** that runs six PM2 production apps. Pixie-class agents typically consume **hundreds of MB** and measurable multi-core CPU; Istio sidecars cite **~500mCPU/pod** industry baseline (see S4 model).
 
@@ -48,7 +48,7 @@ rss_mb=94.8
 | Grafana Beyla | ~50–150MB | low–moderate | no kinematic fuse |
 | Cloudflare ebpf_exporter | split :9435 | moderate | no |
 | node_exporter | ~12MB | very low | no eBPF physics |
-| Istio sidecar (×50 pods) | **25 cores modeled** | **2500× Elite tax** | DECLINE |
+| Istio sidecar (×50 pods) | **25 cores modeled** | **2500× Elite tax** | OUT_OF_SCOPE |
 
 ## Bench excerpt
 

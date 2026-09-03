@@ -27,8 +27,8 @@ pm2 jlist | jq -r '.[] | select(.pm2_env.status != "online") | .name' | wc -l
 if [[ -x /opt/elite/src/scripts/elite-adversarial-audit.sh ]]; then
   bash /opt/elite/src/scripts/elite-adversarial-audit.sh || true
 fi
-if [[ -x /opt/elite/src/deploy/contabo/security-audit.sh ]]; then
-  bash /opt/elite/src/deploy/contabo/security-audit.sh || true
+if [[ -x /opt/elite/src/deploy/server/security-audit.sh ]]; then
+  bash /opt/elite/src/deploy/server/security-audit.sh || true
 fi
 if [[ -x /opt/elite/scripts/pm2-guard.sh ]]; then
   bash /opt/elite/scripts/pm2-guard.sh || true

@@ -1,5 +1,5 @@
 # Elite Physics Pack — optional Docker Compose helpers
-# Prefer systemd + GH binaries on Contabo. This compose is for lab hosts with Docker.
+# Prefer systemd + GH binaries on server. This compose is for lab hosts with Docker.
 #
 #   docker compose -f scripts/oneclick/docker-compose.physics.yml up -d
 #

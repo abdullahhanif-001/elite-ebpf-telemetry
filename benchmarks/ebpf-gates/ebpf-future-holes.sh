@@ -68,7 +68,7 @@ else
 fi
 
 # FH7 PM2 guard script exists
-[[ -f "${ROOT}/scripts/contabo/pm2-guard-wrap.sh" ]] \
+[[ -f "${ROOT}/scripts/server/pm2-guard-wrap.sh" ]] \
   && results+=("$(check FH7 true "pm2-guard-wrap present")") \
   || results+=("$(check FH7 false "pm2-guard missing")")
 

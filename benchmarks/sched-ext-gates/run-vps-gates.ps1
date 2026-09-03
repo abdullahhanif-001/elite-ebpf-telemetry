@@ -12,18 +12,18 @@ Set-Location $Root
 
 function Invoke-Vps {
     param([string]$Cmd)
-    ssh contabo-server $Cmd
+    ssh production-server $Cmd
 }
 
 switch ($Phase) {
     'deploy' {
-        ssh contabo-server "mkdir -p /opt/elite/src/benchmarks /opt/elite/src/scripts/contabo /opt/elite/src/contrib"
-        scp -r benchmarks/sched-ext-gates contabo-server:/opt/elite/src/benchmarks/
-        scp scripts/contabo/sched-ext-vps-prep.sh contabo-server:/opt/elite/src/scripts/contabo/
-        scp scripts/contabo/apply-rt-watchdog-patch.sh contabo-server:/opt/elite/src/scripts/contabo/
-        scp scripts/contabo/patch-sched-ext-makefile.py contabo-server:/opt/elite/src/scripts/contabo/
-        scp -r contrib/sched-ext contabo-server:/opt/elite/src/contrib/
-        Invoke-Vps "chmod +x /opt/elite/src/benchmarks/sched-ext-gates/*.sh /opt/elite/src/scripts/contabo/*.sh"
+        ssh production-server "mkdir -p /opt/elite/src/benchmarks /opt/elite/src/scripts/server /opt/elite/src/contrib"
+        scp -r benchmarks/sched-ext-gates production-server:/opt/elite/src/benchmarks/
+        scp scripts/server/sched-ext-vps-prep.sh production-server:/opt/elite/src/scripts/server/
+        scp scripts/server/apply-rt-watchdog-patch.sh production-server:/opt/elite/src/scripts/server/
+        scp scripts/server/patch-sched-ext-makefile.py production-server:/opt/elite/src/scripts/server/
+        scp -r contrib/sched-ext production-server:/opt/elite/src/contrib/
+        Invoke-Vps "chmod +x /opt/elite/src/benchmarks/sched-ext-gates/*.sh /opt/elite/src/scripts/server/*.sh"
         Write-Host "DEPLOY_OK"
     }
     'baseline' {
@@ -45,8 +45,8 @@ grep -q '^CONFIG_SCHED_CLASS_EXT=y' \$k && echo sched_ext=YES || echo sched_ext=
         Write-Host 'VPS_CONNECT_PASS'
     }
     'prep' {
-        Invoke-Vps "export ELITE_SRC=/opt/elite/src REAL_ONLY=1; bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh swap"
-        Invoke-Vps "export ELITE_SRC=/opt/elite/src; bash /opt/elite/src/scripts/contabo/sched-ext-vps-prep.sh deps"
+        Invoke-Vps "export ELITE_SRC=/opt/elite/src REAL_ONLY=1; bash /opt/elite/src/scripts/server/sched-ext-vps-prep.sh swap"
+        Invoke-Vps "export ELITE_SRC=/opt/elite/src; bash /opt/elite/src/scripts/server/sched-ext-vps-prep.sh deps"
     }
     'repro' {
         Invoke-Vps "export REAL_ONLY=1 ELITE_SRC=/opt/elite/src; bash /opt/elite/src/benchmarks/sched-ext-gates/rt-monopolization-repro.sh"

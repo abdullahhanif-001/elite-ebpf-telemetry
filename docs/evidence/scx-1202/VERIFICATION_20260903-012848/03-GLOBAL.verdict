@@ -1,0 +1,7 @@
+SCX1202_MATRIX_PASS=YES fail=0 checks=12/12 host=ubuntu-s-4vcpu-8gb-nyc1
+RT_GUARD_FLOOD_PASS fail=0 mode=safe_4vcpu host=ubuntu-s-4vcpu-8gb-nyc1 kernel=6.19.0-rc7-scx-dl-g9854922412d3-dirty
+SCX1202_MATRIX_PASS=YES fail=0 checks=12/12 host=ubuntu-s-4vcpu-8gb-nyc1
+GLOBAL_EBPF_SUMMARY host=ubuntu-s-4vcpu-8gb-nyc1 kernel=6.19.0-rc7-scx-dl-g9854922412d3-dirty
+holy_grail=SCX1202_MATRIX_PASS=YES fail=0 checks=12/12 host=ubuntu-s-4vcpu-8gb-nyc1
+fail=0
+OUR_GOAL_LOG phase=GLOBAL result=PASS

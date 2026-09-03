@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Elite #1 gates checklist — run on Contabo after closed-loop install.
+# Elite #1 gates checklist — run on server after closed-loop install.
 # Does NOT invent scores; prints PASS/FAIL from live scrapes + local artifacts.
 set -euo pipefail
 
@@ -15,14 +15,46 @@ export ELITE_GATES_OUT="${OUT}"
 
 pass=0
 fail=0
+na=0
 record() {
   local id="$1" msg="$2" st="$3"
   echo "[$st] $id — $msg" | tee -a "$OUT"
-  if [[ "$st" == "PASS" ]]; then pass=$((pass+1)); else fail=$((fail+1)); fi
+  case "$st" in
+    PASS) pass=$((pass+1)) ;;
+    FAIL) fail=$((fail+1)) ;;
+    N/A|NA) na=$((na+1)) ;;
+    *) fail=$((fail+1)) ;;
+  esac
 }
 record_skip() {
   local id="$1" msg="$2"
+  # SKIP is not PASS. Deferred lanes stay SKIP; REQUIRED lanes must not rely on this.
   echo "[SKIP] $id — $msg" | tee -a "$OUT"
+}
+record_na() {
+  local id="$1" msg="$2"
+  echo "[N/A] $id — $msg" | tee -a "$OUT"
+  na=$((na+1))
+}
+latest_matching_file() {
+  local pattern="$1"
+  local f
+  f="$(ls -1dt ${pattern} 2>/dev/null | head -n1 || true)"
+  [[ -n "${f}" && -e "${f}" ]] || return 1
+  printf '%s' "${f}"
+}
+artifact_has_verdict() {
+  local pattern="$1"
+  local needle="$2"
+  local f
+  f="$(latest_matching_file "${pattern}")" || return 1
+  if [[ -f "${f}" ]]; then
+    grep -q "${needle}" "${f}" 2>/dev/null && return 0
+  fi
+  if [[ -d "${f}" ]]; then
+    grep -Rq "${needle}" "${f}" 2>/dev/null && return 0
+  fi
+  return 1
 }
 
 echo "=== Elite #1 gates checklist ===" | tee "$OUT"
@@ -59,31 +91,40 @@ else
 fi
 rm -f "$tmp"
 
-if [[ -x /opt/elite/scripts/pm2-guard.sh ]]; then
-  if bash /opt/elite/scripts/pm2-guard.sh; then
+# G4: N/A when no PM2 (not PASS). PASS only on PM2_GUARD_OK.
+if ! command -v pm2 >/dev/null 2>&1; then
+  record_na G4 "N/A_NO_PM2 — fresh VM without PM2 (not PASS)"
+elif [[ -x /opt/elite/scripts/pm2-guard.sh ]]; then
+  g4out="$(bash /opt/elite/scripts/pm2-guard.sh 2>&1 || true)"
+  echo "${g4out}" | tee -a "$OUT" >/dev/null
+  if echo "${g4out}" | grep -q 'PM2_GUARD_OK'; then
     record G4 "pm2-guard OK" PASS
+  elif echo "${g4out}" | grep -qE 'PM2_GUARD_N/A'; then
+    record_na G4 "N/A_NO_PM2 — $(echo "${g4out}" | tr '\n' ' ')"
   else
     record G4 "pm2-guard failed" FAIL
   fi
 else
-  record G4 "pm2-guard script missing (skip on fresh VM without PM2)" PASS
+  record G4 "pm2 present but /opt/elite/scripts/pm2-guard.sh missing" FAIL
 fi
 
-# Artifact presence (G3/G5 are historical Contabo proofs — point at trees)
-if [[ -d "${SCRIPT_DIR}/results" ]]; then
-  if ls -d "${SCRIPT_DIR}/results"/category-bakeoff-* >/dev/null 2>&1; then
-    record G3 "category-bakeoff artifact dir present under results/" PASS
-  else
-    record G3 "no category-bakeoff-* under results/ — run category-bakeoff.sh on Contabo" FAIL
-  fi
-  if ls -d "${SCRIPT_DIR}/results"/p1-live-* >/dev/null 2>&1; then
-    record G5 "p1-live artifact dir present (H11 LIVE evidence tree)" PASS
-  else
-    record G5 "no p1-live-* — run competitive-live-predict-proof.sh" FAIL
-  fi
+# G3/G5 require verdict STRINGS inside latest artifacts (dir presence alone ≠ PASS).
+if artifact_has_verdict "${SCRIPT_DIR}/results/category-bakeoff-*" "CATEGORY_BAKEOFF_PASS"; then
+  record G3 "CATEGORY_BAKEOFF_PASS in latest bakeoff artifact" PASS
+elif ls -d "${SCRIPT_DIR}/results"/category-bakeoff-* >/dev/null 2>&1; then
+  record G3 "bakeoff dir present but CATEGORY_BAKEOFF_PASS string missing" FAIL
 else
-  record G3 "results/ missing" FAIL
-  record G5 "results/ missing" FAIL
+  record G3 "no category-bakeoff-* — run category-bakeoff.sh on server" FAIL
+fi
+
+if artifact_has_verdict "${SCRIPT_DIR}/results/p1-live-*" "H11_PASS_LIVE" \
+  || artifact_has_verdict "${SCRIPT_DIR}/results/live-predict-*" "H11_PASS_LIVE" \
+  || grep -Rlq 'H11_PASS_LIVE' /tmp/elite-live-predict-* 2>/dev/null; then
+  record G5 "H11_PASS_LIVE in latest live-predict / p1-live artifact" PASS
+elif ls -d "${SCRIPT_DIR}/results"/p1-live-* >/dev/null 2>&1; then
+  record G5 "p1-live dir present but H11_PASS_LIVE string missing" FAIL
+else
+  record G5 "no H11_PASS_LIVE artifact — run competitive-live-predict-proof.sh" FAIL
 fi
 
 # Install UX probes
@@ -131,10 +172,19 @@ if [[ -f "${SCRIPT_DIR}/results/g0-baseline-latest.txt" ]] && grep -q G0_BASELIN
 else
   record_skip G0 "run benchmarks/zero-buffer/matrix.sh"
 fi
-if [[ -f "${SCRIPT_DIR}/results/w6-xdp-token-bucket-latest.txt" ]] && grep -qE 'G9_TOKEN_BUCKET_PPS_PASS|G9_TOKEN_BUCKET_PPS_SKIP' "${SCRIPT_DIR}/results/w6-xdp-token-bucket-latest.txt"; then
-  record G9 "token bucket pps artifact" PASS
+# G9: SKIP must not count as PASS (L17). Deferred unless ZERO_BUFFER_GATES=1.
+if [[ "${ZERO_BUFFER_GATES:-0}" == "1" ]]; then
+  if [[ -f "${SCRIPT_DIR}/results/w6-xdp-token-bucket-latest.txt" ]] && grep -q 'G9_TOKEN_BUCKET_PPS_PASS' "${SCRIPT_DIR}/results/w6-xdp-token-bucket-latest.txt"; then
+    record G9 "G9_TOKEN_BUCKET_PPS_PASS" PASS
+  else
+    record G9 "G9_TOKEN_BUCKET_PPS_PASS missing (SKIP≠PASS)" FAIL
+  fi
 else
-  record_skip G9 "run zero-buffer matrix"
+  if [[ -f "${SCRIPT_DIR}/results/w6-xdp-token-bucket-latest.txt" ]] && grep -q 'G9_TOKEN_BUCKET_PPS_PASS' "${SCRIPT_DIR}/results/w6-xdp-token-bucket-latest.txt"; then
+    record G9 "G9_TOKEN_BUCKET_PPS_PASS" PASS
+  else
+    record_skip G9 "deferred — run zero-buffer matrix (SKIP≠PASS)"
+  fi
 fi
 if [[ -f "${SCRIPT_DIR}/results/g10-priority-pass-latest.txt" ]] && grep -q G10_PRIORITY_PASS "${SCRIPT_DIR}/results/g10-priority-pass-latest.txt"; then
   record G10 "priority tier pass" PASS
@@ -160,10 +210,10 @@ if [[ "${ZERO_BUFFER_GATES:-0}" == "1" ]] && [[ -f "${BUILD_ROOT}/logs/thunderin
 else
   record_skip G13 "thundering herd v2 bench"
 fi
-if [[ -f "${SCRIPT_DIR}/results/g14-multicore-latest.txt" ]] && grep -qE 'G14_MULTICORE_PASS|G14_MULTICORE_SKIP' "${SCRIPT_DIR}/results/g14-multicore-latest.txt"; then
-  record G14 "multicore checklist" PASS
+if [[ -f "${SCRIPT_DIR}/results/g14-multicore-latest.txt" ]] && grep -q 'G14_MULTICORE_PASS' "${SCRIPT_DIR}/results/g14-multicore-latest.txt"; then
+  record G14 "G14_MULTICORE_PASS" PASS
 else
-  record_skip G14 "run benchmarks/zero-buffer/g14-multicore.sh"
+  record_skip G14 "deferred — run g14-multicore (SKIP≠PASS)"
 fi
 if [[ -f "${SCRIPT_DIR}/results/g15-federate-propagation-latest.txt" ]] && grep -q G15_FEDERATE_PROPAGATION_PASS "${SCRIPT_DIR}/results/g15-federate-propagation-latest.txt"; then
   record G15 "federation propagation" PASS
@@ -171,7 +221,7 @@ else
   record_skip G15 "run g15-federate-propagation-proof.sh"
 fi
 
-echo "=== summary pass=${pass} fail=${fail} out=${OUT} ===" | tee -a "$OUT"
+echo "=== summary pass=${pass} fail=${fail} na=${na} out=${OUT} ===" | tee -a "$OUT"
 cp -f "$OUT" "${LOG_DIR}/gates-checklist-latest.txt" 2>/dev/null || true
 cp -f "$OUT" "${SCRIPT_DIR}/results/gates-checklist-latest.txt" 2>/dev/null || true
 if [[ "$fail" -eq 0 ]]; then

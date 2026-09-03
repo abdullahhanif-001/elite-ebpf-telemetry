@@ -31,4 +31,4 @@
 ## Tier 5 — Elite internal (not prior art)
 
 - ADR-003 / ADR-004 — FACT (repo policy)
-- WORLD_EBPF_COMPARISON / HEAVY scorecards — FACT (claims; honesty gaps noted in NOVEL_GAP)
+- COMPETITOR_BASELINE_MATRIX / HEAVY scorecards — FACT (claims; honesty gaps noted in NOVEL_GAP)

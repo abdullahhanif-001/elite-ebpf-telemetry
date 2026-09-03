@@ -1,5 +1,5 @@
 # compose-sec
 
-Optional Tetragon (observe-only) security events. Off Contabo default.
+Optional Tetragon (observe-only) security events. Off Server default.
 
-Do not enable enforce mode on Contabo without a written policy review.
+Do not enable enforce mode on server without a written policy review.

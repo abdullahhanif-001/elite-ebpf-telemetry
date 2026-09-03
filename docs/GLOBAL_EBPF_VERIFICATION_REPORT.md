@@ -2,8 +2,8 @@
 
 **Author:** Abdullah Hanif  
 **Date:** 2026-08-31  
-**Environment:** sched_ext proof host (4 vCPU, 8 GB RAM), kernel `6.19.0-rc7` with `CONFIG_SCHED_CLASS_EXT` and `CONFIG_FUNCTION_TRACER`  
-**Verdict:** `GLOBAL_EBPF_PASS` — all six verification domains passed; SCX#1202 verification matrix (H1–H12) 12/12.
+**Environment:** production server (4 vCPU, 8 GB RAM), kernel `6.19.0-rc7` with `CONFIG_SCHED_CLASS_EXT` and `CONFIG_FUNCTION_TRACER`  
+**Verdict:** `GLOBAL_EBPF_PASS` — all six verification domains passed; SCX1202 gate matrix sched_ext #1202 matrix 12/12.
 
 ---
 
@@ -14,7 +14,7 @@ This report documents end-to-end verification of the Elite eBPF telemetry stack 
 | Overall gate | Result |
 |--------------|--------|
 | Global eBPF (D1–D6) | **PASS** (`fail=0`) |
-| SCX#1202 matrix (H1–H12) | **PASS** (12/12) |
+| SCX1202 gate matrix #1202 (H1–H12) | **PASS** (12/12) |
 | RT Guard flood (Tier 1) | **PASS** (P1–P5) |
 | Telemetry probes (T1–T11) | **PASS** (11/11 compile + live metrics) |
 | eBPF X-Ray (X1–X8) | **PASS** |
@@ -34,7 +34,7 @@ This report documents end-to-end verification of the Elite eBPF telemetry stack 
 
 ---
 
-## SCX#1202 Verification Matrix (H1–H12)
+## SCX1202 Gate Matrix (sched_ext #1202)
 
 | ID | Symptom / proof | Result |
 |----|-----------------|--------|
@@ -83,7 +83,7 @@ sched_ext and ftrace were enabled on the test kernel. No scheduler stall signatu
 
 ## Known Limitations
 
-1. **lavd scheduler** — BPF arena programs return `-EACCES` on the ftrace test kernel; documented as `SKIP_KERNEL` in matrix and H6/H12 logic.
+1. **lavd scheduler** — BPF arena programs return `-EACCES` on the ftrace test kernel; documented as `SKIP_KERNEL` in matrix and SCX1202 gate matrix H6/H12 logic.
 2. **bpftool on rc kernel** — `linux-tools` package mismatch; X-Ray uses pinned map paths and inspector probes instead of full `bpftool prog list`.
 3. **Policy map pin** — `/sys/fs/bpf/elite/policy` may be absent when bpftool pin is unavailable; verification uses policy file + inspector/XDP loopback attach.
 4. **SCHED_DEADLINE edge case (E2)** — host `chrt -d` unsupported; marked SKIP, not FAIL.
@@ -97,13 +97,6 @@ On a sched_ext-enabled VPS with Elite source at `/opt/elite/src`:
 ```bash
 export REAL_ONLY=1 ELITE_SRC=/opt/elite/src
 
-# Full Linux + eBPF + SCX#1202 challenge proof (T1-T4)
-bash scripts/contabo/run-linux-ebpf-challenge-proof.sh
-# → docs/evidence/scx-1202/CHALLENGE_PROOF_<date>/
-
-# Static verify (any machine, 30 sec)
-bash scripts/verify-scx-1202-evidence.sh
-
 # Full end-to-end report (CPU/RAM/PM2 + all gates)
 bash benchmarks/ebpf-gates/our-goal-full-rerun.sh
 
@@ -114,20 +107,15 @@ bash benchmarks/ebpf-gates/our-goal-fix-failures.sh
 bash benchmarks/ebpf-gates/global-ebpf-aggregate.sh
 ```
 
-SCX#1202 matrix only:
+SCX1202 gate matrix only:
 
 ```bash
-bash benchmarks/ebpf-gates/holy-grail-verify.sh
+bash benchmarks/ebpf-gates/scx1202-matrix-verify.sh
 ```
 
 ---
 
 ## Related Documents
-
-- [TEST_BENCHMARK_REGISTRY.md](TEST_BENCHMARK_REGISTRY.md) — gate catalog and reproduction commands
-- [EBPF_FEATURE_INVENTORY.md](EBPF_FEATURE_INVENTORY.md) — feature inventory
-- [CHALLENGE_QA_PLAYBOOK.md](evidence/scx-1202/CHALLENGE_QA_PLAYBOOK.md) — question → command → verdict
-- [docs/evidence/scx-1202/README.md](evidence/scx-1202/README.md) — auditor entry point
 
 - **Committed evidence (auditor):** [`docs/evidence/scx-1202/README.md`](evidence/scx-1202/README.md) — `bash scripts/verify-scx-1202-evidence.sh`
 - sched_ext upstream pack: [`contrib/sched-ext/UPSTREAM_TRACKING.md`](../contrib/sched-ext/UPSTREAM_TRACKING.md)

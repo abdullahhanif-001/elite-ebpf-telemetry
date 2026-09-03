@@ -67,7 +67,7 @@ func (s *Sampler) Detect() bool {
 	}
 	txt := string(b)
 	if strings.Contains(txt, "hypervisor") {
-		// Soft detect: may still work on some Contabo SKUs.
+		// Soft detect: may still work on some Server SKUs.
 		s.lastErr = "hypervisor_pmu_uncertain"
 	}
 	s.enabled = true

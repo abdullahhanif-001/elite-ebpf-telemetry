@@ -31,7 +31,7 @@ e1_test() {
   sp="$(flood_rt_stress 1 20)"
   sleep 25
   kill "${sp}" "${lp}" 2>/dev/null || true
-  wait "${sp}" "${lp}" 2>/dev/null || true
+  flood_loader_cleanup
   dmesg | tee "${OUT}/E1-dmesg.txt"
   flood_stall_in_dmesg && return 1
   echo "E1 per-cpu kthread scenario — no stall"
@@ -46,7 +46,7 @@ e2_test() {
   local sp=$!
   sleep 20
   kill "${sp}" "${lp}" 2>/dev/null || true
-  wait "${sp}" "${lp}" 2>/dev/null || true
+  flood_loader_cleanup
   dmesg | tee "${OUT}/E2-dmesg.txt"
   flood_stall_in_dmesg && return 1
   echo "E2 SCHED_DEADLINE — no stall"
@@ -60,7 +60,7 @@ e3_test() {
   sp="$(flood_rt_stress_multi 3 20)"
   sleep 25
   kill "${sp}" "${lp}" 2>/dev/null || true
-  wait "${sp}" "${lp}" 2>/dev/null || true
+  flood_loader_cleanup
   dmesg | tee "${OUT}/E3-dmesg.txt"
   flood_stall_in_dmesg && return 1
   echo "E3 multi-CPU RT — no stall"
@@ -93,7 +93,7 @@ e5_test() {
   sp="$(flood_rt_stress 1 35)"
   sleep 40
   kill "${sp}" "${lp}" 2>/dev/null || true
-  wait "${sp}" "${lp}" 2>/dev/null || true
+  flood_loader_cleanup
   dmesg | tee "${OUT}/E5-dmesg.txt"
   flood_stall_in_dmesg && return 1
   echo "E5 lavd 35s RT stress — no stall"
@@ -112,7 +112,7 @@ e6_test() {
   local sp=$!
   sleep 15
   kill "${sp}" "${lp}" 2>/dev/null || true
-  wait "${sp}" "${lp}" 2>/dev/null || true
+  flood_loader_cleanup
   dmesg | tee "${OUT}/E6-dmesg.txt"
   flood_stall_in_dmesg && return 1
   echo "E6 schedtool RT — no stall"

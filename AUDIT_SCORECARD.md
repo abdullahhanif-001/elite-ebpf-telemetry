@@ -2,12 +2,12 @@
 
 **Repository:** [abdullahhanif-001/elite-ebpf-telemetry](https://github.com/abdullahhanif-001/elite-ebpf-telemetry)  
 **Author:** Abdullah Hanif  
-**Verified:** 2026-08-19 (Contabo VPS, real metrics — no mocks)  
+**Verified:** 2026-08-19 (production server, real metrics — no mocks)  
 **PM2 impact:** restarts **131 → 131** (zero effect)
 
 ---
 
-## Competitive rubric score: **92/100 (A+)**
+## Operational rubric score: **92/100 (A)**
 
 | Dimension | Max | Score | Evidence |
 |-----------|-----|-------|----------|
@@ -18,12 +18,12 @@
 | Real metrics live | 15 | 15 | `elite_*` series on `:9102`, Prometheus scrape |
 | Speed SLO | 15 | 14 | CPU avg **0.0017 cores**, p99 scrape **~479ms** |
 | Supply chain | 10 | 10 | `go mod tidy` + updated `go.sum` |
-| Tests & harness | 10 | 5 | Unit tests + Contabo adversarial scripts |
+| Tests & harness | 10 | 5 | Unit tests + Server adversarial scripts |
 | Docs honesty | 5 | 5 | README matches deployed behavior |
 
 ---
 
-## Real metrics (Contabo)
+## Real metrics (server)
 
 ```text
 GET /metrics              -> 200
@@ -38,7 +38,7 @@ PM2 restarts sum=131      (unchanged)
 
 ---
 
-## Adversarial audit (Sherlock-style)
+## Adversarial audit (adversarial red-team)
 
 | ID | Severity | Check | Status |
 |----|----------|-------|--------|

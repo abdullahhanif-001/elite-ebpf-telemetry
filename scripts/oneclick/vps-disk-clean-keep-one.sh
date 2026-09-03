@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# vps-disk-clean-keep-one.sh — Contabo disk clean; keep ONLY newest xerosphere hourly backup.
+# vps-disk-clean-keep-one.sh — Server disk clean; keep ONLY newest xerosphere hourly backup.
 # Absolute: never pm2 stop/restart/delete/kill. Abort on PM2 drift.
 # Usage: bash vps-disk-clean-keep-one.sh --force
-# Prerequisite: Contabo panel snapshot already created (user-confirmed).
+# Prerequisite: Server panel snapshot already created (user-confirmed).
 set -euo pipefail
 
 FORCE="${1:-}"
 if [[ "${FORCE}" != "--force" ]]; then
   echo "Refusing without --force. Usage: $0 --force" >&2
-  echo "Confirm Contabo panel snapshot exists first." >&2
+  echo "Confirm Server panel snapshot exists first." >&2
   exit 2
 fi
 

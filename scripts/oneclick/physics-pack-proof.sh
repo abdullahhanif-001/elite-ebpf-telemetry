@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Contabo / VPS proof for Elite Physics Pack — hit all exporters, sample CPU.
+# Server / VPS proof for Elite Physics Pack — hit all exporters, sample CPU.
 # Does not invent BPF; verifies OSS compose endpoints.
 set -euo pipefail
 

@@ -7,12 +7,12 @@
 
 | Metric | Value | Source |
 |--------|-------|--------|
-| Agent CPU | cpu_cores_avg=0.000222 | Contabo speed proof / [AUDIT_SCORECARD.md](../../AUDIT_SCORECARD.md) |
-| RSS / ceiling | rss_mb=72.2; systemd `MemoryMax=160M` | [deploy/contabo/elite-agent.service](../../deploy/contabo/elite-agent.service) |
+| Agent CPU | cpu_cores_avg=0.000222 | Server speed proof / [AUDIT_SCORECARD.md](../../AUDIT_SCORECARD.md) |
+| RSS / ceiling | rss_mb=72.2; systemd `MemoryMax=160M` | [deploy/server/elite-agent.service](../../deploy/server/elite-agent.service) |
 | Host class | systemd VPS, no CNI required | Physics Pack |
 | PM2 co-resident | PASS | pm2-guard |
 
-## Competitors (cited public — not Contabo installs)
+## Competitors (cited public — not Server installs)
 
 | Project | Footprint class (public) | Citation |
 |---------|--------------------------|----------|

@@ -16,4 +16,4 @@ Pinned versions: [`versions.env`](versions.env).
 
 **ECGF-lite (Track C):** userspace posture (`elite-ecgf`) + systemd envelope compose (`PrivateNetwork`, `User=nobody`, `InaccessiblePaths`). Does **not** invent Landlock/Tetragon/Sandlock/ActPlane; optional compose peers stay attributed upstream if enabled later.
 
-**Marketing claim:** Elite One-Click Physics Pack = packaged Contabo/VPS + K8s compose under Elite branding — **not** “world’s first XDP/AI/kernel invention”.
+**Marketing claim:** Elite One-Click Physics Pack = packaged server/VPS + K8s compose under Elite branding — **not** “world’s first XDP/AI/kernel invention”.

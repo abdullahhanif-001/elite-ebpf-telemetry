@@ -89,7 +89,7 @@ fi
 echo ""
 echo "=== FLOW 4: Shed under load (W5 + herd) ==="
 export ELITE_XDP_IFACE=lo ELITE_XDP_FORCE=1 ELITE_BUILD_ROOT="${BUILD_ROOT}"
-if bash "${SRC}/benchmarks/contabo-gates/w5-xdp-graduated-shed.sh" 2>&1 | tail -3 | grep -q W5_PASS; then
+if bash "${SRC}/benchmarks/server-gates/w5-xdp-graduated-shed.sh" 2>&1 | tail -3 | grep -q W5_PASS; then
   check "GATE_W5" 1 "RSS stable + XDP drop path"
 else
   check "GATE_W5" 0 "W5 not pass"

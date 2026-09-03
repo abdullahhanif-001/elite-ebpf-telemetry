@@ -5,7 +5,7 @@
 ## Elite (this repo)
 
 ```bash
-bash benchmarks/contabo-gates/w4-xdp-inject-latency.sh
+bash benchmarks/server-gates/w4-xdp-inject-latency.sh
 bash scripts/oneclick/thundering-herd-proof.sh
 ```
 

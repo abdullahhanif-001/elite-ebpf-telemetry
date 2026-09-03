@@ -29,4 +29,4 @@ See [deploy/helm/README.md](helm/README.md). Default images: `ghcr.io/abdullahha
 
 ## Bare metal (systemd)
 
-See [deploy/contabo/](contabo/) for VPS/systemd install and audit scripts.
+See [deploy/server/](server/) for VPS/systemd install and audit scripts.

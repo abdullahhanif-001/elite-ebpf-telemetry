@@ -104,7 +104,7 @@ run_gate "D3 telemetry" bash "${G}/telemetry-probe-gate.sh" | tee -a "${REPORT}"
 run_gate "D6 future-holes FH1-FH10" bash "${G}/ebpf-future-holes.sh" | tee -a "${REPORT}"
 run_gate "D4 ebpf-xray" bash "${ROOT}/scripts/oneclick/ebpf-xray-real-proof.sh" | tee -a "${REPORT}"
 run_gate "D5 go tests" bash -c "cd '${ROOT}' && go test ./pkg/exporter/bpfutil/... ./pkg/forecaster/... -count=1 -v" | tee -a "${REPORT}"
-run_gate "D2 holy-grail H1-H12" bash "${G}/holy-grail-verify.sh" | tee -a "${REPORT}"
+run_gate "D2 holy-grail H1-H12" bash "${G}/scx1202-matrix-verify.sh" | tee -a "${REPORT}"
 run_gate "GLOBAL aggregate" bash "${G}/global-ebpf-aggregate.sh" | tee -a "${REPORT}"
 
 capture_vps "AFTER" >> "${REPORT}"
