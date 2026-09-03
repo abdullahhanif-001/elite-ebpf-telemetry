@@ -167,7 +167,7 @@ print_status() {
     "${EBPF_EXPORTER_LISTEN}/metrics" \
     "${IG_METRICS_LISTEN}/metrics"
   do
-    code="$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 "${target}" 2>/dev/null || echo 000)"
+    code="$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 --max-time 3 "${target}" 2>/dev/null || echo 000)"
     echo "  ${target} -> ${code}"
   done
   systemctl is-active elite-agent.service 2>/dev/null || echo "elite-agent.service: not active (install Elite separately)"
