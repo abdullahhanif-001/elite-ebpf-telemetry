@@ -12,14 +12,21 @@ Verification protocol — Abdullah Hanif. Start here. This directory contains **
 ## Quick verify (no VPS)
 
 ```bash
+bash scripts/verify-elite-offline.sh
+```
+
+Runs SCX evidence + matrix log cross-check, claim charter, BPF generate, Go tests, eBPF gates, and Layer 3 BPF compile — no sched_ext kernel required.
+
+Evidence-only (faster):
+
+```bash
 bash scripts/verify-scx-1202-evidence.sh
+bash scripts/verify-scx1202-matrix-from-bundle.sh
 ```
 
 Exit 0 = committed evidence bundle passes **strict** static + log cross-checks (`SCX1202_STRICT=1` default).
 
 **Current bundle** [`VERIFICATION_20260903-012848`](./VERIFICATION_20260903-012848/) — `status=FULL` in MANIFEST. Strict verifier **PASS**.
-
-Superseded PARTIAL bundles: `VERIFICATION_20260901-045612`, `VERIFICATION_20260902-063458` — do not cite as full proof.
 
 ## Reproduce on sched_ext host
 
@@ -49,9 +56,9 @@ bash benchmarks/sched-ext-gates/rt-guard-flood-aggregate.sh  # → RT_GUARD_FLOO
 
 ## Claim language
 
-- **Verified:** RT-guard fix passes core gates on sched_ext kernel (local dev).
-- **Upstream:** PR #3780 **closed** — reopen after dev complete (scx_loader, no SKIP gates).
-- **Not claimed:** Upstream issue [#1202](https://github.com/sched-ext/scx/issues/1202) closed.
+- **Verified:** RT-guard fix passes core gates on sched_ext kernel — FULL bundle, strict verifier PASS.
+- **Upstream:** **Fix ready** — reopen PR [#3780](https://github.com/sched-ext/scx/pull/3780) (closed temporarily for dev only). Steps: [REOPEN_SCX_PR.md](REOPEN_SCX_PR.md).
+- **Not claimed:** Upstream issue [#1202](https://github.com/sched-ext/scx/issues/1202) closed until sched-ext/scx merges Layer 3.
 
 ## Documented limitations (LIMIT-SCX)
 
@@ -63,5 +70,5 @@ bash benchmarks/sched-ext-gates/rt-guard-flood-aggregate.sh  # → RT_GUARD_FLOO
 - [GLOBAL_EBPF_VERIFICATION_REPORT.md](../GLOBAL_EBPF_VERIFICATION_REPORT.md)
 - [contrib/sched-ext/EVIDENCE_REPORT.md](../../contrib/sched-ext/EVIDENCE_REPORT.md)
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)
-- [GOOGLE_VERIFICATION_BRIEF.md](GOOGLE_VERIFICATION_BRIEF.md)
 - [UPSTREAM_PR_TRACKER.md](UPSTREAM_PR_TRACKER.md)
+- [REOPEN_SCX_PR.md](REOPEN_SCX_PR.md)
