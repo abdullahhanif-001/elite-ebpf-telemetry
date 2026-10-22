@@ -56,9 +56,9 @@ bash benchmarks/sched-ext-gates/rt-guard-flood-aggregate.sh  # → RT_GUARD_FLOO
 
 ## Claim language
 
-- **Verified:** RT-guard fix passes core gates on sched_ext kernel (local dev).
-- **Upstream:** PR #3780 **closed** — reopen after dev complete (scx_loader, no SKIP gates).
-- **Not claimed:** Upstream issue [#1202](https://github.com/sched-ext/scx/issues/1202) closed.
+- **Verified:** RT-guard fix passes core gates on sched_ext kernel — FULL bundle, strict verifier PASS.
+- **Upstream:** **Fix ready** — reopen PR [#3780](https://github.com/sched-ext/scx/pull/3780) (closed temporarily for dev only). Steps: [REOPEN_SCX_PR.md](REOPEN_SCX_PR.md).
+- **Not claimed:** Upstream issue [#1202](https://github.com/sched-ext/scx/issues/1202) closed until sched-ext/scx merges Layer 3.
 
 ## Documented limitations (LIMIT-SCX)
 
@@ -71,3 +71,4 @@ bash benchmarks/sched-ext-gates/rt-guard-flood-aggregate.sh  # → RT_GUARD_FLOO
 - [contrib/sched-ext/EVIDENCE_REPORT.md](../../contrib/sched-ext/EVIDENCE_REPORT.md)
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)
 - [UPSTREAM_PR_TRACKER.md](UPSTREAM_PR_TRACKER.md)
+- [REOPEN_SCX_PR.md](REOPEN_SCX_PR.md)

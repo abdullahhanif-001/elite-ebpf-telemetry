@@ -3,9 +3,9 @@
 Separate from Elite product code (ADR-005). Kernel + BPF scheduler contributions
 for [sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202).
 
-## Status: verified fix on VPS (2026-09-01)
+## Status: fix ready — reopen upstream PR #3780
 
-Upstream [#1202](https://github.com/sched-ext/scx/issues/1202) remains **open** until Layer 3 PR merges. Live proof on sched_ext kernel:
+Dev is complete. Upstream [#1202](https://github.com/sched-ext/scx/issues/1202) remains **open** until Layer 3 merges. PR [#3780](https://github.com/sched-ext/scx/pull/3780) was **closed only for dev** — **[reopen for review](../../docs/evidence/scx-1202/REOPEN_SCX_PR.md)**. Proof (FULL evidence bundle):
 
 | Gate | Result |
 |------|--------|

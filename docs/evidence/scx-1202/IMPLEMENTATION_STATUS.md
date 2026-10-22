@@ -30,9 +30,10 @@
 - [x] Strict static verifier — log cross-checks (no verdict/log mismatch)
 - [x] Live re-proof on sched_ext server — `SCX1202_EVIDENCE_VERIFY=PASS`
 
-## Pending (upstream only)
+## Upstream (fix ready — action on sched-ext/scx)
 
-- [ ] Reopen Layer 3 PR on sched-ext/scx (previous #3780 closed for dev)
+- [x] Dev complete — FULL evidence, no `LOADER=SKIP` / no G6 SKIP on sched_ext proof
+- [ ] **Reopen** Layer 3 PR [sched-ext/scx#3780](https://github.com/sched-ext/scx/pull/3780) — see [REOPEN_SCX_PR.md](./REOPEN_SCX_PR.md)
 - [ ] Upstream issue [#1202](https://github.com/sched-ext/scx/issues/1202) closed after merge
 
 ## Re-proof command (on sched_ext server)
