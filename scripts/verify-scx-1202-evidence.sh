@@ -6,7 +6,21 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EVID_BASE="${ROOT}/docs/evidence/scx-1202"
 STRICT="${SCX1202_STRICT:-1}"
 
-latest="$(ls -td "${EVID_BASE}"/VERIFICATION_* 2>/dev/null | head -1 || true)"
+# Pick bundle by verification stamp in the directory name (not mtime — partial bundles
+# must not win over newer FULL captures after checkout or snapshot rebuild).
+mapfile -t _evid_bundles < <(find "${EVID_BASE}" -maxdepth 1 -type d -name 'VERIFICATION_*' | sort -r)
+latest=""
+if [[ "${STRICT}" == "1" ]]; then
+  for _b in "${_evid_bundles[@]}"; do
+    if grep -qE '"status"[[:space:]]*:[[:space:]]*"FULL"' "${_b}/MANIFEST.json" 2>/dev/null; then
+      latest="${_b}"
+      break
+    fi
+  done
+fi
+if [[ -z "${latest}" ]]; then
+  latest="${_evid_bundles[0]:-}"
+fi
 if [[ -z "${latest}" ]]; then
   echo "FAIL: no VERIFICATION_* bundle under ${EVID_BASE}" >&2
   exit 1
