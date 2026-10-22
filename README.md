@@ -50,7 +50,7 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 | RT Guard flood P1–P5 | **`RT_GUARD_FLOOD_PASS`** |
 
 Full published report: **[docs/GLOBAL_EBPF_VERIFICATION_REPORT.md](docs/GLOBAL_EBPF_VERIFICATION_REPORT.md)**  
-Committed evidence (auditor verify): **[docs/evidence/scx-1202/README.md](docs/evidence/scx-1202/README.md)** — run `bash scripts/verify-scx-1202-evidence.sh`  
+Committed evidence (auditor verify): **[docs/evidence/scx-1202/README.md](docs/evidence/scx-1202/README.md)** — no VPS: `bash scripts/verify-elite-offline.sh` · evidence only: `bash scripts/verify-scx-1202-evidence.sh`  
 Google/interview brief: **[docs/evidence/scx-1202/GOOGLE_VERIFICATION_BRIEF.md](docs/evidence/scx-1202/GOOGLE_VERIFICATION_BRIEF.md)**  
 Upstream PR tracker: **[docs/evidence/scx-1202/UPSTREAM_PR_TRACKER.md](docs/evidence/scx-1202/UPSTREAM_PR_TRACKER.md)**  
 sched_ext evidence pack: **[contrib/sched-ext/EVIDENCE_REPORT.md](contrib/sched-ext/EVIDENCE_REPORT.md)**  
