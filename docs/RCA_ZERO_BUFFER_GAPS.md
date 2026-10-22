@@ -33,8 +33,8 @@ Artifacts land in `scripts/oneclick/results/*-latest.txt`.
 ## Honest limits
 
 - Single production server ≠ 10M conn/s; multi-node + documented ceiling
-- Not Maglev / Azure LB replacement (see [`PLAN_SELF_AUDIT.md`](PLAN_SELF_AUDIT.md))
+- Not Maglev / Azure LB replacement (see [`CLAIM_CHARTER.md`](CLAIM_CHARTER.md))
 
 ## Kill criteria
 
-See plan: native XDP unavailable → TC admission fallback; G13 fail on eth0 → lo-only product feature.
+Native XDP unavailable → TC admission fallback; G13 fail on eth0 → lo-only product feature.

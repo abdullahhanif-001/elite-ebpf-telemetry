@@ -42,7 +42,9 @@ __pycache__/
 # Local session reports (not product artifacts)
 reports/
 *.plan.md
+**/*.plan.md
 agent-transcripts/
+scripts/oneclick/results/our-goal/
 
 # local deploy copies
 opt/elite/

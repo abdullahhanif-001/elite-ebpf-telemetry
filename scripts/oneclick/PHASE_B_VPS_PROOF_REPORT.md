@@ -3,8 +3,8 @@
 **Repository:** [abdullahhanif-001/elite-ebpf-telemetry](https://github.com/abdullahhanif-001/elite-ebpf-telemetry)  
 **Author:** Abdullah Hanif  
 **Generated:** 2026-09-02T07:46:27+05:00  
-**Host:** pc-55  
-**Evidence root:** `C:\Users\Administrator\Downloads\cyber expert\scripts\oneclick\results\phase-b-vps-20260902-024627`
+**Host:** production VPS (sanitized)  
+**Evidence root:** `scripts/oneclick/results/phase-b-vps-<stamp>` (local only, gitignored)
 
 ## Executive verdict
 

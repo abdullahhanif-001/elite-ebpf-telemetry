@@ -33,6 +33,9 @@ jobs:
           bash -n scripts/audit-commit.sh
           bash -n scripts/elite-adversarial-audit.sh
           bash -n scripts/oneclick/claim-charter-grep.sh
+          bash -n scripts/verify-elite-offline.sh
+          bash -n scripts/verify-scx1202-matrix-from-bundle.sh
+          bash -n scripts/verify-scx-1202-evidence.sh
           bash -n scripts/oneclick/category-bakeoff.sh
           bash -n scripts/oneclick/ecgf-bench.sh
           bash -n scripts/oneclick/ecgf-redteam.sh
