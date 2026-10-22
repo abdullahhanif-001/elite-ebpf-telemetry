@@ -12,7 +12,16 @@ Verification protocol — Abdullah Hanif. Start here. This directory contains **
 ## Quick verify (no VPS)
 
 ```bash
+bash scripts/verify-elite-offline.sh
+```
+
+Runs SCX evidence + matrix log cross-check, claim charter, BPF generate, Go tests, eBPF gates, and Layer 3 BPF compile — no sched_ext kernel required.
+
+Evidence-only (faster):
+
+```bash
 bash scripts/verify-scx-1202-evidence.sh
+bash scripts/verify-scx1202-matrix-from-bundle.sh
 ```
 
 Exit 0 = committed evidence bundle passes **strict** static + log cross-checks (`SCX1202_STRICT=1` default).

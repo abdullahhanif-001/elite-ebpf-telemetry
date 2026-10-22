@@ -70,6 +70,21 @@ jobs:
       - name: Verify committed SCX#1202 evidence bundle
         run: bash scripts/verify-scx-1202-evidence.sh
 
+  elite-offline-verify:
+    name: Elite offline verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
+        with:
+          go-version-file: go.mod
+      - name: Install BPF toolchain
+        run: sudo apt-get update && sudo apt-get install -y clang llvm make
+      - name: Full offline verification (no sched_ext VPS)
+        run: bash scripts/verify-elite-offline.sh
+        env:
+          ELITE_OFFLINE: "1"
+
   super-linter:
     runs-on: ubuntu-latest
     steps:
