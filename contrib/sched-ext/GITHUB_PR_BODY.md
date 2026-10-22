@@ -28,7 +28,7 @@ Evidence: [`docs/evidence/scx-1202/`](../../docs/evidence/scx-1202/) — run `ba
 - [ ] Issue #1202 repro `STALL_DETECTED=NO` with `LOADER=bpfland` (not SKIP)
 - [ ] `scx_loader` built and on PATH for G6 soak
 
-**Status:** Development in progress. Previous PR #3780 withdrawn. Issue #1202 remains open until full gate matrix passes on DO VPS (`143.244.164.216`).
+**Status:** Development in progress. Previous PR #3780 withdrawn. Issue #1202 remains open until Layer 3 PR merges upstream.
 
 Reproduce: [`docs/evidence/scx-1202/README.md`](../../docs/evidence/scx-1202/README.md)
 
