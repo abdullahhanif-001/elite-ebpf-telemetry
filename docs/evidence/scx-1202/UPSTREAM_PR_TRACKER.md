@@ -1,15 +1,17 @@
 # SCX#1202 Upstream PR Tracker
 
-**Last updated:** 2026-09-03
+**Last updated:** 2026-09-03  
+**Layer 3 fix:** **READY** — full gates green; reopen upstream PR.
 
 ## Layer 3 — sched-ext/scx (BPF interceptor)
 
 | Field | Value |
 |-------|-------|
-| PR | ~~#3780~~ **CLOSED** (withdrawn for dev — reopen when ready) |
-| Status | **Development in progress** — not ready for maintainer review |
+| PR | [#3780](https://github.com/sched-ext/scx/pull/3780) — **CLOSED (dev pause only)** → **reopen now** |
+| Status | **Ready for maintainer review** — dev complete (`VERIFICATION_20260903-012848`, `status=FULL`) |
 | Fixes | [#1202](https://github.com/sched-ext/scx/issues/1202) |
-| Issue comment | [issuecomment-5489342030](https://github.com/sched-ext/scx/issues/1202#issuecomment-5489342030) |
+| PR body | [`contrib/sched-ext/GITHUB_PR_BODY.md`](../../contrib/sched-ext/GITHUB_PR_BODY.md) |
+| Reopen steps | [`REOPEN_SCX_PR.md`](REOPEN_SCX_PR.md) |
 
 ## Layer 2 — LKML (watchdog patch)
 
@@ -37,8 +39,11 @@
 
 ## Upstream checklist
 
-- [x] Layer 3 PR opened on sched-ext/scx (later withdrawn for dev)
-- [x] Comment on #1202 with evidence links
+- [x] Layer 3 implementation + selftests in repo
+- [x] Full gate matrix 12/12 + flood PASS (committed evidence)
+- [x] Strict static verifier PASS
+- [x] PR #3780 opened (closed temporarily for dev — **reopen**)
+- [ ] PR #3780 **reopened** on sched-ext/scx (maintainer review)
+- [ ] Comment on #1202 with fresh evidence link (after reopen)
 - [ ] LKML email sent (Layer 2)
-- [ ] PR reopened and merged
-- [ ] Issue #1202 closed
+- [ ] PR merged → issue #1202 closed upstream

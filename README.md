@@ -30,7 +30,7 @@ Replace per-pod Istio sidecars and log shippers with a single eBPF DaemonSet (or
 
 **Problem:** RT tasks monopolize CPU → EXT scheduler tasks stall → kernel watchdog ejects the BPF scheduler ([sched-ext/scx#1202](https://github.com/sched-ext/scx/issues/1202)).
 
-**Status:** **Development in progress** — verified on server sched_ext kernel (`REAL_ONLY=1`). Upstream PR withdrawn temporarily while we finish dev (scx_loader, full gate matrix). Issue [#1202](https://github.com/sched-ext/scx/issues/1202) open.
+**Status:** **Fix ready for upstream review** — verified on sched_ext kernel (`REAL_ONLY=1`, FULL evidence bundle `VERIFICATION_20260903-012848`, matrix **12/12**, `STALL_DETECTED=NO`). Layer 3 PR [#3780](https://github.com/sched-ext/scx/pull/3780) was closed only during dev; **[reopen #3780](docs/evidence/scx-1202/REOPEN_SCX_PR.md)** for merge review. Issue [#1202](https://github.com/sched-ext/scx/issues/1202) stays open until upstream merges.
 
 **Solution (verified on real VPS, `REAL_ONLY=1`, no mocks):**
 
@@ -53,7 +53,7 @@ Full published report: **[docs/GLOBAL_EBPF_VERIFICATION_REPORT.md](docs/GLOBAL_E
 Committed evidence (auditor verify): **[docs/evidence/scx-1202/README.md](docs/evidence/scx-1202/README.md)** — no VPS: `bash scripts/verify-elite-offline.sh` · evidence only: `bash scripts/verify-scx-1202-evidence.sh`  
 Upstream PR tracker: **[docs/evidence/scx-1202/UPSTREAM_PR_TRACKER.md](docs/evidence/scx-1202/UPSTREAM_PR_TRACKER.md)**  
 sched_ext evidence pack: **[contrib/sched-ext/EVIDENCE_REPORT.md](contrib/sched-ext/EVIDENCE_REPORT.md)**  
-Upstream PR body (ready): **[contrib/sched-ext/GITHUB_PR_BODY.md](contrib/sched-ext/GITHUB_PR_BODY.md)** — `Fixes sched-ext/scx#1202`
+Upstream PR body (ready): **[contrib/sched-ext/GITHUB_PR_BODY.md](contrib/sched-ext/GITHUB_PR_BODY.md)** — `Fixes sched-ext/scx#1202` · **[Reopen PR #3780](docs/evidence/scx-1202/REOPEN_SCX_PR.md)**
 
 Reproduce on a sched_ext host:
 
