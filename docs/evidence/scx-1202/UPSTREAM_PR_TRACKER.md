@@ -1,6 +1,6 @@
 # SCX#1202 Upstream PR Tracker
 
-**Last updated:** 2026-09-01
+**Last updated:** 2026-09-03
 
 ## Layer 3 — sched-ext/scx (BPF interceptor)
 
@@ -32,15 +32,13 @@
 
 | Field | Value |
 |-------|-------|
-| Bundle | [VERIFICATION_20260901-045612](VERIFICATION_20260901-045612/) |
-| Verifier | `bash scripts/verify-scx-1202-evidence.sh` |
-| Tag | `scx-1202-verified-20260901` |
+| Bundle | [VERIFICATION_20260903-012848](VERIFICATION_20260903-012848/) (`status=FULL`) |
+| Verifier | `bash scripts/verify-scx-1202-evidence.sh` · offline: `bash scripts/verify-elite-offline.sh` |
 
-## Fully solved checklist
+## Upstream checklist
 
-- [x] Layer 3 PR open on sched-ext/scx
+- [x] Layer 3 PR opened on sched-ext/scx (later withdrawn for dev)
 - [x] Comment on #1202 with evidence links
 - [ ] LKML email sent (Layer 2)
-- [ ] PR #3780 merged
+- [ ] PR reopened and merged
 - [ ] Issue #1202 closed
-- [ ] README updated to "resolved upstream"

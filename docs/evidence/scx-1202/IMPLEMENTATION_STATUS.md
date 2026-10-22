@@ -17,7 +17,7 @@
 | Flood P1–P5 + Tier3 | `RT_GUARD_FLOOD_PASS fail=0` |
 | Strict verifier | `SCX1202_EVIDENCE_VERIFY=PASS strict=1` |
 
-**Host:** `ubuntu-s-4vcpu-8gb-nyc1` (143.244.164.216)  
+**Host:** production sched_ext server (sanitized hostname)  
 **Kernel:** `6.19.0-rc7-scx-dl-g9854922412d3-dirty` (`CONFIG_SCHED_CLASS_EXT=y`, `CONFIG_FUNCTION_TRACER=y`, `CONFIG_DEBUG_INFO_BTF=y`)
 
 ## Completed (code in repo)
@@ -29,13 +29,6 @@
 - [x] Evidence capture — [`scripts/server/run-scx-1202-evidence.sh`](../../../scripts/server/run-scx-1202-evidence.sh) writes `status=FULL|PARTIAL` in MANIFEST
 - [x] Strict static verifier — log cross-checks (no verdict/log mismatch)
 - [x] Live re-proof on sched_ext server — `SCX1202_EVIDENCE_VERIFY=PASS`
-
-## Superseded bundles (PARTIAL — do not cite as full proof)
-
-| Bundle | Reason |
-|--------|--------|
-| [`VERIFICATION_20260901-045612`](./VERIFICATION_20260901-045612/) | G4 `LOADER=SKIP`, G6 SKIP, stale flood graft |
-| [`VERIFICATION_20260902-063458`](./VERIFICATION_20260902-063458/) | Matrix 6/12, no ftrace kernel, global D1–D6 missing |
 
 ## Pending (upstream only)
 

@@ -21,7 +21,7 @@
 ## Public evidence (link in email body — do not attach raw VPS logs)
 
 ```text
-Evidence: https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/docs/evidence/scx-1202/VERIFICATION_20260901-045612/01-RT_GUARD_PASS.verdict
+Evidence: https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/docs/evidence/scx-1202/VERIFICATION_20260903-012848/01-RT_GUARD_PASS.verdict
 Verifier: https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/scripts/verify-scx-1202-evidence.sh
 Layer 3 PR: https://github.com/sched-ext/scx/pull/3780
 ```

@@ -28,8 +28,6 @@ Exit 0 = committed evidence bundle passes **strict** static + log cross-checks (
 
 **Current bundle** [`VERIFICATION_20260903-012848`](./VERIFICATION_20260903-012848/) — `status=FULL` in MANIFEST. Strict verifier **PASS**.
 
-Superseded PARTIAL bundles: `VERIFICATION_20260901-045612`, `VERIFICATION_20260902-063458` — do not cite as full proof.
-
 ## Reproduce on sched_ext host
 
 ```bash
@@ -72,5 +70,4 @@ bash benchmarks/sched-ext-gates/rt-guard-flood-aggregate.sh  # → RT_GUARD_FLOO
 - [GLOBAL_EBPF_VERIFICATION_REPORT.md](../GLOBAL_EBPF_VERIFICATION_REPORT.md)
 - [contrib/sched-ext/EVIDENCE_REPORT.md](../../contrib/sched-ext/EVIDENCE_REPORT.md)
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)
-- [GOOGLE_VERIFICATION_BRIEF.md](GOOGLE_VERIFICATION_BRIEF.md)
 - [UPSTREAM_PR_TRACKER.md](UPSTREAM_PR_TRACKER.md)
