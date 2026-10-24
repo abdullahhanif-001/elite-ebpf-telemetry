@@ -16,3 +16,7 @@
 | U12 | Honest Server closed-loop proofs | PARTIALLY_SOLVED | Hygiene (F1) |
 
 See `problems/` for full records.
+
+**Bypass research (not Elite product scope):** live-VM claim rules and smoke gates live in
+[research/BYPASS_CLAIM_CHARTER.md](../../research/BYPASS_CLAIM_CHARTER.md) — run
+`bash scripts/research/run-research-gate.sh` on the repro host (no `ELITE_OFFLINE`).

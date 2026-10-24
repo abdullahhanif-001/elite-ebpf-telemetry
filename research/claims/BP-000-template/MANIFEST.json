@@ -1,0 +1,7 @@
+{
+  "claim_id": "BP-000-template",
+  "status": "template",
+  "track": "verifier",
+  "impact": "HYPOTHESIS",
+  "summary": "Non-passing example layout — copy to BP-001+ for real claims"
+}

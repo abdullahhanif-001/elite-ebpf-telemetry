@@ -30,7 +30,7 @@ Evidence: [`abdullahhanif-001/elite-ebpf-telemetry` `docs/evidence/scx-1202/VERI
 - [x] SCX1202 matrix H1–H12 — `SCX1202_MATRIX_PASS=YES checks=12/12`
 - [x] `RT_GUARD_FLOOD_PASS fail=0`
 
-**Status:** **Fix ready for review.** PR [#3780](https://github.com/sched-ext/scx/pull/3780) was closed temporarily while dev finished (scx_loader + full gate matrix). **Please reopen #3780** for maintainer review — gates are green; this body is current.
+**Status:** **Fix ready for review.** PR [#3780](https://github.com/sched-ext/scx/pull/3780) is **OPEN** — gates green; maintainer Q&A: [`docs/evidence/scx-1202/MAINTAINER_REPLY_3780.md`](https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/docs/evidence/scx-1202/MAINTAINER_REPLY_3780.md).
 
 Reproduce: [`docs/evidence/scx-1202/README.md`](https://github.com/abdullahhanif-001/elite-ebpf-telemetry/blob/main/docs/evidence/scx-1202/README.md)
 
