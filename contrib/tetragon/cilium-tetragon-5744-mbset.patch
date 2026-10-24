@@ -1,5 +1,5 @@
 From d34f4990f3180736198efcdee7352481cc709c5f Mon Sep 17 00:00:00 2001
-From: Cursor Agent <cursoragent@cursor.com>
+From: Abdullah Hanif <318923962+abdullahhanif-001@users.noreply.github.com>
 Date: Fri, 23 Oct 2026 10:00:42 +0000
 Subject: [PATCH] mbset: fix followChildren ID leak on duplicate paths
 
