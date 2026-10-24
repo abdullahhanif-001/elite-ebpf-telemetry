@@ -1,0 +1,6 @@
+{
+  "hostname": "template-do-not-use",
+  "kernel_release": "0.0.0-template",
+  "research_tier": "R0",
+  "note": "Replace with live-preflight output on filing a real claim"
+}
